@@ -2,7 +2,6 @@
 
 Hipóteses da fase de descoberta do projeto de app para frequentadores das praias do Rio de Janeiro (qualidade da água, chuva, maré e areia).
 
-Cada item é uma afirmação testável, a ser confirmada ou refutada por entrevistas e formulário.
 
 ## Existência e intensidade da dor
 
