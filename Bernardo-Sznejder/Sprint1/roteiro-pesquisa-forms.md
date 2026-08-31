@@ -10,8 +10,6 @@ Roteiro de formulário de entrevista (Google Forms)
 
 **Título da pesquisa:** Hábitos e necessidades de frequentadores das praias do Rio de Janeiro
 
-**Pesquisadores:** Bernardo Sznejder, Vitor Rocha, Davi Souza, Lucas Soares
-
 **Instituição:** PUC-Rio
 
 #### Objetivo da pesquisa
