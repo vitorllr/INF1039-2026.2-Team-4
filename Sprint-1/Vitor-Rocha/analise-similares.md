@@ -1,6 +1,6 @@
 # Análise de similares
 
-Levantamento das soluções que hoje informam o carioca sobre condições de praia, com foco em qualidade da água, para situar onde o nosso projeto se diferencia. Foram analisadas quatro ferramentas em uso: dois aplicativos (Beach In Rio e a ferramenta oficial do INEA), um site agregador (Praia Limpa) e um app de nicho adjacente (iScamar, voltado à pesca). A comparação olha não só o que cada uma mostra, mas *como* trata o dado: se apenas o repassa, se o interpreta, e se antecipa condições em vez de descrever o passado.
+Levantamento das soluções que hoje informam o carioca sobre condições de praia, com foco em qualidade da água, para situar onde o nosso projeto se diferencia. Foram analisadas quatro ferramentas em uso: dois aplicativos (Beach In Rio e a ferramenta oficial do INEA), um site agregador (Praia Limpa) e um app de nicho adjacente (iScamar, voltado à pesca). 
 
 ## Beach In Rio
 
@@ -12,7 +12,7 @@ A limitação é que ele para exatamente aí. Reflete o boletim como ele é, sem
 
 É a ferramenta oficial do próprio órgão que produz o dado. Permite consulta com localização por GPS, apontando as praias monitoradas mais próximas e seu status. Por vir da fonte, é a referência de autoridade.
 
-Justamente por ser a face pública do boletim, herda todas as suas características: descreve o presente segundo a última medição, não antecipa nada e não traduz o "próprio/impróprio" em orientação prática. É informação de origem, não interpretação, o que deixa o trabalho de decisão inteiramente com o usuário.
+Justamente por ser a face pública do boletim, herda todas as suas características: descreve o presente segundo a última medição, não antecipa nada e não traduz o "próprio/impróprio" em orientação prática. 
 
 ## Praia Limpa
 
@@ -24,7 +24,7 @@ Projeto pessoal, sem anúncios, mantido de forma independente. Sua força é a c
 
 É o mais sofisticado do conjunto, embora mire outro público: pescadores. Vale analisá-lo menos como concorrente direto e mais como prova de conceito do modelo que queremos construir. O iScamar calcula uma "nota do dia" por ponto, combinando maré, vento, fase da lua e pressão. Ou seja, ele já faz a fusão de múltiplos sinais numa recomendação interpretada, que é o coração da nossa proposta.
 
-Três lições concretas saem dele. Ele declara abertamente suas fontes de dados (vento, tempo e pressão via Open-Meteo; maré por estação harmônica combinada a serviço de terceiros), o que valida a viabilidade técnica do nosso lado. Ele trata a balneabilidade como recurso secundário e, ao fazê-lo, deixa visível o mesmo problema de defasagem, com pontos marcados como "sem dado recente". E ele separa com cuidado a balneabilidade da segurança do pescado, uma nuance que mostra maturidade no trato do dado.
+Três lições concretas saem dele. Ele declara abertamente suas fontes de dados (vento, tempo e pressão via Open-Meteo. Tem maré por estação harmônica combinada a serviço de terceiros), o que valida a viabilidade técnica do nosso lado. Ele trata a balneabilidade como recurso secundário e, ao fazê-lo, deixa visível o mesmo problema de defasagem, com pontos marcados como "sem dado recente". E ele separa com cuidado a balneabilidade da segurança do pescado, uma nuance que mostra maturidade no trato do dado.
 
 O que ele *não* faz abre nosso espaço: a nota é otimizada para prever se o peixe morde, não se a pessoa pode nadar. A lógica é oposta à nossa, e o público também. Não existe o equivalente do iScamar voltado ao banhista.
 
