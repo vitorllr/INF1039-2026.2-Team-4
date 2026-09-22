@@ -1,0 +1,755 @@
+{
+  "fonte": "https://alertadecheias.inea.rj.gov.br/dados.php",
+  "extraido_em": "2026-09-22T13:06:28.094508+00:00",
+  "regioes_consultadas": [
+    "baia_de_guanabara"
+  ],
+  "total_estacoes": 31,
+  "estacoes": [
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Cachoeiras de Macacu",
+      "curso_dagua": "rio Macacu",
+      "nome_estacao": "Japuíba",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 10:00",
+      "nivel_alerta": "VIGILÂNCIA",
+      "nivel_alerta_cor": "#70ad47",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0",
+        "30d": "152.6"
+      },
+      "nivel_rio_m": {
+        "ultimo": "1.31",
+        "15min": "1.31",
+        "30min": "1.31",
+        "45min": "1.31"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Duque de Caxias",
+      "curso_dagua": "rio Saracuruna",
+      "nome_estacao": "Santa Cruz da Serra",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 09:15",
+      "nivel_alerta": "VIGILÂNCIA",
+      "nivel_alerta_cor": "#70ad47",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0.2",
+        "30d": "246.8"
+      },
+      "nivel_rio_m": {
+        "ultimo": "0.85",
+        "15min": "0.85",
+        "30min": "0.85",
+        "45min": "0.85"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Magé",
+      "curso_dagua": "rio Inhomirim",
+      "nome_estacao": "Ponte de Ferro Piabeta",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 09:30",
+      "nivel_alerta": "VIGILÂNCIA",
+      "nivel_alerta_cor": "#70ad47",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0.2",
+        "30d": "255.6"
+      },
+      "nivel_rio_m": {
+        "ultimo": "1.1",
+        "15min": "1.1",
+        "30min": "1.1",
+        "45min": "1.1"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Duque de Caxias",
+      "curso_dagua": "rio Capivari",
+      "nome_estacao": "Ponte de Ferro Capivari",
+      "tendencia_rio": "descendo",
+      "ultima_leitura": "22/09/2026 10:00",
+      "nivel_alerta": "VIGILÂNCIA",
+      "nivel_alerta_cor": "#70ad47",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0.2",
+        "96h": "0.4",
+        "30d": "234.8"
+      },
+      "nivel_rio_m": {
+        "ultimo": "2.11",
+        "15min": "2.12",
+        "30min": "2.11",
+        "45min": "2.12"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "São João de Meriti",
+      "curso_dagua": "rio Pavuna",
+      "nome_estacao": "CET Meriti",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 09:30",
+      "nivel_alerta": "VIGILÂNCIA",
+      "nivel_alerta_cor": "#70ad47",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0.2",
+        "30d": "126.8"
+      },
+      "nivel_rio_m": {
+        "ultimo": "0.07",
+        "15min": "0.07",
+        "30min": "0.07",
+        "45min": "0.07"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Niterói",
+      "curso_dagua": "rio Engenhoca",
+      "nome_estacao": "Niterói / Engenhoca",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 09:45",
+      "nivel_alerta": "VIGILÂNCIA",
+      "nivel_alerta_cor": "#70ad47",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0.4",
+        "30d": "184.2"
+      },
+      "nivel_rio_m": {
+        "ultimo": "0.26",
+        "15min": "0.26",
+        "30min": "0.26",
+        "45min": "0.26"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "São Gonçalo",
+      "curso_dagua": "rio Alcântara",
+      "nome_estacao": "Colubandê-Alcântara",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 09:45",
+      "nivel_alerta": "VIGILÂNCIA",
+      "nivel_alerta_cor": "#70ad47",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0.4",
+        "30d": "164.4"
+      },
+      "nivel_rio_m": {
+        "ultimo": "0.5",
+        "15min": "0.5",
+        "30min": "0.5",
+        "45min": "0.5"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Rio de Janeiro",
+      "curso_dagua": "rio Acari",
+      "nome_estacao": "Acari",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 09:45",
+      "nivel_alerta": "VIGILÂNCIA",
+      "nivel_alerta_cor": "#70ad47",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0",
+        "30d": "128.2"
+      },
+      "nivel_rio_m": {
+        "ultimo": "-",
+        "15min": "-",
+        "30min": "-",
+        "45min": "-"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "São Gonçalo",
+      "curso_dagua": "rio da Aldeia",
+      "nome_estacao": "Ipiíba",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 10:00",
+      "nivel_alerta": "VIGILÂNCIA",
+      "nivel_alerta_cor": "#70ad47",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0",
+        "30d": "0"
+      },
+      "nivel_rio_m": {
+        "ultimo": "1.02",
+        "15min": "1.02",
+        "30min": "1.02",
+        "45min": "1.02"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Rio de Janeiro",
+      "curso_dagua": "rio Maracanã",
+      "nome_estacao": "São Cristóvão",
+      "tendencia_rio": "descendo",
+      "ultima_leitura": "22/09/2026 09:15",
+      "nivel_alerta": "VIGILÂNCIA",
+      "nivel_alerta_cor": "#70ad47",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0",
+        "30d": "160.6"
+      },
+      "nivel_rio_m": {
+        "ultimo": "0.15",
+        "15min": "0.16",
+        "30min": "0.14",
+        "45min": "0.13"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Niterói",
+      "curso_dagua": "-",
+      "nome_estacao": "Niterói / BPRV",
+      "tendencia_rio": null,
+      "ultima_leitura": "22/09/2026 10:00",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0.4",
+        "30d": "164.6"
+      },
+      "nivel_rio_m": {
+        "ultimo": "-",
+        "15min": "-",
+        "30min": "-",
+        "45min": "-"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Cachoeiras de Macacu",
+      "curso_dagua": "rio Macacu",
+      "nome_estacao": "Cachoeiras de Macacu",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 09:45",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0.2",
+        "30d": "306.2"
+      },
+      "nivel_rio_m": {
+        "ultimo": "0.8",
+        "15min": "0.8",
+        "30min": "0.8",
+        "45min": "0.8"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Magé",
+      "curso_dagua": "-",
+      "nome_estacao": "Andorinhas",
+      "tendencia_rio": null,
+      "ultima_leitura": "22/09/2026 10:00",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0",
+        "30d": "4.2"
+      },
+      "nivel_rio_m": {
+        "ultimo": "-",
+        "15min": "-",
+        "30min": "-",
+        "45min": "-"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Rio de Janeiro",
+      "curso_dagua": "-",
+      "nome_estacao": "Realengo",
+      "tendencia_rio": null,
+      "ultima_leitura": "22/09/2026 10:00",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0",
+        "30d": "53.2"
+      },
+      "nivel_rio_m": {
+        "ultimo": "-",
+        "15min": "-",
+        "30min": "-",
+        "45min": "-"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Magé",
+      "curso_dagua": "-",
+      "nome_estacao": "Raiz da Serra",
+      "tendencia_rio": null,
+      "ultima_leitura": "22/09/2026 10:00",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0.8",
+        "96h": "1.2",
+        "30d": "228.8"
+      },
+      "nivel_rio_m": {
+        "ultimo": "-",
+        "15min": "-",
+        "30min": "-",
+        "45min": "-"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Duque de Caxias",
+      "curso_dagua": "-",
+      "nome_estacao": "Xerém - Mantiquira",
+      "tendencia_rio": null,
+      "ultima_leitura": "22/09/2026 10:00",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0.2",
+        "30d": "228.2"
+      },
+      "nivel_rio_m": {
+        "ultimo": "-",
+        "15min": "-",
+        "30min": "-",
+        "45min": "-"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Tanguá",
+      "curso_dagua": "rio Tanguá",
+      "nome_estacao": "BR-101",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 09:45",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0",
+        "30d": "212.6"
+      },
+      "nivel_rio_m": {
+        "ultimo": "1.56",
+        "15min": "1.56",
+        "30min": "1.56",
+        "45min": "1.56"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Tanguá",
+      "curso_dagua": "rio Duques",
+      "nome_estacao": "Duques",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 10:00",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0",
+        "30d": "216.4"
+      },
+      "nivel_rio_m": {
+        "ultimo": "0.53",
+        "15min": "0.53",
+        "30min": "0.53",
+        "45min": "0.53"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Tanguá",
+      "curso_dagua": "-",
+      "nome_estacao": "Haras MZC",
+      "tendencia_rio": null,
+      "ultima_leitura": "22/09/2026 09:45",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0",
+        "30d": "197"
+      },
+      "nivel_rio_m": {
+        "ultimo": "-",
+        "15min": "-",
+        "30min": "-",
+        "45min": "-"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Tanguá",
+      "curso_dagua": "rio Iguá",
+      "nome_estacao": "Haras Vitória",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 10:00",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0",
+        "30d": "140.2"
+      },
+      "nivel_rio_m": {
+        "ultimo": "0.83",
+        "15min": "0.83",
+        "30min": "0.83",
+        "45min": "0.83"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "São Gonçalo",
+      "curso_dagua": "-",
+      "nome_estacao": "Largo da Ideia",
+      "tendencia_rio": null,
+      "ultima_leitura": "22/09/2026 10:00",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0",
+        "30d": "168.8"
+      },
+      "nivel_rio_m": {
+        "ultimo": "-",
+        "15min": "-",
+        "30min": "-",
+        "45min": "-"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Rio de Janeiro",
+      "curso_dagua": "-",
+      "nome_estacao": "Eletrobrás",
+      "tendencia_rio": null,
+      "ultima_leitura": "22/09/2026 09:30",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0.2",
+        "96h": "0.6",
+        "30d": "165.8"
+      },
+      "nivel_rio_m": {
+        "ultimo": "-",
+        "15min": "-",
+        "30min": "-",
+        "45min": "-"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Rio de Janeiro",
+      "curso_dagua": "-",
+      "nome_estacao": "Campo Grande",
+      "tendencia_rio": null,
+      "ultima_leitura": "22/09/2026 10:00",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0.4",
+        "1h": "0.4",
+        "4h": "0.4",
+        "24h": "0.4",
+        "96h": "1.4",
+        "30d": "160.2"
+      },
+      "nivel_rio_m": {
+        "ultimo": "-",
+        "15min": "-",
+        "30min": "-",
+        "45min": "-"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Cachoeiras de Macacu",
+      "curso_dagua": "rio Tatu",
+      "nome_estacao": "Tatu",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 09:15",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "1.4",
+        "30d": "202.4"
+      },
+      "nivel_rio_m": {
+        "ultimo": "0.5",
+        "15min": "0.5",
+        "30min": "0.5",
+        "45min": "0.5"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Cachoeiras de Macacu",
+      "curso_dagua": "Soarinho",
+      "nome_estacao": "Soarinho",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 09:15",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "2",
+        "30d": "215.4"
+      },
+      "nivel_rio_m": {
+        "ultimo": "0.8",
+        "15min": "0.8",
+        "30min": "0.8",
+        "45min": "0.8"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Itaboraí",
+      "curso_dagua": "rio Macacu",
+      "nome_estacao": "Barragem da CEDAE",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 09:15",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0",
+        "30d": "177.8"
+      },
+      "nivel_rio_m": {
+        "ultimo": "2.76",
+        "15min": "2.76",
+        "30min": "2.76",
+        "45min": "2.76"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Cachoeiras de Macacu",
+      "curso_dagua": "rio Guapiaçu",
+      "nome_estacao": "Duas Barras",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 08:45",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0.6",
+        "30d": "381.6"
+      },
+      "nivel_rio_m": {
+        "ultimo": "1.15",
+        "15min": "1.15",
+        "30min": "1.15",
+        "45min": "1.15"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Guapimirim",
+      "curso_dagua": "rio Iconha",
+      "nome_estacao": "Orindí",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 07:15",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0",
+        "30d": "151.6"
+      },
+      "nivel_rio_m": {
+        "ultimo": "1.7",
+        "15min": "1.7",
+        "30min": "1.7",
+        "45min": "1.7"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Guapimirim",
+      "curso_dagua": "Guapimirim",
+      "nome_estacao": "Guapimirim",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 08:00",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0.6",
+        "30d": "205.4"
+      },
+      "nivel_rio_m": {
+        "ultimo": "-",
+        "15min": "-",
+        "30min": "-",
+        "45min": "-"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Cachoeiras de Macacu",
+      "curso_dagua": "rio Guapiaçu",
+      "nome_estacao": "Quizanga",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "12/09/2026 12:00",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0",
+        "30d": "163.6"
+      },
+      "nivel_rio_m": {
+        "ultimo": "1.6",
+        "15min": "1.6",
+        "30min": "1.6",
+        "45min": "1.6"
+      }
+    },
+    {
+      "regiao_hidrografica": "RH V Baia de Guanabara",
+      "municipio": "Rio de Janeiro",
+      "curso_dagua": "rio Tijuca",
+      "nome_estacao": "Capela Mayrink",
+      "tendencia_rio": "estavel",
+      "ultima_leitura": "22/09/2026 08:00",
+      "nivel_alerta": "Rede básica",
+      "nivel_alerta_cor": "#999999",
+      "chuva_acumulada_mm": {
+        "ultimo": "0",
+        "1h": "0",
+        "4h": "0",
+        "24h": "0",
+        "96h": "0",
+        "30d": "257.6"
+      },
+      "nivel_rio_m": {
+        "ultimo": "0.34",
+        "15min": "0.34",
+        "30min": "0.34",
+        "45min": "0.34"
+      }
+    }
+  ],
+  "erros": []
+}
