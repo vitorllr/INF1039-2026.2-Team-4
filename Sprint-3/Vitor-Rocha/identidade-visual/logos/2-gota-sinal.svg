@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <title>BlueTide - conceito Gota-Sinal</title>
+  <defs>
+    <clipPath id="drop-clip">
+      <path d="M100,18 C140,78 172,120 172,153 A72,72 0 1 1 28,153 C28,120 60,78 100,18 Z"/>
+    </clipPath>
+  </defs>
+  <rect width="200" height="200" fill="#F5F9FA"/>
+  <g clip-path="url(#drop-clip)">
+    <rect x="20" y="18" width="160" height="60" fill="#1E8A5F"/>
+    <rect x="20" y="78" width="160" height="60" fill="#C97A1E"/>
+    <rect x="20" y="138" width="160" height="87" fill="#B23A2E"/>
+  </g>
+  <path d="M100,18 C140,78 172,120 172,153 A72,72 0 1 1 28,153 C28,120 60,78 100,18 Z"
+        fill="none" stroke="#0B3C5D" stroke-width="5"/>
+</svg>
