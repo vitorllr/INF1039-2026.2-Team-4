@@ -1,212 +1,120 @@
 #!/usr/bin/env python3
-"""PoC parser for INEA's public flood alert bulletin (Sistema de Alerta de Cheias).
+"""PoC parser for INEA's public beach-water-quality bulletin (balneabilidade).
 
-Fetches the per-region station tables published at
-https://alertadecheias.inea.rj.gov.br/dados/<regiao>.php and extracts them
-into structured JSON: municipality, watercourse, station name, river trend,
-last reading timestamp, alert level, accumulated rainfall and river level
-readings.
+INEA's own page (https://www.inea.rj.gov.br/ar-agua-e-solo/balneabilidade-das-praias/)
+publishes the current statewide bulletin only as a weekly PDF whose per-point
+status is drawn as colored markers on map images, not as extractable text
+(see README.md). The same classification INEA publishes for Niteroi's beaches
+is also exposed as structured JSON through Niteroi's public GIS portal, in a
+layer named "Boletins de Balneabilidade - INEA". This script queries that
+ArcGIS FeatureServer and extracts one record per monitoring point: beach
+name, municipality, status (propria/impropria) and bulletin date.
 
-See README.md in this folder for source details and caveats.
+See README.md in this folder for source details and caveats (this covers
+Niteroi only, and the feed has not been updated since 2023).
 """
 
 import argparse
 import json
-import re
-import sys
-import urllib.request
-import urllib.error
 import ssl
+import sys
+import urllib.error
+import urllib.parse
+import urllib.request
 from datetime import datetime, timezone
-from html.parser import HTMLParser
 
-BASE_URL = "https://alertadecheias.inea.rj.gov.br"
+LAYER_URL = (
+    "https://geo.niteroi.rj.gov.br/arcgis/rest/services/"
+    "Aplicacoes/AplicacaoINEA/FeatureServer/0/query"
+)
+MUNICIPIO = "Niteroi"
 
-# The 9 hydrographic regions ("regioes hidrograficas") INEA publishes data for,
-# as listed on https://alertadecheias.inea.rj.gov.br/dados.php
-REGIONS = {
-    "medio_paraiba_do_sul": "RH III Medio Paraiba do Sul",
-    "guandu": "RH II Guandu",
-    "baia_da_ilha_grande": "RH I Baia da Ilha Grande",
-    "piabanha": "RH IV Piabanha",
-    "baia_de_guanabara": "RH V Baia de Guanabara",
-    "lagos_sao_joao": "RH VI Lagos Sao Joao",
-    "baixo_paraiba_do_sul_e_itabapoana": "RH IX Baixo Paraiba do Sul e Itabapoana",
-    "macae_e_das_ostras": "RH VIII Macae e das Ostras",
-    "rio_dois_rios": "RH VII Rio Dois Rios",
-}
+FIELDS = [
+    "praia",
+    "codigo_ponto",
+    "localizacao",
+    "ultima_data_atualizacao",
+    "ultimo_status",
+]
 
-# INEA's TLS chain for this host does not include the intermediate CA, so
-# strict verification fails locally ("unable to verify the first certificate").
-# See README.md caveats for details. We fall back to an unverified context
-# rather than silently failing.
+# This host's TLS chain does not include the intermediate CA, so strict
+# verification fails locally ("unable to verify the first certificate").
+# See README.md caveats. We fall back to an unverified context rather than
+# silently failing.
 _SSL_CONTEXT = ssl.create_default_context()
 _SSL_CONTEXT.check_hostname = False
 _SSL_CONTEXT.verify_mode = ssl.CERT_NONE
 
+_STATUS_MAP = {
+    "Própria": "propria",
+    "Propria": "propria",
+    "Imprópria": "impropria",
+    "Impropria": "impropria",
+}
 
-def fetch(url: str, timeout: int = 20) -> str:
+
+def fetch_points(timeout: int = 20) -> list[dict]:
+    query = {
+        "where": "1=1",
+        "outFields": ",".join(FIELDS),
+        "returnDistinctValues": "true",
+        "returnGeometry": "false",
+        "f": "json",
+    }
+    url = f"{LAYER_URL}?{urllib.parse.urlencode(query)}"
     req = urllib.request.Request(url, headers={"User-Agent": "BlueTide-PoC/1.0"})
     with urllib.request.urlopen(req, timeout=timeout, context=_SSL_CONTEXT) as resp:
-        raw = resp.read()
-    # The page's <meta charset> tags are contradictory (both utf-8 and
-    # windows-1252 are declared), but the actual bytes served are UTF-8.
-    return raw.decode("utf-8", errors="replace")
+        payload = json.loads(resp.read().decode("utf-8"))
+
+    if "error" in payload:
+        raise RuntimeError(f"ArcGIS error: {payload['error']}")
+
+    return [f["attributes"] for f in payload.get("features", [])]
 
 
-class _TableParser(HTMLParser):
-    """Minimal HTML table extractor: walks <table id="Table"> row by row."""
-
-    def __init__(self):
-        super().__init__(convert_charrefs=True)
-        self.in_target_table = False
-        self.table_depth = 0
-        self.in_row = False
-        self.in_cell = False
-        self.current_cell_text = []
-        self.current_cell_attrs = {}
-        self.current_row = []
-        self.rows = []
-
-    def handle_starttag(self, tag, attrs):
-        attrs = dict(attrs)
-        if tag == "table":
-            if attrs.get("id") == "Table":
-                self.in_target_table = True
-                self.table_depth = 1
-            elif self.in_target_table:
-                self.table_depth += 1
-        if not self.in_target_table:
-            return
-        if tag == "tr":
-            self.in_row = True
-            self.current_row = []
-        elif tag in ("td", "th") and self.in_row:
-            self.in_cell = True
-            self.current_cell_text = []
-            self.current_cell_attrs = attrs
-        elif tag == "img" and self.in_cell:
-            # Trend/status icons carry their meaning in the filename, e.g.
-            # imagens/estavel.png, imagens/subindo.png, imagens/descendo.png
-            src = attrs.get("src", "")
-            self.current_cell_text.append(f"__IMG__:{src}")
-
-    def handle_endtag(self, tag):
-        if not self.in_target_table:
-            return
-        if tag == "table":
-            self.table_depth -= 1
-            if self.table_depth <= 0:
-                self.in_target_table = False
-        elif tag in ("td", "th") and self.in_cell:
-            self.in_cell = False
-            text = "".join(self.current_cell_text).strip()
-            self.current_row.append(
-                {
-                    "text": text,
-                    "style": self.current_cell_attrs.get("style", ""),
-                }
-            )
-        elif tag == "tr" and self.in_row:
-            self.in_row = False
-            if self.current_row:
-                self.rows.append(self.current_row)
-
-    def handle_data(self, data):
-        if self.in_cell:
-            self.current_cell_text.append(data)
+def _epoch_ms_to_date(value) -> str | None:
+    if value is None:
+        return None
+    return datetime.fromtimestamp(value / 1000, tz=timezone.utc).date().isoformat()
 
 
-def _cell_alert_color(style: str) -> str | None:
-    match = re.search(r"background-color:\s*([^;]+)", style)
-    return match.group(1).strip() if match else None
-
-
-def _cell_trend(text: str) -> str | None:
-    match = re.search(r"__IMG__:.*?/(\w+)\.png", text)
-    return match.group(1) if match else None
-
-
-def parse_region_html(html: str, region_slug: str) -> list[dict]:
-    parser = _TableParser()
-    parser.feed(html)
-
-    stations = []
-    for row in parser.rows:
-        cells = [c["text"] for c in row]
-        # Header rows repeat the column titles; skip anything that isn't a
-        # real 17-column data row (the table has a fixed column count).
-        if len(cells) < 17:
-            continue
-        if cells[0] in ("Municipio", "Município", ""):
-            continue
-
-        trend = _cell_trend(cells[3])
-        alert_color = _cell_alert_color(row[5]["style"])
-
-        stations.append(
+def parse_points(raw_points: list[dict]) -> list[dict]:
+    pontos = []
+    for attrs in raw_points:
+        status_raw = attrs.get("ultimo_status")
+        pontos.append(
             {
-                "regiao_hidrografica": REGIONS.get(region_slug, region_slug),
-                "municipio": cells[0],
-                "curso_dagua": cells[1],
-                "nome_estacao": cells[2],
-                "tendencia_rio": trend,
-                "ultima_leitura": cells[4],
-                "nivel_alerta": cells[5],
-                "nivel_alerta_cor": alert_color,
-                "chuva_acumulada_mm": {
-                    "ultimo": cells[6],
-                    "1h": cells[7],
-                    "4h": cells[8],
-                    "24h": cells[9],
-                    "96h": cells[10],
-                    "30d": cells[11],
-                },
-                "nivel_rio_m": {
-                    "ultimo": cells[12],
-                    "15min": cells[13],
-                    "30min": cells[14],
-                    "45min": cells[15],
-                },
+                "praia": attrs.get("praia"),
+                "municipio": MUNICIPIO,
+                "codigo_ponto": attrs.get("codigo_ponto"),
+                "localizacao": attrs.get("localizacao"),
+                "status": _STATUS_MAP.get(status_raw, status_raw),
+                "data_publicacao_boletim": _epoch_ms_to_date(
+                    attrs.get("ultima_data_atualizacao")
+                ),
             }
         )
-    return stations
-
-
-def fetch_and_parse_region(region_slug: str) -> list[dict]:
-    url = f"{BASE_URL}/dados/{region_slug}.php"
-    html = fetch(url)
-    return parse_region_html(html, region_slug)
+    pontos.sort(key=lambda p: (p["praia"] or "", p["codigo_ponto"] or ""))
+    return pontos
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument(
-        "--region",
-        choices=sorted(REGIONS) + ["all"],
-        default="baia_de_guanabara",
-        help="Which hydrographic region to fetch (default: baia_de_guanabara, "
-        "which covers the city of Rio de Janeiro and Baixada Fluminense).",
-    )
     ap.add_argument("--out", default="-", help="Output file path, or - for stdout")
     args = ap.parse_args()
 
-    slugs = list(REGIONS) if args.region == "all" else [args.region]
-
-    all_stations = []
     errors = []
-    for slug in slugs:
-        try:
-            all_stations.extend(fetch_and_parse_region(slug))
-        except (urllib.error.URLError, TimeoutError) as exc:
-            errors.append({"regiao": slug, "erro": str(exc)})
+    pontos = []
+    try:
+        pontos = parse_points(fetch_points())
+    except (urllib.error.URLError, TimeoutError, RuntimeError) as exc:
+        errors.append({"erro": str(exc)})
 
     output = {
-        "fonte": f"{BASE_URL}/dados.php",
+        "fonte": LAYER_URL,
         "extraido_em": datetime.now(timezone.utc).isoformat(),
-        "regioes_consultadas": slugs,
-        "total_estacoes": len(all_stations),
-        "estacoes": all_stations,
+        "total_pontos": len(pontos),
+        "pontos": pontos,
         "erros": errors,
     }
 
