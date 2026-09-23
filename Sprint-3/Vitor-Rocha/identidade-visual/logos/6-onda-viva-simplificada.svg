@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Onda Viva simplificada">
-  <title>BlueTide - conceito Onda-Viva-Simplificada</title>
-  <rect x="0" y="0" width="200" height="200" rx="28" fill="#BFE3EA"/>
-  <circle cx="128" cy="66" r="34" fill="#1C7C93"/>
-  <path d="M30 108 C55 88, 75 88, 100 108 C120 124, 140 88, 172 100" fill="none" stroke="#0B3C5D" stroke-width="11" stroke-linecap="round"/>
-  <path d="M22 136 C50 112, 72 112, 100 136 C124 156, 148 112, 178 128" fill="none" stroke="#0A1F2B" stroke-width="11" stroke-linecap="round"/>
-</svg>
