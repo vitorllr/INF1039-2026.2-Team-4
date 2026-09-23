@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <title>BlueTide - conceito Onda-Viva</title>
+  <rect width="200" height="200" rx="28" fill="#BFE3EA"/>
+  <circle cx="128" cy="72" r="46" fill="#1C7C93"/>
+  <path d="M40,100 C48,88 56,88 64,100 M64,100 C72,88 80,88 88,100"
+        fill="none" stroke="#0B3C5D" stroke-width="6" stroke-linecap="round"/>
+  <path d="M60,150 C58,120 82,100 100,100 C120,100 128,80 116,64
+           C108,72 106,85 119,92 C140,102 146,126 120,141 C104,150 84,155 60,150 Z"
+        fill="#0B3C5D"/>
+  <path d="M20,158 C42,138 62,138 85,158 C105,176 128,138 158,150"
+        fill="none" stroke="#0B3C5D" stroke-width="8" stroke-linecap="round"/>
+  <path d="M18,174 C40,156 60,156 82,174 C102,190 124,156 156,166"
+        fill="none" stroke="#0B3C5D" stroke-width="6" stroke-linecap="round" opacity="0.6"/>
+</svg>
