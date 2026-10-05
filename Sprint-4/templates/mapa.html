@@ -29,7 +29,17 @@
     </div>
 
     <script>
-        const mapa = L.map('mapa').setView([-22.985, -43.205], 15);
+        const mapa = L.map('mapa', {
+        center: [-22.975, -43.205],
+        zoom: 13,
+        zoomControl: false,
+        dragging: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        touchZoom: false,
+        boxZoom: false,
+        keyboard: false
+    });
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors',
