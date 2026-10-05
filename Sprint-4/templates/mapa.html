@@ -13,14 +13,13 @@
             position: relative;
             width: 100%;
             max-width: 480px;
-            height: 100vh;
-            max-height: 750px;
+            height: 751px;
             margin: 0 auto;
             overflow: hidden;
             background: white;
         }
 
-        #mapa { width: 100%; height: 100%; }
+        #mapa { width: 100%; height: 50%; }
     </style>
 </head>
 <body>
@@ -30,16 +29,17 @@
 
     <script>
         const mapa = L.map('mapa', {
-        center: [-22.975, -43.205],
-        zoom: 13,
-        zoomControl: false,
-        dragging: false,
-        scrollWheelZoom: false,
-        doubleClickZoom: false,
-        touchZoom: false,
-        boxZoom: false,
-        keyboard: false
-    });
+            center: [-22.975, -43.200],
+            zoom: 13.7,
+            zoomSnap: 0.5,
+            zoomControl: false,
+            dragging: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            touchZoom: false,
+            boxZoom: false,
+            keyboard: false
+        });
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors',
