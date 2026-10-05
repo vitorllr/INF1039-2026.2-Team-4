@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa do BlueTide</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body { margin: 0; background: #f1f5f6; }
+
+        #app {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            max-height: 750px;
+            margin: 0 auto;
+            overflow: hidden;
+            background: white;
+        }
+
+        #mapa { width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="mapa"></div>
+    </div>
+
+    <script>
+        const mapa = L.map('mapa').setView([-22.985, -43.205], 15);
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(mapa);
+    </script>
+</body>
+</html>
