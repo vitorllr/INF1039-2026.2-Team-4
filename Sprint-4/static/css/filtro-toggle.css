@@ -1,0 +1,12 @@
+body {
+    font-family: "Inter", system-ui, sans-serif;
+}
+
+.btn-primary {
+    background-color: #1c3550;
+
+}
+
+.form-range::-webkit-slider-thumb {
+    background-color: #1c3550;
+}
