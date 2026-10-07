@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pesquisa de praias</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="../static/css/pesquisa.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+
+    <div class="container col-8 py-2">
+        <header class="d-flex justify-content-between align-items-center py-4 border-bottom">
+            <h1 class="h3 fw-bold m-0">Pesquisa</h1>
+            <div
+                class="avatar rounded-circle bg-dark text-white d-flex align-items-center justify-content-center fw-semibold small">
+                MC</div>
+        </header>
+
+        <div class="d-flex gap-3 mt-4">
+            <div class="input-group input-group-lg flex-grow-1">
+                <span class="input-group-text bg-white border-2 border-info-subtle border-end-0 rounded-start-4 ps-4">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round">
+                        <circle cx="11" cy="11" r="7" />
+                        <path d="M20 20l-4-4" />
+                    </svg>
+                </span>
+                <input id="busca"
+                    class="form-control border-2 border-info-subtle border-start-0 rounded-end-4 ps-0 fs-6"
+                    placeholder="Praia, posto ou bairro">
+            </div>
+            <a href="filtro-toggle.html" class="btn btn-outline-dark btn-filtro border-2 rounded-4 px-3"
+                aria-label="Filtros">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" class="mt-2">
+                    <path d="M4 7h7M17 7h3M4 17h3M13 17h7" />
+                    <circle cx="14" cy="7" r="2.5" />
+                    <circle cx="10" cy="17" r="2.5" />
+                </svg>
+            </a>
+        </div>
+
+        <p id="contador" class="text-secondary mt-3 mb-3"></p>
+
+        <div id="lista" class="d-flex flex-column gap-3 overflow-auto" style="height: 600px;"></div>
+    </div>
+</body>
+
+</html>
+
+<script>
+    const praias = [
+        { nome: "Botafogo", local: "Enseada", cidade: "Rio de Janeiro", estado: "RJ", bairro: "Botafogo", condicao: "Impropria", nota: 8.5, distancia: 1.1, andando: "7 min", lotacao: "10%", imagem: "img/copacabana.jpg", ondas: 0.2 },
+        { nome: "Copacabana", local: "Posto 5", cidade: "Rio de Janeiro", estado: "RJ", bairro: "Copacabana", condicao: "Atencao", nota: 4.2, distancia: 3.5, andando: "5 min", lotacao: "50%", imagem: "img/copacabana.jpg", ondas: 0.5 },
+        { nome: "Copacabana", local: "Posto 4", cidade: "Rio de Janeiro", estado: "RJ", bairro: "Copacabana", condicao: "Propria", nota: 9.1, distancia: 0.5, andando: "4 min", lotacao: "90%", imagem: "img/copacabana.jpg", ondas: 0.3 },
+        { nome: "Copacabana", local: "Posto 6", cidade: "Rio de Janeiro", estado: "RJ", bairro: "Copacabana", condicao: "Impropria", nota: 2.8, distancia: 1.3, andando: "6 min", lotacao: "10%", imagem: "img/copacabana.jpg", ondas: 1.7 },
+        { nome: "Copacabana", local: "Posto 2", cidade: "Rio de Janeiro", estado: "RJ", bairro: "Copacabana", condicao: "Propria", nota: 6.7, distancia: 4.7, andando: "9 min", lotacao: "20%", imagem: "img/copacabana.jpg", ondas: 2.0 },
+    ];
+
+    const lista = document.getElementById("lista");
+    const busca = document.getElementById("busca");
+    const contador = document.getElementById("contador");
+
+    const ICONE_CHECK = `<svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg>`;
+    const ICONE_CHECK_PEQUENO = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg>`;
+    const ICONE_X = `<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.6"/><path d="M5.8 5.8l4.4 4.4M10.2 5.8l-4.4 4.4" stroke-linecap="round"/></svg>`;
+    const ICONE_ALERTA = `<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.6"/><path d="M8 4.8v4" stroke-linecap="round"/><circle cx="8" cy="11.2" r="0.6" fill="currentColor"/></svg>`;
+
+    const condicoes = {
+        Propria: { rotulo: "Própria", classe: "bg-success-subtle text-success-emphasis", icone: ICONE_CHECK_PEQUENO },
+        Impropria: { rotulo: "Imprópria", classe: "bg-danger-subtle text-danger-emphasis", icone: ICONE_X },
+        Atencao: { rotulo: "Atenção", classe: "bg-warning-subtle text-warning-emphasis", icone: ICONE_ALERTA },
+    };
+
+    const numero = (valor, casas) => valor.toLocaleString("pt-BR", { minimumFractionDigits: casas, maximumFractionDigits: casas });
+
+    function render(items) {
+        contador.textContent = `${items.length} postos encontrados • toque em ✓ para comparar (até 3)`;
+        lista.innerHTML = items.map(p => {
+            const condicao = condicoes[p.condicao];
+            return `
+    <article class="card border-0 rounded-5 shadow-sm">
+      <div class="card-body d-flex align-items-center justify-content-between gap-3 p-4">
+        <div class="min-w-0">
+          <h2 class="h5 fw-semibold mb-1">${p.nome} • ${p.local}</h2>
+          <p class="text-secondary mb-2">${p.bairro} • ${numero(p.distancia, 1)} km • ~${p.andando} • lotação ${p.lotacao} • ondas ${numero(p.ondas, 1)} m</p>
+          <span class="badge rounded-pill d-inline-flex align-items-center gap-1 fs-6 fw-semibold py-2 px-3 ${condicao.classe}">${condicao.icone}${condicao.rotulo}</span>
+        </div>
+        <div class="check-circulo flex-shrink-0 rounded-circle border border-2 border-info-subtle text-dark d-flex align-items-center justify-content-center">${ICONE_CHECK}</div>
+      </div>
+    </article>`;
+        }).join("");
+    }
+
+    busca.addEventListener("input", e => {
+        const termo = e.target.value.toLowerCase();
+        render(praias.filter(p =>
+            p.nome.toLowerCase().includes(termo) ||
+            p.local.toLowerCase().includes(termo) ||
+            p.bairro.toLowerCase().includes(termo) ||
+            p.cidade.toLowerCase().includes(termo)
+        ));
+    });
+
+    render(praias);
+</script>
