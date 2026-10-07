@@ -4,47 +4,432 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapa do BlueTide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        body { margin: 0; background: #f1f5f6; }
+        :root {
+            --fundo: #ece8df;
+            --papel: #faf8f3;
+            --tinta: #1d3b5c;
+            --texto: #2b2f33;
+            --suave: #8a8f94;
+            --linha: #e2ddd2;
+            --propria: #43875f;
+            --atencao: #c07f36;
+            --impropria: #a64332;
+            --sem-dados: #9aa0a6;
+            --raio: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: var(--fundo);
+            font-family: 'Open Sans', sans-serif;
+            color: var(--texto);
+        }
 
         #app {
             position: relative;
+            display: flex;
+            flex-direction: column;
             width: 100%;
             max-width: 480px;
-            height: 751px;
+            height: 100vh;
+            max-height: 751px;
             margin: 0 auto;
             overflow: hidden;
-            background: white;
+            background: var(--papel);
         }
 
-        #mapa { width: 100%; height: 50%; }
+        #mapa {
+            width: 100%;
+            height: 44%;
+            flex-shrink: 0;
+        }
+
+        .leaflet-tile-pane {
+            filter: grayscale(1) contrast(0.85) brightness(1.08);
+        }
+
+        .leaflet-control-attribution {
+            font-size: 9px;
+        }
+
+        .topo {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            z-index: 1000;
+            display: flex;
+            gap: 8px;
+        }
+
+        .busca {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 48px;
+            padding: 0 16px;
+            background: var(--papel);
+            border-radius: var(--raio);
+            box-shadow: 0 2px 10px rgba(29, 59, 92, 0.12);
+        }
+
+        .busca img {
+            width: 18px;
+        }
+
+        .busca span {
+            font-size: 14px;
+            color: var(--suave);
+        }
+
+        .botao-topo {
+            position: relative;
+            display: grid;
+            place-items: center;
+            width: 48px;
+            height: 48px;
+            background: var(--papel);
+            border-radius: var(--raio);
+            box-shadow: 0 2px 10px rgba(29, 59, 92, 0.12);
+        }
+
+        .botao-topo img {
+            width: 24px;
+        }
+
+        .ponto-alerta {
+            position: absolute;
+            top: 11px;
+            right: 12px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--impropria);
+            border: 2px solid var(--papel);
+        }
+
+        .boletim {
+            position: absolute;
+            top: 76px;
+            left: 16px;
+            z-index: 1000;
+            display: flex;
+            gap: 6px;
+        }
+
+        .boletim span {
+            padding: 6px 12px;
+            background: var(--tinta);
+            color: var(--papel);
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+        }
+
+        .painel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 18px 24px 16px;
+            overflow: hidden;
+        }
+
+        .legenda {
+            display: flex;
+            gap: 16px;
+            padding-bottom: 14px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--linha);
+            font-size: 12px;
+            color: var(--suave);
+        }
+
+        .legenda span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legenda span::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .legenda .propria::before { background: var(--propria); }
+        .legenda .atencao::before { background: var(--atencao); }
+        .legenda .impropria::before { background: var(--impropria); }
+        .legenda .sem-dados::before { background: var(--sem-dados); }
+
+        .cabecalho {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .local {
+            margin: 0;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--suave);
+        }
+
+        .nome {
+            margin: 2px 0 0;
+            font-size: 36px;
+            font-weight: 300;
+            line-height: 1.1;
+            color: var(--tinta);
+        }
+
+        .favorito img {
+            width: 28px;
+        }
+
+        .situacao {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 14px 0 16px;
+            margin-left: -7px;
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--propria);
+        }
+
+        .situacao img {
+            width: 22px;
+        }
+
+        .dados {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-top: 1px solid var(--linha);
+            border-bottom: 1px solid var(--linha);
+        }
+
+        .dado {
+            padding: 12px 0;
+        }
+
+        .dado + .dado {
+            padding-left: 16px;
+            border-left: 1px solid var(--linha);
+        }
+
+        .dado small {
+            display: block;
+            font-size: 11px;
+            color: var(--suave);
+        }
+
+        .dado strong {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--texto);
+        }
+
+        .historico {
+            margin-top: 14px;
+        }
+
+        .historico small {
+            font-size: 11px;
+            color: var(--suave);
+        }
+
+        .barras {
+            display: flex;
+            gap: 4px;
+            margin-top: 8px;
+        }
+
+        .barras span {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+        }
+
+        .barras .propria { background: var(--propria); }
+        .barras .atencao { background: var(--atencao); }
+        .barras .impropria { background: var(--impropria); }
+        .barras .sem-dados { background: var(--sem-dados); }
+
+        .menu {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0 14px;
+            border-top: 1px solid var(--linha);
+            background: var(--papel);
+        }
+
+        .item-menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            width: 72px;
+            font-size: 12px;
+            color: var(--suave);
+            opacity: 0.6;
+        }
+
+        .item-menu img {
+            width: 26px;
+            height: 26px;
+            object-fit: contain;
+        }
+
+        .item-menu.ativo {
+            color: var(--tinta);
+            font-weight: 600;
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
     <div id="app">
         <div id="mapa"></div>
+
+        <header class="topo">
+            <div class="busca">
+                <img src="imagens/icone-busca.png" alt="">
+                <span>Buscar praia, posto ou bairro</span>
+            </div>
+            <div class="botao-topo">
+                <img src="imagens/icone-filtros.png" alt="">
+            </div>
+            <div class="botao-topo">
+                <img src="imagens/icone-notificacoes.png" alt="">
+                <span class="ponto-alerta"></span>
+            </div>
+        </header>
+
+        <div class="boletim">
+            <span>Boletim INEA</span>
+            <span>Hoje, 08:30</span>
+        </div>
+
+        <section class="painel">
+            <div class="legenda">
+                <span class="propria">Própria</span>
+                <span class="atencao">Atenção</span>
+                <span class="impropria">Imprópria</span>
+                <span class="sem-dados">Sem dados</span>
+            </div>
+
+            <div class="cabecalho">
+                <div>
+                    <p class="local">Posto 11</p>
+                    <h1 class="nome">Leblon</h1>
+                </div>
+                <div class="favorito">
+                    <img src="imagens/icone-favoritos.png" alt="">
+                </div>
+            </div>
+
+            <div class="situacao">
+                <img src="imagens/marcador-verde.png" alt="">
+                Própria para banho
+            </div>
+
+            <div class="dados">
+                <div class="dado">
+                    <small>Última coleta</small>
+                    <strong>Ontem, 10:30</strong>
+                </div>
+                <div class="dado">
+                    <small>Enterococos</small>
+                    <strong>48 NMP/100 ml</strong>
+                </div>
+            </div>
+
+            <div class="historico">
+                <small>Últimos 7 boletins</small>
+                <div class="barras">
+                    <span class="propria"></span>
+                    <span class="propria"></span>
+                    <span class="atencao"></span>
+                    <span class="propria"></span>
+                    <span class="impropria"></span>
+                    <span class="propria"></span>
+                    <span class="propria"></span>
+                </div>
+            </div>
+        </section>
+
+        <nav class="menu">
+            <div class="item-menu ativo">
+                <img src="imagens/icone-local.png" alt="">
+                Mapa
+            </div>
+            <div class="item-menu">
+                <img src="imagens/icone-busca.png" alt="">
+                Pesquisa
+            </div>
+            <div class="item-menu">
+                <img src="imagens/icone-favoritos.png" alt="">
+                Favoritos
+            </div>
+            <div class="item-menu">
+                <img src="imagens/icone-usuario.png" alt="">
+                Perfil
+            </div>
+        </nav>
     </div>
 
     <script>
         const mapa = L.map('mapa', {
-            center: [-22.975, -43.200],
-            zoom: 13.7,
+            center: [-22.982, -43.205],
+            zoom: 13.5,
             zoomSnap: 0.5,
-            zoomControl: false,
-            dragging: false,
-            scrollWheelZoom: false,
-            doubleClickZoom: false,
-            touchZoom: false,
-            boxZoom: false,
-            keyboard: false
         });
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors',
             maxZoom: 19
         }).addTo(mapa);
+
+        function criarIcone(arquivo, tamanho) {
+            return L.icon({
+                iconUrl: 'imagens/' + arquivo,
+                iconSize: [tamanho, tamanho],
+                iconAnchor: [tamanho / 2, tamanho / 2]
+            });
+        }
+
+        const praias = [
+            { coordenadas: [-22.9880, -43.2290], icone: 'marcador-verde.png', tamanho: 30 },
+            { coordenadas: [-22.9872, -43.2215], icone: 'marcador-verde-grande.png', tamanho: 42 },
+            { coordenadas: [-22.9866, -43.2120], icone: 'marcador-verde.png', tamanho: 30 },
+            { coordenadas: [-22.9860, -43.2040], icone: 'marcador-verde.png', tamanho: 30 },
+            { coordenadas: [-22.9855, -43.1975], icone: 'marcador-vermelho.png', tamanho: 30 },
+            { coordenadas: [-22.9890, -43.1925], icone: 'marcador-verde.png', tamanho: 30 },
+            { coordenadas: [-22.9855, -43.1880], icone: 'marcador-verde.png', tamanho: 30 },
+            { coordenadas: [-22.9790, -43.1880], icone: 'marcador-laranja.png', tamanho: 30 },
+            { coordenadas: [-22.9720, -43.1830], icone: 'marcador-cinza.png', tamanho: 34 }
+        ];
+
+        praias.forEach(function (praia) {
+            L.marker(praia.coordenadas, { icon: criarIcone(praia.icone, praia.tamanho), interactive: false })
+                .addTo(mapa);
+        });
     </script>
 </body>
 </html>
