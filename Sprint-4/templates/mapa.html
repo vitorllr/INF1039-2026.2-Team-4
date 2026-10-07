@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa do BlueTide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="../static/css/mapa.css">
+</head>
+<body>
+    <div id="app">
+        <div id="mapa"></div>
+
+        <header class="topo">
+            <div class="busca">
+                <img src="imagens/icone-busca.png" alt="">
+                <span>Buscar praia, posto ou bairro</span>
+            </div>
+            <div class="botao-topo">
+                <img src="imagens/icone-filtros.png" alt="">
+            </div>
+            <div class="botao-topo">
+                <img src="imagens/icone-notificacoes.png" alt="">
+                <span class="ponto-alerta"></span>
+            </div>
+        </header>
+
+        <div class="boletim">
+            <span>Boletim INEA</span>
+            <span>Hoje, 08:30</span>
+        </div>
+
+        <section class="painel">
+            <div class="legenda">
+                <span class="propria">Própria</span>
+                <span class="atencao">Atenção</span>
+                <span class="impropria">Imprópria</span>
+                <span class="sem-dados">Sem dados</span>
+            </div>
+
+            <div class="cabecalho">
+                <div>
+                    <p class="local">Posto 11</p>
+                    <h1 class="nome">Leblon</h1>
+                </div>
+                <div class="favorito">
+                    <img src="imagens/icone-favoritos.png" alt="">
+                </div>
+            </div>
+
+            <div class="situacao">
+                <img src="imagens/marcador-verde.png" alt="">
+                Própria para banho
+            </div>
+
+            <div class="dados">
+                <div class="dado">
+                    <small>Última coleta</small>
+                    <strong>Ontem, 10:30</strong>
+                </div>
+                <div class="dado">
+                    <small>Enterococos</small>
+                    <strong>48 NMP/100 ml</strong>
+                </div>
+            </div>
+
+            <div class="historico">
+                <small>Últimos 7 boletins</small>
+                <div class="barras">
+                    <span class="propria"></span>
+                    <span class="propria"></span>
+                    <span class="atencao"></span>
+                    <span class="propria"></span>
+                    <span class="impropria"></span>
+                    <span class="propria"></span>
+                    <span class="propria"></span>
+                </div>
+            </div>
+        </section>
+
+        <nav class="menu">
+            <div class="item-menu ativo">
+                <img src="imagens/icone-local.png" alt="">
+                Mapa
+            </div>
+            <div class="item-menu">
+                <img src="imagens/icone-busca.png" alt="">
+                Pesquisa
+            </div>
+            <div class="item-menu">
+                <img src="imagens/icone-favoritos.png" alt="">
+                Favoritos
+            </div>
+            <div class="item-menu">
+                <img src="imagens/icone-usuario.png" alt="">
+                Perfil
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        const mapa = L.map('mapa', {
+            center: [-22.982, -43.205],
+            zoom: 13.5,
+            zoomSnap: 0.5,
+        });
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(mapa);
+
+        function criarIcone(arquivo, tamanho) {
+            return L.icon({
+                iconUrl: 'imagens/' + arquivo,
+                iconSize: [tamanho, tamanho],
+                iconAnchor: [tamanho / 2, tamanho / 2]
+            });
+        }
+
+        const praias = [
+            { coordenadas: [-22.9880, -43.2290], icone: 'marcador-verde.png', tamanho: 30 },
+            { coordenadas: [-22.9872, -43.2215], icone: 'marcador-verde-grande.png', tamanho: 42 },
+            { coordenadas: [-22.9866, -43.2120], icone: 'marcador-verde.png', tamanho: 30 },
+            { coordenadas: [-22.9860, -43.2040], icone: 'marcador-verde.png', tamanho: 30 },
+            { coordenadas: [-22.9855, -43.1975], icone: 'marcador-vermelho.png', tamanho: 30 },
+            { coordenadas: [-22.9890, -43.1925], icone: 'marcador-verde.png', tamanho: 30 },
+            { coordenadas: [-22.9855, -43.1880], icone: 'marcador-verde.png', tamanho: 30 },
+            { coordenadas: [-22.9790, -43.1880], icone: 'marcador-laranja.png', tamanho: 30 },
+            { coordenadas: [-22.9720, -43.1830], icone: 'marcador-cinza.png', tamanho: 34 }
+        ];
+
+        praias.forEach(function (praia) {
+            L.marker(praia.coordenadas, { icon: criarIcone(praia.icone, praia.tamanho), interactive: false })
+                .addTo(mapa);
+        });
+    </script>
+</body>
+</html>
