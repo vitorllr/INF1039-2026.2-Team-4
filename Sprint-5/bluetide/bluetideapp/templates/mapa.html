@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <link rel="stylesheet" href="{% static 'core/css/mapa.css' %}">
+    <link rel="stylesheet" href="{% static 'css/mapa.css' %}">
 </head>
 <body>
     <div id="app">
@@ -18,14 +18,14 @@
 
         <header class="topo">
             <div class="busca">
-                <img src="{% static 'core/imagens/icone-busca.png' %}" alt="">
+                <img src="{% static 'imagens/icone-busca.png' %}" alt="">
                 <span>Buscar praia, posto ou bairro</span>
             </div>
             <div class="botao-topo">
-                <img src="{% static 'core/imagens/icone-filtros.png' %}" alt="">
+                <img src="{% static 'imagens/icone-filtros.png' %}" alt="">
             </div>
             <div class="botao-topo">
-                <img src="{% static 'core/imagens/icone-notificacoes.png' %}" alt="">
+                <img src="{% static 'imagens/icone-notificacoes.png' %}" alt="">
                 <span class="ponto-alerta"></span>
             </div>
         </header>
@@ -49,12 +49,12 @@
                     <h1 class="nome">Leblon</h1>
                 </div>
                 <div class="favorito">
-                    <img src="{% static 'core/imagens/icone-favoritos.png' %}" alt="">
+                    <img src="{% static 'imagens/icone-favoritos.png' %}" alt="">
                 </div>
             </div>
 
             <div class="situacao">
-                <img src="{% static 'core/imagens/marcador-verde.png' %}" alt="">
+                <img src="{% static 'imagens/marcador-verde.png' %}" alt="">
                 Própria para banho
             </div>
 
@@ -85,19 +85,19 @@
 
         <nav class="menu">
             <div class="item-menu ativo">
-                <img src="{% static 'core/imagens/icone-local.png' %}" alt="">
+                <img src="{% static 'imagens/icone-local.png' %}" alt="">
                 Mapa
             </div>
             <div class="item-menu">
-                <img src="{% static 'core/imagens/icone-busca.png' %}" alt="">
+                <img src="{% static 'imagens/icone-busca.png' %}" alt="">
                 Pesquisa
             </div>
             <div class="item-menu">
-                <img src="{% static 'core/imagens/icone-favoritos.png' %}" alt="">
+                <img src="{% static 'imagens/icone-favoritos.png' %}" alt="">
                 Favoritos
             </div>
             <div class="item-menu">
-                <img src="{% static 'core/imagens/icone-usuario.png' %}" alt="">
+                <img src="{% static 'imagens/icone-usuario.png' %}" alt="">
                 Perfil
             </div>
         </nav>
@@ -117,7 +117,7 @@
 
         function criarIcone(arquivo, tamanho) {
             return L.icon({
-                iconUrl: '{% static 'core/imagens/' %}' + arquivo,
+                iconUrl: staticImagens + arquivo,
                 iconSize: [tamanho, tamanho],
                 iconAnchor: [tamanho / 2, tamanho / 2]
             });
