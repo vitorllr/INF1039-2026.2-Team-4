@@ -1,0 +1,21 @@
+body {
+    font-family: "Inter", system-ui, sans-serif;
+}
+
+.avatar {
+    width: 44px;
+    height: 44px;
+}
+
+.check-circulo {
+    width: 56px;
+    height: 56px;
+}
+
+.min-w-0 {
+    min-width: 0;
+}
+
+.btn-filtro {
+    height: 56px;
+}
