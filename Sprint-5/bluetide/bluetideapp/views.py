@@ -7,3 +7,7 @@ def home(request):
 
 def pesquisa(request):
     return render(request, "pesquisa.html")
+
+
+def mapa_web(request):
+    return render(request, "mapa-web.html")

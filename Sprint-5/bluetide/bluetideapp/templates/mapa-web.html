@@ -1,0 +1,190 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa do BlueTide</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="{% static 'css/mapa-web.css' %}">
+</head>
+
+<body>
+    <div class="app d-flex">
+        <div class="sidemenu-wrap flex-shrink-0">
+            <nav class="sidemenu offcanvas-lg offcanvas-start" tabindex="-1" id="sidemenu"
+                aria-label="Menu principal">
+                <div class="offcanvas-header">
+                    <span class="sidemenu-marca">BlueTide</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidemenu"
+                        aria-label="Fechar menu"></button>
+                </div>
+                <div class="offcanvas-body d-flex flex-column p-3">
+                    <a href="#" class="sidemenu-marca d-none d-lg-block text-decoration-none px-3 py-3 mb-3">BlueTide</a>
+                    <ul class="nav nav-pills flex-column gap-1">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link d-flex align-items-center gap-3 active" aria-current="page">
+                                <img src="{% static 'imagens/icone-local.png' %}" alt="">
+                                Mapa
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link d-flex align-items-center gap-3">
+                                <img src="{% static 'imagens/icone-busca.png' %}" alt="">
+                                Pesquisa
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link d-flex align-items-center gap-3">
+                                <img src="{% static 'imagens/icone-favoritos.png' %}" alt="">
+                                Favoritos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link d-flex align-items-center gap-3">
+                                <img src="{% static 'imagens/icone-usuario.png' %}" alt="">
+                                Perfil
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+
+        <main class="flex-grow-1 d-flex flex-column flex-xl-row min-w-0">
+            <div class="mapa-area position-relative min-w-0">
+                <div id="mapa" class="w-100 h-100"></div>
+
+                <header class="topo position-absolute top-0 start-0 end-0 d-flex gap-2 p-3">
+                    <button type="button" class="botao-topo btn p-0 d-lg-none" data-bs-toggle="offcanvas"
+                        data-bs-target="#sidemenu" aria-controls="sidemenu" aria-label="Abrir menu">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round">
+                            <path d="M4 7h16M4 12h16M4 17h16" />
+                        </svg>
+                    </button>
+                    <div class="busca flex-grow-1 d-flex align-items-center gap-2 px-3 min-w-0">
+                        <img src="{% static 'imagens/icone-busca.png' %}" alt="" width="18">
+                        <span class="text-truncate">Buscar praia, posto ou bairro</span>
+                    </div>
+                    <button type="button" class="botao-topo btn p-0 d-grid place-items-center" aria-label="Filtros">
+                        <img src="{% static 'imagens/icone-filtros.png' %}" alt="" width="24">
+                    </button>
+                    <button type="button" class="botao-topo btn p-0 d-grid place-items-center position-relative"
+                        aria-label="Notificações">
+                        <img src="{% static 'imagens/icone-notificacoes.png' %}" alt="" width="24">
+                        <span class="ponto-alerta position-absolute"></span>
+                    </button>
+                </header>
+
+                <div class="boletim position-absolute d-flex gap-2">
+                    <span>Boletim INEA</span>
+                    <span>Hoje, 08:30</span>
+                </div>
+            </div>
+
+            <aside class="painel flex-shrink-0 p-4 overflow-auto">
+                <div class="legenda d-flex flex-wrap gap-3 pb-3 mb-3">
+                    <span class="propria">Própria</span>
+                    <span class="atencao">Atenção</span>
+                    <span class="impropria">Imprópria</span>
+                    <span class="sem-dados">Sem dados</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="local m-0">Posto 11</p>
+                        <h1 class="nome m-0">Leblon</h1>
+                    </div>
+                    <button type="button" class="btn p-0" aria-label="Favoritar">
+                        <img src="{% static 'imagens/icone-favoritos.png' %}" alt="" width="28">
+                    </button>
+                </div>
+
+                <div class="situacao d-flex align-items-center gap-2 my-3">
+                    <img src="{% static 'imagens/marcador-verde.png' %}" alt="" width="22">
+                    Própria para banho
+                </div>
+
+                <div class="dados row g-0">
+                    <div class="dado col-6">
+                        <small class="d-block">Última coleta</small>
+                        <strong>Ontem, 10:30</strong>
+                    </div>
+                    <div class="dado col-6 ps-3">
+                        <small class="d-block">Enterococos</small>
+                        <strong>48 NMP/100 ml</strong>
+                    </div>
+                </div>
+
+                <div class="historico mt-3">
+                    <small>Últimos 7 boletins</small>
+                    <div class="barras d-flex gap-1 mt-2">
+                        <span class="propria"></span>
+                        <span class="propria"></span>
+                        <span class="atencao"></span>
+                        <span class="propria"></span>
+                        <span class="impropria"></span>
+                        <span class="propria"></span>
+                        <span class="propria"></span>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+    <script>
+        const staticImagens = "{% static 'imagens/' %}";
+
+        const mapa = L.map('mapa', {
+            center: [-22.982, -43.205],
+            zoom: 13.5,
+            zoomSnap: 0.5,
+            zoomControl: false,
+        });
+        L.control.zoom({ position: 'bottomright' }).addTo(mapa);
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19,
+            referrerPolicy: 'strict-origin-when-cross-origin'
+        }).addTo(mapa);
+
+        function criarIcone(arquivo, tamanho) {
+            return L.icon({
+                iconUrl: staticImagens + arquivo,
+                iconSize: [tamanho, tamanho],
+                iconAnchor: [tamanho / 2, tamanho / 2]
+            });
+        }
+
+        const praias = [
+            { coordenadas: [-22.9880, -43.2290], icone: 'marcador-verde.png', tamanho: 30 },
+            { coordenadas: [-22.9872, -43.2215], icone: 'marcador-verde-grande.png', tamanho: 42 },
+            { coordenadas: [-22.9866, -43.2120], icone: 'marcador-verde.png', tamanho: 30 },
+            { coordenadas: [-22.9860, -43.2040], icone: 'marcador-verde.png', tamanho: 30 },
+            { coordenadas: [-22.9855, -43.1975], icone: 'marcador-vermelho.png', tamanho: 30 },
+            { coordenadas: [-22.9890, -43.1925], icone: 'marcador-verde.png', tamanho: 30 },
+            { coordenadas: [-22.9855, -43.1880], icone: 'marcador-verde.png', tamanho: 30 },
+            { coordenadas: [-22.9790, -43.1880], icone: 'marcador-laranja.png', tamanho: 30 },
+            { coordenadas: [-22.9720, -43.1830], icone: 'marcador-cinza.png', tamanho: 34 }
+        ];
+
+        praias.forEach(function (praia) {
+            L.marker(praia.coordenadas, { icon: criarIcone(praia.icone, praia.tamanho), interactive: false })
+                .addTo(mapa);
+        });
+    </script>
+</body>
+
+</html>
