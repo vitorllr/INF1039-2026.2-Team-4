@@ -16,17 +16,17 @@
         <div id="mapa"></div>
 
         <header class="topo">
-            <div class="busca">
+            <button type="button" class="busca">
                 <img src="imagens/icone-busca.png" alt="">
                 <span>Buscar praia, posto ou bairro</span>
-            </div>
-            <div class="botao-topo">
+            </button>
+            <button type="button" class="botao-topo">
                 <img src="imagens/icone-filtros.png" alt="">
-            </div>
-            <div class="botao-topo">
+            </button>
+            <button type="button" class="botao-topo">
                 <img src="imagens/icone-notificacoes.png" alt="">
                 <span class="ponto-alerta"></span>
-            </div>
+            </button>
         </header>
 
         <div class="boletim">
@@ -47,9 +47,9 @@
                     <p class="local">Posto 11</p>
                     <h1 class="nome">Leblon</h1>
                 </div>
-                <div class="favorito">
+                <button type="button" class="favorito">
                     <img src="imagens/icone-favoritos.png" alt="">
-                </div>
+                </button>
             </div>
 
             <div class="situacao">
@@ -83,22 +83,22 @@
         </section>
 
         <nav class="menu">
-            <div class="item-menu ativo">
+            <button type="button" class="item-menu ativo">
                 <img src="imagens/icone-local.png" alt="">
                 Mapa
-            </div>
-            <div class="item-menu">
+            </button>
+            <button type="button" class="item-menu">
                 <img src="imagens/icone-busca.png" alt="">
                 Pesquisa
-            </div>
-            <div class="item-menu">
+            </button>
+            <button type="button" class="item-menu">
                 <img src="imagens/icone-favoritos.png" alt="">
                 Favoritos
-            </div>
-            <div class="item-menu">
+            </button>
+            <button type="button" class="item-menu">
                 <img src="imagens/icone-usuario.png" alt="">
                 Perfil
-            </div>
+            </button>
         </nav>
     </div>
 
@@ -107,7 +107,10 @@
             center: [-22.982, -43.205],
             zoom: 13.5,
             zoomSnap: 0.5,
+            zoomControl: false
         });
+
+        L.control.zoom({ position: 'bottomright' }).addTo(mapa);
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors',
