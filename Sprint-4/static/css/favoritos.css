@@ -1,0 +1,133 @@
+/* cores e letras do app */
+body {
+    font-family: "Inter", sans-serif;
+    color: #0A1F2B;
+    background-color: #E7EEF1;
+}
+
+h1,
+h2,
+h3 {
+    font-family: "Sora", sans-serif;
+    color: #0B3C5D;
+}
+
+a {
+    color: #1C7C93;
+    text-decoration: none;
+}
+
+/* a tela do celular no meio da pagina */
+.celular {
+    width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background-color: #F5F9FA;
+    box-shadow: 0 0 40px #c7d2d8;
+}
+
+.topo h1 {
+    font-size: 22px;
+}
+
+.avatar {
+    width: 42px;
+    height: 42px;
+    background-color: #0B3C5D;
+    color: #FFFFFF;
+    font-size: 14px;
+}
+
+/* os cartoes brancos */
+.cartao {
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: 0 2px 8px #e2e8ec;
+}
+
+.rotulo {
+    font-size: 11px;
+    font-weight: 600;
+    color: #5A6B74;
+}
+
+.cartao-praia h2 {
+    font-size: 17px;
+}
+
+.info {
+    font-size: 13px;
+    color: #5A6B74;
+}
+
+/* o coracao de favorito */
+.botao-coracao {
+    background-color: transparent;
+    border: none;
+    color: #B23A2E;
+}
+
+/* os selos de status */
+.selo {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+}
+
+.selo-verde {
+    background-color: #E3F3EC;
+    color: #1E8A5F;
+}
+
+.selo-amarelo {
+    background-color: #F6ECDD;
+    color: #C97A1E;
+}
+
+.selo-vermelho {
+    background-color: #F6E5E2;
+    color: #B23A2E;
+}
+
+/* a barrinha de condicao */
+.segmento {
+    height: 7px;
+    border-radius: 4px;
+}
+
+.segmento-verde {
+    background-color: #1E8A5F;
+}
+
+.segmento-vermelho {
+    background-color: #B23A2E;
+}
+
+.segmento-claro {
+    background-color: #CFE6EC;
+}
+
+/* o menu de baixo */
+.menu {
+    background-color: #F5F9FA;
+    border-top: 1px solid #DCE7EB;
+}
+
+.item-menu {
+    color: #0B3C5D;
+    font-size: 12px;
+}
+
+.ativo {
+    color: #1C7C93;
+}
+
+.badge-nav {
+    background-color: #1C7C93;
+    color: #FFFFFF;
+    border-radius: 20px;
+    font-size: 11px;
+    padding: 1px 6px;
+}
