@@ -26,5 +26,7 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("pesquisa/", views.pesquisa, name="pesquisa"),
     path("web/", views.mapa_web, name="mapa_web"),
+    path("perfil/", views.perfil, name="perfil"),
+    path("favoritos/", views.favoritos, name="favoritos"),
 
 ]
