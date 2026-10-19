@@ -11,3 +11,11 @@ def pesquisa(request):
 
 def mapa_web(request):
     return render(request, "mapa-web.html")
+
+
+def perfil(request):
+    return render(request, "perfil.html")
+
+
+def favoritos(request):
+    return render(request, "favoritos.html")
