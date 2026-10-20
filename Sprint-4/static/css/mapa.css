@@ -41,13 +41,14 @@
         }
 
         #app {
+            
             position: relative;
             display: flex;
             flex-direction: column;
             width: 100%;
-            max-width: 480px;
+
             height: 100vh;
-            max-height: 751px;
+            height: 100dvh;
             margin: 0 auto;
             overflow: hidden;
             background: var(--papel);
@@ -79,6 +80,7 @@
 
         .busca {
             flex: 1;
+            min-width: 0;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -94,6 +96,9 @@
         }
 
         .busca span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
             font-size: 14px;
             color: var(--suave);
         }
@@ -102,6 +107,7 @@
             position: relative;
             display: grid;
             place-items: center;
+            flex-shrink: 0;
             width: 48px;
             height: 48px;
             background: var(--papel);
@@ -147,13 +153,14 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 18px 24px 16px;
+            padding: 18px 20px 16px;
             overflow-y: auto;
         }
 
         .legenda {
             display: flex;
-            gap: 16px;
+            flex-wrap: wrap;
+            gap: 8px 16px;
             padding-bottom: 14px;
             margin-bottom: 16px;
             border-bottom: 1px solid var(--linha);
@@ -196,7 +203,7 @@
 
         .nome {
             margin: 2px 0 0;
-            font-size: 36px;
+            font-size: 32px;
             font-weight: 300;
             line-height: 1.1;
             color: var(--tinta);
@@ -304,4 +311,54 @@
             color: var(--tinta);
             font-weight: 600;
             opacity: 1;
+        }
+
+        /* NOVO: tablet, coluna centralizada de 640px com mapa maior */
+        @media (min-width: 768px) {
+            #app {
+                max-width: 640px;
+            }
+
+            #mapa {
+                height: 50%;
+            }
+
+            .painel {
+                padding: 24px 32px 20px;
+            }
+
+            .nome {
+                font-size: 36px;
+            }
+        }
+
+        /* NOVO: computador, painel à esquerda e mapa grande à direita */
+        @media (min-width: 1024px) {
+            #app {
+                display: grid;
+                grid-template-columns: 400px 1fr;
+                grid-template-rows: minmax(0, 1fr) auto;
+                max-width: 1200px;
+            }
+
+            #mapa {
+                grid-column: 2;
+                grid-row: 1 / 3;
+                height: 100%;
+            }
+
+            .painel {
+                grid-column: 1;
+                grid-row: 1;
+            }
+
+            .menu {
+                grid-column: 1;
+                grid-row: 2;
+            }
+
+            .topo,
+            .boletim {
+                left: 416px;
+            }
         }
