@@ -2,14 +2,48 @@ body {
     font-family: "Inter", system-ui, sans-serif;
 }
 
+.pagina-pesquisa {
+    width: 100%;
+}
+ 
+/* pra tablet */
+@media (min-width: 768px) {
+    .pagina-pesquisa {
+        width: 85%;
+    }
+}
+ 
+/* pra computador*/
+@media (min-width: 1024px) {
+    .pagina-pesquisa {
+        width: 66.66%;
+    }
+}
+
 .avatar {
     width: 44px;
     height: 44px;
 }
 
+/* volta a 44px no tablet e computador */
+@media (min-width: 768px) {
+    .avatar {
+        width: 44px;
+        height: 44px;
+    }
+}
+
 .check-circulo {
     width: 56px;
     height: 56px;
+}
+
+/* volta a 56px no tablet e computador */
+@media (min-width: 768px) {
+    .check-circulo {
+        width: 56px;
+        height: 56px;
+    }
 }
 
 .min-w-0 {
@@ -18,4 +52,23 @@ body {
 
 .btn-filtro {
     height: 56px;
+}
+
+/* volta a 56px no tablet e computador */
+@media (min-width: 768px) {
+    .btn-filtro {
+        height: 56px;
+    }
+}
+ 
+/* altura da lista no celular */
+.lista-praias {
+    height: 60vh;
+}
+ 
+/* altura fixa no computador */
+@media (min-width: 1024px) {
+    .lista-praias {
+        height: 600px;
+    }
 }
