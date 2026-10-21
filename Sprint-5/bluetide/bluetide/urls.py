@@ -30,5 +30,4 @@ urlpatterns = [
     path("favoritos/", views.favoritos, name="favoritos"),
     path("faq/", views.duvidas, name="duvidas"),
     path("alertas/", views.alertas, name="alertas")
-
 ]
