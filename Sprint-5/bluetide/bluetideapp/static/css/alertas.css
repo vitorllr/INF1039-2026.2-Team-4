@@ -1,0 +1,92 @@
+body {
+    font-family: "Inter", sans-serif;
+    color: #0A1F2B;
+    background-color: #E7EEF1;
+}
+
+h1,h2,h3 {
+    font-family: "Sora", sans-serif;
+    color: #0B3C5D;
+}
+
+a {
+    color: #1C7C93;
+    text-decoration: none;
+}
+
+.celular {
+    width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background-color: #F5F9FA;
+    box-shadow: 0 0 40px #c7d2d8;
+}
+
+.topo h1 {
+    font-size: 22px;
+}
+
+.seta {
+    color: #0B3C5D;
+}
+
+.avatar {
+    width: 42px;
+    height: 42px;
+    background-color: #0B3C5D;
+    color: #FFFFFF;
+    font-size: 14px;
+}
+
+.titulo-secao {
+    font-size: 20px;
+}
+
+.cartao {
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: 0 2px 8px #e2e8ec;
+}
+
+.nome-alerta {
+    font-size: 17px;
+}
+
+.info {
+    font-size: 13px;
+    color: #5A6B74;
+}
+
+.interruptor {
+    width: 52px;
+    height: 30px;
+    border-radius: 20px;
+    background-color: #CFE6EC;
+    padding: 3px;
+}
+
+.interruptor.ligado {
+    background-color: #0B3C5D;
+}
+
+.bolinha {
+    width: 24px;
+    height: 24px;
+    border-radius: 20px;
+    background-color: #FFFFFF;
+}
+
+.link-lidas {
+    font-size: 14px;
+}
+
+.cartao-historico {
+    border-left: 4px solid #1C7C93;
+}
+
+.texto-historico {
+    font-size: 15px;
+    color: #0A1F2B;
+}
+
