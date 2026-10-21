@@ -1,5 +1,6 @@
-/* cores e letras do app */
+
 body {
+
     font-family: "Inter", sans-serif;
     color: #0A1F2B;
     background-color: #E7EEF1;
@@ -17,11 +18,13 @@ a {
     text-decoration: none;
 }
 
-/* a tela do celular no meio da pagina */
+
 .celular {
-    width: 420px;
+    width: 100%;
+    max-width: 420px;
     margin: 0 auto;
     min-height: 100vh;
+    min-height: 100dvh;
     background-color: #F5F9FA;
     box-shadow: 0 0 40px #c7d2d8;
 }
@@ -30,7 +33,7 @@ a {
     font-size: 22px;
 }
 
-/* os avatares com as iniciais */
+
 .avatar {
     width: 42px;
     height: 42px;
@@ -47,12 +50,13 @@ a {
     font-size: 18px;
 }
 
-/* os cartoes brancos */
+
 .cartao {
     background-color: #FFFFFF;
     border-radius: 16px;
     padding: 16px 18px;
     box-shadow: 0 2px 8px #e2e8ec;
+    min-width: 0;
 }
 
 .nome {
@@ -60,11 +64,13 @@ a {
     font-weight: 700;
     color: #0B3C5D;
     font-size: 17px;
+    overflow-wrap: anywhere;
 }
 
 .info {
     font-size: 13px;
     color: #5A6B74;
+    overflow-wrap: anywhere;
 }
 
 .rotulo {
@@ -73,17 +79,18 @@ a {
     color: #5A6B74;
 }
 
-/* linha com divisoria dentro do cartao */
+
 .linha-sep {
     border-bottom: 1px solid #eef2f4;
 }
 
-/* o botao de ligar/desligar (so visual) */
+
 .toggle {
     width: 48px;
     height: 26px;
     border-radius: 20px;
     padding: 3px;
+    flex-shrink: 0;
 }
 
 .toggle-on {
@@ -101,7 +108,7 @@ a {
     background-color: #FFFFFF;
 }
 
-/* as opcoes de como ir a praia */
+
 .opcao {
     border: 1px solid #CFE6EC;
     border-radius: 12px;
@@ -116,7 +123,7 @@ a {
     color: #FFFFFF;
 }
 
-/* os icones das listas */
+
 .icone-azul {
     color: #1C7C93;
 }
@@ -125,7 +132,7 @@ a {
     color: #9BB0B8;
 }
 
-/* o botao de sair */
+
 .botao-sair {
     border: 1px solid #B23A2E;
     border-radius: 14px;
@@ -139,10 +146,11 @@ a {
     color: #5A6B74;
 }
 
-/* o menu de baixo */
+
 .menu {
     background-color: #F5F9FA;
     border-top: 1px solid #DCE7EB;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
 }
 
 .item-menu {
@@ -160,4 +168,44 @@ a {
     border-radius: 20px;
     font-size: 11px;
     padding: 1px 6px;
+}
+
+@media (max-width: 380px) {
+    .topo h1 {
+        font-size: 20px;
+    }
+
+    .cartao {
+        padding: 14px;
+    }
+
+    .opcao {
+        padding: 10px 6px;
+        font-size: 14px;
+    }
+
+    .nome {
+        font-size: 16px;
+    }
+
+    .menu {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .celular {
+        box-shadow: none;
+    }
+}
+
+@media (min-width: 768px) {
+    .celular {
+        max-width: 480px;
+    }
+
+    .topo h1 {
+        font-size: 26px;
+    }
 }
