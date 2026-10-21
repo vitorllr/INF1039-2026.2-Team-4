@@ -21,4 +21,7 @@ def favoritos(request):
     return render(request, "favoritos.html")
 
 def duvidas(request):
-    return render(request,"duvidas_frequentes.html")
+    return render(request, "duvidas_frequentes.html")
+
+def alertas(request):
+    return render(request, "alertas.html")
