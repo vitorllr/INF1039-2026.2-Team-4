@@ -1,13 +1,10 @@
-/* cores e letras do app */
 body {
     font-family: "Inter", sans-serif;
     color: #0A1F2B;
     background-color: #E7EEF1;
 }
 
-h1,
-h2,
-h3 {
+h1,h2,h3 {
     font-family: "Sora", sans-serif;
     color: #0B3C5D;
 }
@@ -17,7 +14,6 @@ a {
     text-decoration: none;
 }
 
-/* a tela do celular no meio da pagina */
 .celular {
     width: 420px;
     margin: 0 auto;
@@ -30,7 +26,6 @@ a {
     font-size: 22px;
 }
 
-/* os avatares com as iniciais */
 .avatar {
     width: 42px;
     height: 42px;
@@ -47,7 +42,6 @@ a {
     font-size: 18px;
 }
 
-/* os cartoes brancos */
 .cartao {
     background-color: #FFFFFF;
     border-radius: 16px;
@@ -73,12 +67,10 @@ a {
     color: #5A6B74;
 }
 
-/* linha com divisoria dentro do cartao */
 .linha-sep {
     border-bottom: 1px solid #eef2f4;
 }
 
-/* o botao de ligar/desligar (so visual) */
 .toggle {
     width: 48px;
     height: 26px;
@@ -101,7 +93,6 @@ a {
     background-color: #FFFFFF;
 }
 
-/* as opcoes de como ir a praia */
 .opcao {
     border: 1px solid #CFE6EC;
     border-radius: 12px;
@@ -116,7 +107,6 @@ a {
     color: #FFFFFF;
 }
 
-/* os icones das listas */
 .icone-azul {
     color: #1C7C93;
 }
@@ -125,7 +115,6 @@ a {
     color: #9BB0B8;
 }
 
-/* o botao de sair */
 .botao-sair {
     border: 1px solid #B23A2E;
     border-radius: 14px;
@@ -139,7 +128,6 @@ a {
     color: #5A6B74;
 }
 
-/* o menu de baixo */
 .menu {
     background-color: #F5F9FA;
     border-top: 1px solid #DCE7EB;

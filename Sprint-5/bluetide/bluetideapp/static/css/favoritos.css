@@ -1,13 +1,10 @@
-/* cores e letras do app */
 body {
     font-family: "Inter", sans-serif;
     color: #0A1F2B;
     background-color: #E7EEF1;
 }
 
-h1,
-h2,
-h3 {
+h1,h2,h3 {
     font-family: "Sora", sans-serif;
     color: #0B3C5D;
 }
@@ -17,7 +14,6 @@ a {
     text-decoration: none;
 }
 
-/* a tela do celular no meio da pagina */
 .celular {
     width: 420px;
     margin: 0 auto;
@@ -38,7 +34,6 @@ a {
     font-size: 14px;
 }
 
-/* os cartoes brancos */
 .cartao {
     background-color: #FFFFFF;
     border-radius: 16px;
@@ -61,14 +56,12 @@ a {
     color: #5A6B74;
 }
 
-/* o coracao de favorito */
 .botao-coracao {
     background-color: transparent;
     border: none;
     color: #B23A2E;
 }
 
-/* os selos de status */
 .selo {
     font-size: 13px;
     font-weight: 600;
@@ -109,7 +102,6 @@ a {
     background-color: #CFE6EC;
 }
 
-/* o menu de baixo */
 .menu {
     background-color: #F5F9FA;
     border-top: 1px solid #DCE7EB;
