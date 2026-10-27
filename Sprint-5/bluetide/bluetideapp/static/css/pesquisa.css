@@ -1,74 +1,381 @@
+:root {
+    --azul-mare: #0B3C5D;
+    --teal: #1C7C93;
+    --espuma: #BFE3EA;
+    --tinta: #0A1F2B;
+    --papel: #F5F9FA;
+    --branco: #FFFFFF;
+    --suave: #5A6B74;
+    --propria: #1E8A5F;
+    --atencao: #C97A1E;
+    --impropria: #B23A2E;
+    --sem-dados: #9AA0A6;
+    --raio: 14px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: "Inter", system-ui, sans-serif;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-variant-numeric: tabular-nums;
+    background: var(--papel);
+    color: var(--tinta);
+    overflow: hidden;
 }
 
-.pagina-pesquisa {
-    width: 100%;
-}
- 
-/* pra tablet */
-@media (min-width: 768px) {
-    .pagina-pesquisa {
-        width: 85%;
-    }
-}
- 
-/* pra computador*/
-@media (min-width: 1024px) {
-    .pagina-pesquisa {
-        width: 66.66%;
-    }
+button,
+input {
+    font-family: inherit;
 }
 
-.avatar {
-    width: 44px;
-    height: 44px;
+button {
+    cursor: pointer;
 }
 
-/* volta a 44px no tablet e computador */
-@media (min-width: 768px) {
-    .avatar {
-        width: 44px;
-        height: 44px;
-    }
+.app {
+    display: flex;
+    height: 100vh;
+    height: 100dvh;
 }
 
-.check-circulo {
-    width: 56px;
-    height: 56px;
+.sidemenu {
+    flex-shrink: 0;
+    width: 240px;
+    padding: 16px;
+    background: var(--branco);
+    border-right: 1px solid var(--espuma);
 }
 
-/* volta a 56px no tablet e computador */
-@media (min-width: 768px) {
-    .check-circulo {
-        width: 56px;
-        height: 56px;
-    }
+.sidemenu-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    margin-bottom: 16px;
 }
 
-.min-w-0 {
+.sidemenu-marca {
+    font-family: 'Sora', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--azul-mare);
+    text-decoration: none;
+}
+
+.botao-fechar {
+    display: none;
+    padding: 4px;
+    background: none;
+    border: 0;
+    color: var(--tinta);
+}
+
+.sidemenu-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sidemenu-link {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    border-radius: var(--raio);
+    color: var(--suave);
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.sidemenu-link:hover {
+    background: var(--espuma);
+    color: var(--azul-mare);
+}
+
+.sidemenu-link img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    opacity: 0.6;
+}
+
+.sidemenu-link.ativo {
+    background: var(--azul-mare);
+    color: var(--branco);
+    font-weight: 600;
+}
+
+.sidemenu-link.ativo img {
+    filter: brightness(0) invert(1);
+    opacity: 1;
+}
+
+.fundo-escuro {
+    display: none;
+}
+
+.conteudo {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+}
+
+.topo-celular {
+    display: none;
+}
+
+.botao-topo {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    background: var(--branco);
+    border: 0;
+    border-radius: var(--raio);
+    box-shadow: 0 2px 10px rgba(11, 60, 93, 0.12);
+    color: var(--azul-mare);
+}
+
+.botao-topo img {
+    width: 24px;
+}
+
+.page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 32px 48px;
+}
+
+.page h1 {
+    margin: 0 0 24px;
+    font-family: 'Sora', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--azul-mare);
+}
+
+.barra-busca {
+    display: flex;
+    gap: 8px;
+}
+
+.busca {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    height: 48px;
+    padding: 0 16px;
+    background: var(--branco);
+    border-radius: var(--raio);
+    box-shadow: 0 2px 10px rgba(11, 60, 93, 0.12);
+    cursor: text;
+}
+
+.busca img {
+    width: 18px;
+}
+
+.busca input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    background: none;
+    border: 0;
+    outline: none;
+    font-size: 14px;
+    color: var(--tinta);
+}
+
+.busca input::placeholder {
+    color: var(--suave);
+}
+
+.busca:focus-within {
+    box-shadow: 0 0 0 2px var(--teal);
+}
+
+.contador {
+    margin: 16px 0;
+    font-size: 13px;
+    color: var(--suave);
+}
+
+.lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cartao-praia {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    background: var(--branco);
+    border: 1px solid var(--espuma);
+    border-radius: var(--raio);
+}
+
+.cartao-info {
     min-width: 0;
 }
 
-.btn-filtro {
-    height: 56px;
+.cartao-local {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--teal);
 }
 
-/* volta a 56px no tablet e computador */
-@media (min-width: 768px) {
-    .btn-filtro {
-        height: 56px;
+.cartao-nome {
+    margin: 2px 0 6px;
+    font-family: 'Sora', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--azul-mare);
+}
+
+.cartao-detalhes {
+    margin: 0 0 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--suave);
+}
+
+.selo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.selo-propria {
+    background: #E3F3EC;
+    color: var(--propria);
+}
+
+.selo-atencao {
+    background: #F6ECDD;
+    color: var(--atencao);
+}
+
+.selo-impropria {
+    background: #F6E5E2;
+    color: var(--impropria);
+}
+
+.check-circulo {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    background: none;
+    border: 2px solid var(--espuma);
+    border-radius: 50%;
+    color: var(--teal);
+}
+
+.check-circulo:hover {
+    background: var(--espuma);
+    border-color: var(--teal);
+}
+
+@media (max-width: 991.98px) {
+    .sidemenu {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        width: 260px;
+        padding: 0;
+        border-right: 0;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .sidemenu-topo {
+        padding: 16px 20px;
+        margin-bottom: 0;
+        border-bottom: 1px solid var(--espuma);
+    }
+
+    .botao-fechar {
+        display: block;
+    }
+
+    .sidemenu-lista {
+        padding: 16px;
+    }
+
+    .menu-aberto .sidemenu {
+        transform: translateX(0);
+        box-shadow: 0 0 30px rgba(10, 31, 43, 0.2);
+    }
+
+    .menu-aberto .fundo-escuro {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 1040;
+        background: rgba(10, 31, 43, 0.5);
+    }
+
+    .topo-celular {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        padding: 16px;
+        background: var(--branco);
+        border-bottom: 1px solid var(--espuma);
     }
 }
- 
-/* altura da lista no celular */
-.lista-praias {
-    height: 60vh;
-}
- 
-/* altura fixa no computador */
-@media (min-width: 1024px) {
-    .lista-praias {
-        height: 600px;
+
+@media (max-width: 575.98px) {
+    .page {
+        padding: 24px 16px 32px;
+    }
+
+    .page h1 {
+        margin-bottom: 18px;
+        font-size: 26px;
+    }
+
+    .cartao-praia {
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .cartao-nome {
+        font-size: 18px;
+    }
+
+    .check-circulo {
+        width: 40px;
+        height: 40px;
     }
 }

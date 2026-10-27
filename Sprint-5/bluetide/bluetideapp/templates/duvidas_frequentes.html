@@ -1,142 +1,201 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dúvidas frequentes</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../static/css/duvidas.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dúvidas frequentes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/duvidas.css' %}">
 </head>
+
 <body>
+    <div class="app">
 
-<main class="page">
-  <h1>Dúvidas frequentes</h1>
-  <p class="intro">Aqui você entende de onde vêm as informações do app, como ler cada indicador e como usar os recursos para escolher a melhor praia do dia.</p>
+        <nav class="sidemenu" aria-label="Menu principal">
+            <div class="sidemenu-topo">
+                <a href="{% url 'mapa_web' %}" class="sidemenu-marca">BlueTide</a>
+                <button type="button" class="botao-fechar" onclick="fecharMenu()" aria-label="Fechar menu">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round">
+                        <path d="M6 6l12 12M18 6L6 18" />
+                    </svg>
+                </button>
+            </div>
+            <ul class="sidemenu-lista">
+                <li>
+                    <a href="{% url 'mapa_web' %}" class="sidemenu-link">
+                        <img src="{% static 'imagens/icone-local.png' %}" alt="">
+                        Mapa
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'pesquisa' %}" class="sidemenu-link">
+                        <img src="{% static 'imagens/icone-busca.png' %}" alt="">
+                        Pesquisa
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'favoritos' %}" class="sidemenu-link">
+                        <img src="{% static 'imagens/icone-favoritos.png' %}" alt="">
+                        Favoritos
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'perfil' %}" class="sidemenu-link ativo" aria-current="page">
+                        <img src="{% static 'imagens/icone-usuario.png' %}" alt="">
+                        Perfil
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
-  <div class="pills">
-    <span class="pill">Balneabilidade</span>
-    <span class="pill">Mar e ondas</span>
-    <span class="pill">Clima</span>
-  </div>
+        <div class="fundo-escuro" onclick="fecharMenu()"></div>
 
-  <section class="faq">
+        <main class="conteudo">
 
-    <details name="faq">
-      <summary><span class="num">01</span><span class="q">De onde vêm os dados de balneabilidade?</span><span class="chev"></span></summary>
-      <div class="answer">
-        <p>Os dados vêm dos boletins oficiais do <strong>INEA</strong> (Instituto Estadual do Ambiente), que coleta amostras de água em pontos fixos ao longo das praias. Cada ponto de coleta aparece no mapa como um marcador.</p>
-        <p>O app não faz a análise da água: ele organiza as informações do INEA de um jeito mais fácil de consultar. Por isso, não é um canal oficial do órgão.</p>
-      </div>
-    </details>
+            <header class="topo-celular">
+                <button type="button" class="botao-topo" onclick="abrirMenu()" aria-label="Abrir menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round">
+                        <path d="M4 7h16M4 12h16M4 17h16" />
+                    </svg>
+                </button>
+                <span class="sidemenu-marca">BlueTide</span>
+            </header>
 
-    <details name="faq">
-      <summary><span class="num">02</span><span class="q">O que significam as cores no mapa?</span><span class="chev"></span></summary>
-      <div class="answer">
-        <ul class="legend">
-          <li><span class="dot" style="background: var(--green)"></span><strong>Própria:</strong> a última análise ficou dentro do limite para banho.</li>
-          <li><span class="dot" style="background: var(--amber)"></span><strong>Atenção:</strong> está própria, mas teve resultado ruim recentemente ou choveu forte nas últimas 24 horas.</li>
-          <li><span class="dot" style="background: var(--red)"></span><strong>Imprópria:</strong> a água passou do limite. Evite entrar no mar.</li>
-          <li><span class="dot" style="background: var(--gray)"></span><strong>Sem dados:</strong> o ponto não tem boletim recente.</li>
-        </ul>
-        <p>A barra "Últimos 7 boletins" usa as mesmas cores e mostra o histórico da praia, do mais antigo (esquerda) ao mais recente (direita).</p>
-      </div>
-    </details>
+            <div class="page">
+                <h1>Dúvidas frequentes</h1>
+                <p class="intro">Aqui você entende de onde vêm as informações do app, como ler cada indicador e como usar os recursos para escolher a melhor praia do dia.</p>
 
-    <details name="faq">
-      <summary><span class="num">03</span><span class="q">Com que frequência as informações são atualizadas?</span><span class="chev"></span></summary>
-      <div class="answer">
-        <p><strong>Balneabilidade:</strong> é atualizada sempre que o INEA publica um novo boletim. A data e o horário da coleta aparecem no card da praia, em "Última coleta".</p>
-        <p><strong>Temperatura, tempo, vento, UV e ondas:</strong> são atualizados várias vezes ao longo do dia, com base em previsões meteorológicas.</p>
-      </div>
-    </details>
+                <div class="pills">
+                    <span class="pill">Balneabilidade</span>
+                    <span class="pill">Mar e ondas</span>
+                    <span class="pill">Clima</span>
+                </div>
 
-    <details name="faq">
-      <summary><span class="num">04</span><span class="q">O que são enterococos e o que quer dizer "NMP/100 ml"?</span><span class="chev"></span></summary>
-      <div class="answer">
-        <p>Enterococos são bactérias que vivem no intestino de pessoas e animais. Quando aparecem em grande quantidade na água, indicam contaminação por esgoto.</p>
-        <p><strong>NMP/100 ml</strong> significa "Número Mais Provável" de bactérias em 100 ml de água. Quanto menor o número, melhor.</p>
-        <p>Pela Resolução CONAMA 274/2000, a praia é considerada imprópria, entre outros critérios, quando a última amostra passa de 400 NMP/100 ml.</p>
-      </div>
-    </details>
+                <section class="faq">
 
-    <details name="faq">
-      <summary><span class="num">05</span><span class="q">A praia está "Própria". Posso entrar sem preocupação?</span><span class="chev"></span></summary>
-      <div class="answer">
-        <p>"Própria" fala apenas da <strong>qualidade da água</strong> na última coleta. Não indica se o mar está seguro para nadar: para isso, veja as condições do mar e a bandeira dos salva-vidas.</p>
-        <p>Depois de chuva forte, a água dos rios, canais e galerias leva esgoto e lixo para o mar. Evite o banho por até 24 horas após a chuva, mesmo que o app mostre "Própria", porque a coleta pode ter sido feita antes dela.</p>
-        <p>Evite também ficar perto de saídas de canais e de línguas negras.</p>
-      </div>
-    </details>
+                    <details name="faq">
+                        <summary><span class="num">01</span><span class="q">De onde vêm os dados de balneabilidade?</span><span class="chev"></span></summary>
+                        <div class="answer">
+                            <p>Os dados vêm dos boletins oficiais do <strong>INEA</strong> (Instituto Estadual do Ambiente), que coleta amostras de água em pontos fixos ao longo das praias. Cada ponto de coleta aparece no mapa como um marcador.</p>
+                            <p>O app não faz a análise da água: ele organiza as informações do INEA de um jeito mais fácil de consultar. Por isso, não é um canal oficial do órgão.</p>
+                        </div>
+                    </details>
 
-    <details name="faq">
-      <summary><span class="num">06</span><span class="q">Como funciona a informação de lotação?</span><span class="chev"></span></summary>
-      <div class="answer">
-        <p>A lotação é uma <strong>estimativa</strong>, não uma contagem exata de pessoas. Ela leva em conta o dia da semana, o horário, feriados e a previsão do tempo.</p>
-        <ul>
-          <li><strong>Vazia:</strong> bastante espaço na areia.</li>
-          <li><strong>Moderada:</strong> movimento normal.</li>
-          <li><strong>Cheia:</strong> praia lotada, difícil achar lugar.</li>
-        </ul>
-      </div>
-    </details>
+                    <details name="faq">
+                        <summary><span class="num">02</span><span class="q">O que significam as cores no mapa?</span><span class="chev"></span></summary>
+                        <div class="answer">
+                            <ul class="legend">
+                                <li><span class="dot propria"></span><strong>Própria:</strong> a última análise ficou dentro do limite para banho.</li>
+                                <li><span class="dot atencao"></span><strong>Atenção:</strong> está própria, mas teve resultado ruim recentemente ou choveu forte nas últimas 24 horas.</li>
+                                <li><span class="dot impropria"></span><strong>Imprópria:</strong> a água passou do limite. Evite entrar no mar.</li>
+                                <li><span class="dot sem-dados"></span><strong>Sem dados:</strong> o ponto não tem boletim recente.</li>
+                            </ul>
+                            <p>A barra "Últimos 7 boletins" usa as mesmas cores e mostra o histórico da praia, do mais antigo (esquerda) ao mais recente (direita).</p>
+                        </div>
+                    </details>
 
-    <details name="faq">
-      <summary><span class="num">07</span><span class="q">Como leio as condições do mar e o gráfico de ondas?</span><span class="chev"></span></summary>
-      <div class="answer">
-        <ul>
-          <li><strong>Flat:</strong> mar calmo, ondas pequenas. Bom para nadar e para crianças.</li>
-          <li><strong>Mexido:</strong> ondas e correnteza moderadas. Tenha cuidado.</li>
-          <li><strong>Agitado:</strong> ondas grandes e correnteza forte. Evite o banho.</li>
-        </ul>
-        <p>O gráfico mostra a altura prevista das ondas, em metros, ao longo do dia. Barras mais altas significam ondas maiores. Use para escolher o melhor horário de ir à praia.</p>
-      </div>
-    </details>
+                    <details name="faq">
+                        <summary><span class="num">03</span><span class="q">Com que frequência as informações são atualizadas?</span><span class="chev"></span></summary>
+                        <div class="answer">
+                            <p><strong>Balneabilidade:</strong> é atualizada sempre que o INEA publica um novo boletim. A data e o horário da coleta aparecem no card da praia, em "Última coleta".</p>
+                            <p><strong>Temperatura, tempo, vento, UV e ondas:</strong> são atualizados várias vezes ao longo do dia, com base em previsões meteorológicas.</p>
+                        </div>
+                    </details>
 
-    <details name="faq">
-      <summary><span class="num">08</span><span class="q">O que significa o índice UV?</span><span class="chev"></span></summary>
-      <div class="answer">
-        <p>O índice UV mede a intensidade da radiação do sol que queima a pele. Quanto maior o número, mais rápido você se queima.</p>
-        <div class="uv">
-          <span style="background: #4d8a5e">0 a 2<small>Baixo</small></span>
-          <span style="background: #b8a33a">3 a 5<small>Moderado</small></span>
-          <span style="background: #c48a3b">6 a 7<small>Alto</small></span>
-          <span style="background: #ae4a3c">8 a 10<small>Muito alto</small></span>
-          <span style="background: #6d3f6e">11+<small>Extremo</small></span>
-        </div>
-        <p>No Rio, o UV costuma ficar alto ou muito alto entre 10h e 16h, mesmo com tempo nublado. Use protetor solar e reaplique a cada 2 horas e sempre depois de sair da água.</p>
-      </div>
-    </details>
+                    <details name="faq">
+                        <summary><span class="num">04</span><span class="q">O que são enterococos e o que quer dizer "NMP/100 ml"?</span><span class="chev"></span></summary>
+                        <div class="answer">
+                            <p>Enterococos são bactérias que vivem no intestino de pessoas e animais. Quando aparecem em grande quantidade na água, indicam contaminação por esgoto.</p>
+                            <p><strong>NMP/100 ml</strong> significa "Número Mais Provável" de bactérias em 100 ml de água. Quanto menor o número, melhor.</p>
+                            <p>Pela Resolução CONAMA 274/2000, a praia é considerada imprópria, entre outros critérios, quando a última amostra passa de 400 NMP/100 ml.</p>
+                        </div>
+                    </details>
 
-    <details name="faq">
-      <summary><span class="num">09</span><span class="q">O que quer dizer o alerta de bandeira vermelha?</span><span class="chev"></span></summary>
-      <div class="answer">
-        <p>A bandeira vermelha é a sinalização dos salva-vidas de que o mar está <strong>perigoso para banho</strong>, por correnteza forte, ondas grandes ou buracos no fundo.</p>
-        <p>Quando há esse alerta, o app mostra um aviso vermelho no card da praia.</p>
-        <p class="alert">A bandeira na areia e a orientação dos salva-vidas valem mais que o app. Em caso de emergência, ligue 193.</p>
-      </div>
-    </details>
+                    <details name="faq">
+                        <summary><span class="num">05</span><span class="q">A praia está "Própria". Posso entrar sem preocupação?</span><span class="chev"></span></summary>
+                        <div class="answer">
+                            <p>"Própria" fala apenas da <strong>qualidade da água</strong> na última coleta. Não indica se o mar está seguro para nadar: para isso, veja as condições do mar e a bandeira dos salva-vidas.</p>
+                            <p>Depois de chuva forte, a água dos rios, canais e galerias leva esgoto e lixo para o mar. Evite o banho por até 24 horas após a chuva, mesmo que o app mostre "Própria", porque a coleta pode ter sido feita antes dela.</p>
+                            <p>Evite também ficar perto de saídas de canais e de línguas negras.</p>
+                        </div>
+                    </details>
 
-    <details name="faq">
-      <summary><span class="num">10</span><span class="q">Como salvo praias e recebo alertas?</span><span class="chev"></span></summary>
-      <div class="answer">
-        <p><strong>Favoritos:</strong> toque no coração no card da praia. Ela passa a aparecer na aba Favoritos.</p>
-        <p><strong>Alertas:</strong> toque no sino no topo do mapa e escolha os avisos que quer receber, como quando uma praia favorita fica imprópria ou recebe bandeira vermelha.</p>
-      </div>
-    </details>
+                    <details name="faq">
+                        <summary><span class="num">06</span><span class="q">Como funciona a informação de lotação?</span><span class="chev"></span></summary>
+                        <div class="answer">
+                            <p>A lotação é uma <strong>estimativa</strong>, não uma contagem exata de pessoas. Ela leva em conta o dia da semana, o horário, feriados e a previsão do tempo.</p>
+                            <ul>
+                                <li><strong>Vazia:</strong> bastante espaço na areia.</li>
+                                <li><strong>Moderada:</strong> movimento normal.</li>
+                                <li><strong>Cheia:</strong> praia lotada, difícil achar lugar.</li>
+                            </ul>
+                        </div>
+                    </details>
 
-  </section>
-</main>
+                    <details name="faq">
+                        <summary><span class="num">07</span><span class="q">Como leio as condições do mar e o gráfico de ondas?</span><span class="chev"></span></summary>
+                        <div class="answer">
+                            <ul>
+                                <li><strong>Flat:</strong> mar calmo, ondas pequenas. Bom para nadar e para crianças.</li>
+                                <li><strong>Mexido:</strong> ondas e correnteza moderadas. Tenha cuidado.</li>
+                                <li><strong>Agitado:</strong> ondas grandes e correnteza forte. Evite o banho.</li>
+                            </ul>
+                            <p>O gráfico mostra a altura prevista das ondas, em metros, ao longo do dia. Barras mais altas significam ondas maiores. Use para escolher o melhor horário de ir à praia.</p>
+                        </div>
+                    </details>
 
-<nav class="nav">
-  <ul>
-    <li><a href="#"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Mapa</a></li>
-    <li><a href="#"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Pesquisa</a></li>
-    <li><a href="#"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>Favoritos</a></li>
-    <li><a href="#" class="active"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>Perfil</a></li>
-  </ul>
-</nav>
+                    <details name="faq">
+                        <summary><span class="num">08</span><span class="q">O que significa o índice UV?</span><span class="chev"></span></summary>
+                        <div class="answer">
+                            <p>O índice UV mede a intensidade da radiação do sol que queima a pele. Quanto maior o número, mais rápido você se queima.</p>
+                            <div class="uv">
+                                <span class="baixo">0 a 2<small>Baixo</small></span>
+                                <span class="moderado">3 a 5<small>Moderado</small></span>
+                                <span class="alto">6 a 7<small>Alto</small></span>
+                                <span class="muito-alto">8 a 10<small>Muito alto</small></span>
+                                <span class="extremo">11+<small>Extremo</small></span>
+                            </div>
+                            <p>No Rio, o UV costuma ficar alto ou muito alto entre 10h e 16h, mesmo com tempo nublado. Use protetor solar e reaplique a cada 2 horas e sempre depois de sair da água.</p>
+                        </div>
+                    </details>
 
+                    <details name="faq">
+                        <summary><span class="num">09</span><span class="q">O que quer dizer o alerta de bandeira vermelha?</span><span class="chev"></span></summary>
+                        <div class="answer">
+                            <p>A bandeira vermelha é a sinalização dos salva-vidas de que o mar está <strong>perigoso para banho</strong>, por correnteza forte, ondas grandes ou buracos no fundo.</p>
+                            <p>Quando há esse alerta, o app mostra um aviso vermelho no card da praia.</p>
+                            <p class="aviso">A bandeira na areia e a orientação dos salva-vidas valem mais que o app. Em caso de emergência, ligue 193.</p>
+                        </div>
+                    </details>
+
+                    <details name="faq">
+                        <summary><span class="num">10</span><span class="q">Como salvo praias e recebo alertas?</span><span class="chev"></span></summary>
+                        <div class="answer">
+                            <p><strong>Favoritos:</strong> toque no coração no card da praia. Ela passa a aparecer na aba Favoritos.</p>
+                            <p><strong>Alertas:</strong> toque no sino no topo do mapa e escolha os avisos que quer receber, como quando uma praia favorita fica imprópria ou recebe bandeira vermelha.</p>
+                        </div>
+                    </details>
+
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function abrirMenu() {
+            document.body.classList.add("menu-aberto");
+        }
+
+        function fecharMenu() {
+            document.body.classList.remove("menu-aberto");
+        }
+    </script>
 </body>
+
 </html>
