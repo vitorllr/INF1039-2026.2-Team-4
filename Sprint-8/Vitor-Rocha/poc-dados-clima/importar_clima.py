@@ -17,7 +17,6 @@ CAMPOS_POR_HORA = [
     "uv_index",
 ]
 
-# Coordenadas aproximadas do centro de cada praia
 PRAIAS = [
     {"nome": "Leme", "latitude": -22.9636, "longitude": -43.1690},
     {"nome": "Copacabana", "latitude": -22.9711, "longitude": -43.1822},
@@ -35,8 +34,7 @@ PRAIAS = [
 
 
 def importar_clima():
-    # O Open-Meteo aceita várias coordenadas numa chamada só
-    # e devolve uma resposta por coordenada, na mesma ordem.
+
     resposta = requests.get(
         URL_PREVISAO,
         params={
@@ -44,7 +42,6 @@ def importar_clima():
             "longitude": ",".join(str(p["longitude"]) for p in PRAIAS),
             "timezone": FUSO,
             "hourly": ",".join(CAMPOS_POR_HORA),
-            # Os dois dias passados respondem "choveu ontem?"
             "past_days": 2,
             "forecast_days": 2,
         },
