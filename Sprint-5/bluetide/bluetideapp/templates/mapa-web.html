@@ -30,25 +30,25 @@
                     <a href="#" class="sidemenu-marca d-none d-lg-block text-decoration-none px-3 py-3 mb-3">BlueTide</a>
                     <ul class="nav nav-pills flex-column gap-1">
                         <li class="nav-item">
-                            <a href="#" class="nav-link d-flex align-items-center gap-3 active" aria-current="page">
+                            <a href="{% url 'mapa_web' %}" class="nav-link d-flex align-items-center gap-3 active" aria-current="page">
                                 <img src="{% static 'imagens/icone-local.png' %}" alt="">
                                 Mapa
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link d-flex align-items-center gap-3">
+                            <a href="{% url 'pesquisa' %}" class="nav-link d-flex align-items-center gap-3">
                                 <img src="{% static 'imagens/icone-busca.png' %}" alt="">
                                 Pesquisa
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link d-flex align-items-center gap-3">
+                            <a href="{% url 'favoritos' %}" class="nav-link d-flex align-items-center gap-3">
                                 <img src="{% static 'imagens/icone-favoritos.png' %}" alt="">
                                 Favoritos
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link d-flex align-items-center gap-3">
+                            <a href="{% url 'perfil' %}" class="nav-link d-flex align-items-center gap-3">
                                 <img src="{% static 'imagens/icone-usuario.png' %}" alt="">
                                 Perfil
                             </a>

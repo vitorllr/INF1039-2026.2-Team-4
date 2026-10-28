@@ -29,5 +29,6 @@ urlpatterns = [
     path("perfil/", views.perfil, name="perfil"),
     path("favoritos/", views.favoritos, name="favoritos"),
     path("faq/", views.duvidas, name="duvidas"),
-    path("alertas/", views.alertas, name="alertas")
+    path("alertas/", views.alertas, name="alertas"),
+    path("detalhes/", views.detalhes, name="detalhes")
 ]
