@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detalhes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+    <link href="../static/css/detalhes.css" rel="stylesheet">
+</head>
+<body>
+    <div class="celular d-flex flex-column">
+        <header class="topo d-flex justify-content-between align-items-center px-4 py-3 border-bottom">
+            <div class="d-flex align-items-center gap-3">
+                <svg class="seta" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 5 8 12l7 7"></path>
+                </svg>
+                <h1 class="m-0">Detalhes</h1>
+            </div>
+            <div class="avatar rounded-circle d-flex align-items-center justify-content-center fw-semibold">MC</div>
+        </header>
+
+        <div class="hero">
+            <img class="hero-img" src="../static/imagens/beach.jpg" alt="Praia de Ipanema">
+            <div class="hero-botoes d-flex gap-2">
+                <button type="button" class="botao-redondo d-flex align-items-center justify-content-center">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <line x1="8.5" y1="13.5" x2="15.5" y2="17.5"></line>
+                        <line x1="15.5" y1="6.5" x2="8.5" y2="10.5"></line>
+                    </svg>
+                </button>
+                <button type="button" class="botao-redondo coracao d-flex align-items-center justify-content-center">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 21s-7-4.5-9.5-8.5C1 10 2 6.5 5 6c2-.3 3.5 1 4.5 2.5C10.5 7 12 5.7 14 6c3 .5 4 4 2.5 6.5C19 16.5 12 21 12 21z"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="hero-texto">
+                <h2 class="m-0">Ipanema • Posto 9</h2>
+                <p class="m-0">Ipanema – Zona Sul</p>
+            </div>
+        </div>
+
+        <div class="px-3 pt-3 pb-4 d-flex flex-column gap-3">
+            <div class="cartao">
+                <span class="selo selo-grande selo-verde d-inline-flex align-items-center gap-2">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"></path>
+                    </svg>
+                    Água própria para banho
+                </span>
+                <p class="info mt-3 mb-2">Boletim oficial INEA nº 82/2026 • Coleta: Ontem, 10:15</p>
+                <p class="mb-3">Banho liberado. Enterococos abaixo de 100 NMP/100 ml no último laudo.</p>
+                <p class="rotulo m-0">MEDIDOR DE ENTEROCOCOS</p>
+                <div class="barra-medidor d-flex mt-2">
+                    <div class="medida medida-verde"></div>
+                    <div class="medida medida-marcador"></div>
+                    <div class="medida medida-verde2"></div>
+                    <div class="medida medida-amarelo"></div>
+                    <div class="medida medida-vermelho flex-grow-1"></div>
+                </div>
+                <div class="d-flex justify-content-between mt-1">
+                    <span class="escala">0</span>
+                    <span class="escala">100</span>
+                    <span class="escala">400</span>
+                    <span class="escala">2000+</span>
+                </div>
+                <p class="valor-medidor m-0 mt-2">38 NMP/100 ml</p>
+            </div>
+            <h2 class="titulo-secao m-0">Condições em tempo real • Estação Ipanema</h2>
+            <div class="row g-3">
+
+                <div class="col-6">
+                    <div class="cartao h-100">
+                        <p class="rotulo d-flex align-items-center gap-2 m-0">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 8c2-2 4-2 6 0s4 2 6 0 4-2 6 0"></path>
+                                <path d="M2 14c2-2 4-2 6 0s4 2 6 0 4-2 6 0"></path>
+                            </svg>
+                            ONDA &amp; MARÉ
+                        </p>
+                        <p class="numero m-0 mt-2"><span class="numero-grande">0,8</span> m</p>
+                        <p class="info m-0 mt-2">Período 8s • Mar calmo<br>Maré 0,4 m (Enchente)<br>Próxima alta: 1,1 m às 15:40</p>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="cartao h-100">
+                        <p class="rotulo d-flex align-items-center gap-2 m-0">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="8" cy="8" r="3"></circle>
+                                <path d="M3 20c0-3 2.5-5 5-5s5 2 5 5"></path>
+                                <circle cx="17" cy="9" r="2.5"></circle>
+                                <path d="M15 20c0-2.5 1.5-4 3.5-4s3.5 1.5 3.5 4"></path>
+                            </svg>
+                            OCUPAÇÃO
+                        </p>
+                        <p class="numero m-0 mt-2"><span class="numero-grande">~55%</span></p>
+                        <div class="d-flex gap-1 mt-2">
+                            <div class="segmento segmento-verde flex-grow-1"></div>
+                            <div class="segmento segmento-verde flex-grow-1"></div>
+                            <div class="segmento segmento-verde flex-grow-1"></div>
+                            <div class="segmento segmento-claro flex-grow-1"></div>
+                            <div class="segmento segmento-claro flex-grow-1"></div>
+                        </div>
+                        <p class="info m-0 mt-2">Lotação Moderada • Câmeras COR-Rio e relatos</p>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="cartao h-100">
+                        <p class="rotulo d-flex align-items-center gap-2 m-0">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="4"></circle>
+                                <line x1="12" y1="2" x2="12" y2="5"></line>
+                                <line x1="12" y1="19" x2="12" y2="22"></line>
+                                <line x1="2" y1="12" x2="5" y2="12"></line>
+                                <line x1="19" y1="12" x2="22" y2="12"></line>
+                                <line x1="5" y1="5" x2="7" y2="7"></line>
+                                <line x1="17" y1="17" x2="19" y2="19"></line>
+                                <line x1="5" y1="19" x2="7" y2="17"></line>
+                                <line x1="17" y1="7" x2="19" y2="5"></line>
+                            </svg>
+                            CLIMA &amp; UV
+                        </p>
+                        <p class="numero m-0 mt-2"><span class="numero-grande">28</span> °C</p>
+                        <p class="info m-0 mt-2">Ensolarado • Água 22 °C • UV 8 (Muito alto)</p>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="cartao h-100">
+                        <p class="rotulo d-flex align-items-center gap-2 m-0">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 8h11a3 3 0 1 0-3-3"></path>
+                                <path d="M3 13h15a3 3 0 1 1-3 3"></path>
+                            </svg>
+                            VENTO &amp; MAR
+                        </p>
+                        <p class="numero m-0 mt-2"><span class="numero-grande">12</span> km/h</p>
+                        <p class="info d-flex align-items-start gap-2 m-0 mt-2">
+                            <svg class="bandeira" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="3" x2="5" y2="21"></line>
+                                <path d="M5 4h12l-2 4 2 4H5z"></path>
+                            </svg>
+                            <span>SO • GMAR: corrente moderada, atenção</span>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+            <div class="cartao d-flex justify-content-between text-center">
+                <div class="resumo-item">
+                    <p class="rotulo m-0">CHUVA 24H</p>
+                    <p class="resumo-valor m-0 mt-1">0,0 mm</p>
+                </div>
+                <div class="resumo-item borda-lados">
+                    <p class="rotulo m-0">MARÉ</p>
+                    <p class="resumo-valor m-0 mt-1">0,4 m</p>
+                </div>
+                <div class="resumo-item">
+                    <p class="rotulo m-0">IDADE DO LAUDO</p>
+                    <p class="resumo-valor m-0 mt-1">22 h</p>
+                </div>
+            </div>
+            <h2 class="titulo-secao m-0">Postos próximos</h2>
+
+            <div class="cartao posto d-flex justify-content-between align-items-center">
+                <span class="d-inline-flex align-items-center gap-2">
+                    <svg class="pin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"></path>
+                        <circle cx="12" cy="10" r="2.5"></circle>
+                    </svg>
+                    <span class="nome-posto">Ipanema • Posto 9 <span class="info">(atual)</span></span>
+                </span>
+                <span class="selo selo-verde d-inline-flex align-items-center gap-1">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"></path>
+                    </svg>
+                    Própria
+                </span>
+            </div>
+
+            <div class="cartao posto d-flex justify-content-between align-items-center">
+                <span class="d-inline-flex align-items-center gap-2">
+                    <svg class="pin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"></path>
+                        <circle cx="12" cy="10" r="2.5"></circle>
+                    </svg>
+                    <span class="nome-posto">Ipanema • Posto 8</span>
+                </span>
+                <span class="selo selo-vermelho d-inline-flex align-items-center gap-1">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                    </svg>
+                    Imprópria
+                </span>
+            </div>
+
+            <div class="cartao posto d-flex justify-content-between align-items-center">
+                <span class="d-inline-flex align-items-center gap-2">
+                    <svg class="pin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"></path>
+                        <circle cx="12" cy="10" r="2.5"></circle>
+                    </svg>
+                    <span class="nome-posto">Ipanema • Posto 10</span>
+                </span>
+                <span class="selo selo-verde d-inline-flex align-items-center gap-1">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"></path>
+                    </svg>
+                    Própria
+                </span>
+            </div>
+
+            <div class="cartao posto d-flex justify-content-between align-items-center">
+                <span class="d-inline-flex align-items-center gap-2">
+                    <svg class="pin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"></path>
+                        <circle cx="12" cy="10" r="2.5"></circle>
+                    </svg>
+                    <span class="nome-posto">Arpoador • Posto 7</span>
+                </span>
+                <span class="selo selo-verde d-inline-flex align-items-center gap-1">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"></path>
+                    </svg>
+                    Própria
+                </span>
+            </div>
+
+            <a href="previsao.html" class="botao-principal text-center">Ver previsão das próximas 72h →</a>
+
+            <div class="row g-3">
+                <div class="col-6">
+                    <a href="comparar.html" class="botao-secundario d-flex align-items-center justify-content-center gap-2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="3" x2="12" y2="21"></line>
+                            <line x1="5" y1="7" x2="19" y2="7"></line>
+                            <path d="M5 7 2 14h6z"></path>
+                            <path d="M19 7 16 14h6z"></path>
+                        </svg>
+                        Comparar
+                    </a>
+                </div>
+                <div class="col-6">
+                    <a href="como-chegar.html" class="botao-secundario d-flex align-items-center justify-content-center gap-2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"></path>
+                            <circle cx="12" cy="10" r="2.5"></circle>
+                        </svg>
+                        Como chegar
+                    </a>
+                </div>
+            </div>
+
+            <a href="reportar.html" class="botao-secundario d-flex align-items-center justify-content-center gap-2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16v12H7l-3 3z"></path>
+                    <line x1="12" y1="8" x2="12" y2="11"></line>
+                    <line x1="12" y1="13" x2="12" y2="13"></line>
+                </svg>
+                Reportar condição visual na areia
+            </a>
+
+            <p class="info d-flex align-items-start gap-2 m-0">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 12h12a3 3 0 0 0 3-3V5"></path>
+                    <line x1="4" y1="12" x2="4" y2="15"></line>
+                    <path d="M4 15a7 7 0 0 0 14 0"></path>
+                </svg>
+                <span>A classificação tem caráter informativo e não substitui a sinalização do GMAR na praia.</span>
+            </p>
+
+        </div>
+
+    </div>
+</body>
+</html>

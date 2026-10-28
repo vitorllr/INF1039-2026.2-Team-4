@@ -1,0 +1,245 @@
+body {
+    font-family: "Inter", sans-serif;
+    color: #0A1F2B;
+    background-color: #E7EEF1;
+}
+
+h1, h2, h3 {
+    font-family: "Sora", sans-serif;
+    color: #0B3C5D;
+}
+
+a {
+    color: #1C7C93;
+    text-decoration: none;
+}
+
+.celular {
+    width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background-color: #F5F9FA;
+    box-shadow: 0 0 40px #c7d2d8;
+}
+
+.topo h1 {
+    font-size: 22px;
+}
+
+.seta {
+    color: #0B3C5D;
+}
+
+.avatar {
+    width: 42px;
+    height: 42px;
+    background-color: #0B3C5D;
+    color: #FFFFFF;
+    font-size: 14px;
+}
+
+.hero {
+    position: relative;
+}
+
+.hero-img {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+    display: block;
+}
+
+.hero-botoes {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+}
+
+.botao-redondo {
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 30px;
+    background-color: #FFFFFF;
+    color: #0B3C5D;
+}
+
+.coracao {
+    color: #B23A2E;
+}
+
+.hero-texto {
+    position: absolute;
+    left: 18px;
+    bottom: 16px;
+}
+
+.hero-texto h2 {
+    font-size: 26px;
+    color: #FFFFFF;
+    text-shadow: 0 1px 4px #0A1F2B;
+}
+
+.hero-texto p {
+    font-size: 15px;
+    color: #FFFFFF;
+    text-shadow: 0 1px 4px #0A1F2B;
+}
+
+.cartao {
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: 0 2px 8px #e2e8ec;
+}
+
+.info {
+    font-size: 13px;
+    color: #5A6B74;
+}
+
+.rotulo {
+    font-size: 11px;
+    font-weight: 600;
+    color: #5A6B74;
+}
+
+.selo {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+}
+
+.selo-grande {
+    font-size: 16px;
+    padding: 8px 16px;
+}
+
+.selo-verde {
+    background-color: #E3F3EC;
+    color: #1E8A5F;
+}
+
+.selo-vermelho {
+    background-color: #F6E5E2;
+    color: #B23A2E;
+}
+
+.barra-medidor {
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.medida {
+    height: 12px;
+}
+
+.medida-verde, .medida-verde2 {
+    background-color: #1E8A5F;
+}
+
+.medida-verde {
+    width: 7%;
+}
+
+.medida-verde2 {
+    width: 20%;
+}
+
+.medida-marcador {
+    width: 4px;
+    background-color: #0A1F2B;
+}
+
+.medida-amarelo {
+    width: 22%;
+    background-color: #C97A1E;
+}
+
+.medida-vermelho {
+    background-color: #B23A2E;
+}
+
+.escala {
+    font-size: 12px;
+    color: #5A6B74;
+}
+
+.valor-medidor {
+    font-family: "Sora", sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #0A1F2B;
+}
+
+.titulo-secao {
+    font-size: 19px;
+}
+
+.numero-grande {
+    font-family: "Sora", sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: #0A1F2B;
+}
+
+.segmento {
+    height: 7px;
+    border-radius: 4px;
+}
+
+.segmento-verde {
+    background-color: #1E8A5F;
+}
+
+.segmento-claro {
+    background-color: #CFE6EC;
+}
+
+.bandeira {
+    color: #C97A1E;
+}
+
+.resumo-item {
+    width: 33%;
+}
+
+.borda-lados {
+    border-left: 1px solid #DCE7EB;
+    border-right: 1px solid #DCE7EB;
+}
+
+.resumo-valor {
+    font-family: "Sora", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0A1F2B;
+}
+
+.pin {
+    color: #1C7C93;
+}
+
+.nome-posto {
+    font-size: 16px;
+    color: #0A1F2B;
+}
+
+.botao-principal {
+    display: block;
+    background-color: #0B3C5D;
+    color: #FFFFFF;
+    font-weight: 600;
+    padding: 14px;
+    border-radius: 12px;
+}
+
+.botao-secundario {
+    background-color: #FFFFFF;
+    border: 1px solid #CFE0E6;
+    color: #0B3C5D;
+    font-weight: 600;
+    padding: 12px;
+    border-radius: 12px;
+}

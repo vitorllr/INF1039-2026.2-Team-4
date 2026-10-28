@@ -26,3 +26,5 @@ def duvidas(request):
 def alertas(request):
     return render(request, "alertas.html")
 
+def detalhes(request):
+    return render(request, "detalhes.html")
