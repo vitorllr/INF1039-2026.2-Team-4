@@ -12,8 +12,55 @@
 </head>
 
 <body>
+    <nav class="sidemenu" aria-label="Menu principal">
+        <div class="sidemenu-topo">
+            <a href="{% url 'mapa_web' %}" class="sidemenu-marca">BlueTide</a>
+            <button type="button" class="botao-fechar" onclick="fecharMenu()" aria-label="Fechar menu">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+            </button>
+        </div>
+        <ul class="sidemenu-lista">
+            <li>
+                <a href="{% url 'mapa_web' %}" class="sidemenu-link">
+                    <img src="{% static 'imagens/icone-local.png' %}" alt="">
+                    Mapa
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'pesquisa' %}" class="sidemenu-link">
+                    <img src="{% static 'imagens/icone-busca.png' %}" alt="">
+                    Pesquisa
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'favoritos' %}" class="sidemenu-link">
+                    <img src="{% static 'imagens/icone-favoritos.png' %}" alt="">
+                    Favoritos
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'perfil' %}" class="sidemenu-link ativo" aria-current="page">
+                    <img src="{% static 'imagens/icone-usuario.png' %}" alt="">
+                    Perfil
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="fundo-escuro" onclick="fecharMenu()"></div>
 
     <div class="celular d-flex flex-column">
+
+        <header class="topo-celular">
+            <button type="button" class="botao-topo" onclick="abrirMenu()" aria-label="Abrir menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M4 7h16M4 12h16M4 17h16" />
+                </svg>
+            </button>
+            <span class="sidemenu-marca">BlueTide</span>
+        </header>
 
         <header class="topo d-flex justify-content-between align-items-center px-4 py-3 border-bottom">
             <h1 class="m-0">Meu perfil</h1>
@@ -125,40 +172,19 @@
 
         </div>
 
-        <nav class="menu d-flex justify-content-between px-4 py-3 mt-auto">
-            <div class="item-menu d-flex flex-column align-items-center gap-1">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"></path>
-                    <circle cx="12" cy="10" r="2.5"></circle>
-                </svg>
-                <span>Mapa</span>
-            </div>
-            <div class="item-menu d-flex flex-column align-items-center gap-1">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="7"></circle>
-                    <line x1="21" y1="21" x2="16.5" y2="16.5"></line>
-                </svg>
-                <span>Pesquisa</span>
-            </div>
-            <div class="item-menu d-flex flex-column align-items-center gap-1">
-                <span class="d-flex align-items-center gap-1">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 21s-7-4.5-9.5-8.5C1 10 2 6.5 5 6c2-.3 3.5 1 4.5 2.5C10.5 7 12 5.7 14 6c3 .5 4 4 2.5 6.5C19 16.5 12 21 12 21z"></path>
-                    </svg>
-                    <span class="badge-nav">3</span>
-                </span>
-                <span>Favoritos</span>
-            </div>
-            <div class="item-menu ativo d-flex flex-column align-items-center gap-1">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="8" r="4"></circle>
-                    <path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path>
-                </svg>
-                <span>Perfil</span>
-            </div>
-        </nav>
+
 
     </div>
+    
+    <script>
+        function abrirMenu() {
+            document.body.classList.add("menu-aberto");
+        }
+
+        function fecharMenu() {
+            document.body.classList.remove("menu-aberto");
+        }
+    </script>
 </body>
 
 </html>
