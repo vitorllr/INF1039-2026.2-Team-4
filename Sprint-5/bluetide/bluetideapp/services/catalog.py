@@ -1,6 +1,19 @@
 from dataclasses import dataclass
 
 
+# A fixed local frame keeps the simplified coast diagram stable between loads.
+# Coordinates are WGS84 decimal degrees, projected to local meters. This diagram
+# is illustrative, not suitable for navigation.
+MAP_BOUNDS = {
+    "south": -23.002,
+    "north": -22.975,
+    "west": -43.226,
+    "east": -43.188,
+}
+MAP_METERS_PER_DEGREE_LATITUDE = 111_320
+MAP_METERS_PER_DEGREE_LONGITUDE = 102_478  # cos(22.99 degrees) * 111,320
+
+
 @dataclass(frozen=True)
 class BeachPoint:
     slug: str
@@ -9,13 +22,19 @@ class BeachPoint:
     neighborhood: str
     latitude: float
     longitude: float
-    map_x: int
-    map_y: int
     summary: str
 
     @property
     def display_name(self) -> str:
         return f"{self.name} · {self.posto}"
+
+    @property
+    def map_x(self) -> int:
+        return round((self.longitude - MAP_BOUNDS["west"]) * MAP_METERS_PER_DEGREE_LONGITUDE)
+
+    @property
+    def map_y(self) -> int:
+        return round((MAP_BOUNDS["north"] - self.latitude) * MAP_METERS_PER_DEGREE_LATITUDE)
 
 
 BEACH_POINTS = (
@@ -26,8 +45,6 @@ BEACH_POINTS = (
         neighborhood="Arpoador",
         latitude=-22.9884,
         longitude=-43.1934,
-        map_x=83,
-        map_y=67,
         summary="Perto do Arpoador, com mar mais exposto.",
     ),
     BeachPoint(
@@ -37,8 +54,6 @@ BEACH_POINTS = (
         neighborhood="Ipanema",
         latitude=-22.9869,
         longitude=-43.2005,
-        map_x=66,
-        map_y=58,
         summary="Trecho central com acesso pela Farme de Amoedo.",
     ),
     BeachPoint(
@@ -48,8 +63,6 @@ BEACH_POINTS = (
         neighborhood="Ipanema",
         latitude=-22.9868,
         longitude=-43.2050,
-        map_x=50,
-        map_y=52,
         summary="Trecho movimentado próximo à Rua Vinícius de Moraes.",
     ),
     BeachPoint(
@@ -59,8 +72,6 @@ BEACH_POINTS = (
         neighborhood="Ipanema",
         latitude=-22.9861,
         longitude=-43.2115,
-        map_x=34,
-        map_y=45,
         summary="Trecho mais próximo ao Jardim de Alah.",
     ),
     BeachPoint(
@@ -70,8 +81,6 @@ BEACH_POINTS = (
         neighborhood="Leblon",
         latitude=-22.9870,
         longitude=-43.2204,
-        map_x=18,
-        map_y=38,
         summary="Limite com o Leblon e acesso pelo canal do Jardim de Alah.",
     ),
 )

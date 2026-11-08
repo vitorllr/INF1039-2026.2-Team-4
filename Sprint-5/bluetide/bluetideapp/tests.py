@@ -88,6 +88,16 @@ class RecommendationTests(SimpleTestCase):
         self.assertTrue(first[0]["recommendation"].available)
         self.assertFalse(first[-1]["recommendation"].available)
 
+    def test_map_positions_follow_geographic_coordinates(self):
+        points_west_to_east = sorted(BEACH_POINTS, key=lambda point: point.longitude)
+        points_north_to_south = sorted(BEACH_POINTS, key=lambda point: point.latitude, reverse=True)
+
+        self.assertEqual([point.posto for point in points_west_to_east], ["Posto 11", "Posto 10", "Posto 9", "Posto 8", "Posto 7"])
+        self.assertEqual(sorted(point.map_x for point in points_west_to_east), [point.map_x for point in points_west_to_east])
+        self.assertEqual(sorted(point.map_y for point in points_north_to_south), [point.map_y for point in points_north_to_south])
+        self.assertLess(max(point.map_y for point in BEACH_POINTS) - min(point.map_y for point in BEACH_POINTS), 300)
+        self.assertGreater(max(point.map_x for point in BEACH_POINTS) - min(point.map_x for point in BEACH_POINTS), 2700)
+
 
 class FakeResponse(io.BytesIO):
     status = 200
@@ -222,3 +232,10 @@ class ViewTests(SimpleTestCase):
 
         self.assertContains(response, "Modo demonstração")
         self.assertContains(response, "Nenhum dado é apresentado como leitura oficial ao vivo")
+
+    def test_map_identifies_approximate_coast_and_places_pins_from_coordinates(self):
+        response = self.client.get("/web/")
+
+        self.assertContains(response, "não é mapa de navegação")
+        for point in BEACH_POINTS:
+            self.assertContains(response, f'cx="{point.map_x}" cy="{point.map_y}"')

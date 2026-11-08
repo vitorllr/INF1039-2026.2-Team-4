@@ -759,36 +759,24 @@ h3 {
 .coast-map {
     position: relative;
     min-width: 0;
-    min-height: 580px;
+    aspect-ratio: 1.3;
     overflow: hidden;
     border: 1px solid #c7e0e4;
     border-radius: var(--radius-lg);
-    background:
-        linear-gradient(160deg, transparent 0 42%, rgba(255, 255, 255, 0.85) 42.3% 44%, transparent 44.3%),
-        linear-gradient(160deg, var(--tide-100) 0 44%, #e7d5aa 44.2% 56%, #d9cfad 56.2% 100%);
+    background: #cfe9e8;
     box-shadow: var(--shadow-md);
 }
 
-.coast-map::before,
-.coast-map::after {
+.coast-map-art {
     position: absolute;
     inset: 0;
-    content: "";
+    width: 100%;
+    height: 100%;
+}
+
+.coast-map-art > rect,
+.coast-map-art > path {
     pointer-events: none;
-}
-
-.coast-map::before {
-    background:
-        radial-gradient(circle at 14% 80%, rgba(30, 138, 95, 0.18) 0 2px, transparent 3px),
-        radial-gradient(circle at 68% 70%, rgba(11, 60, 93, 0.12) 0 1px, transparent 2px);
-    background-size: 38px 38px, 26px 26px;
-    opacity: 0.65;
-}
-
-.coast-map::after {
-    inset: auto 0 0;
-    height: 38%;
-    background: linear-gradient(180deg, transparent, rgba(6, 43, 66, 0.08));
 }
 
 .map-label {
@@ -803,52 +791,65 @@ h3 {
 }
 
 .map-label-water {
-    top: 17%;
-    left: 9%;
+    right: 7%;
+    bottom: 9%;
     color: rgba(19, 86, 117, 0.48);
 }
 
 .map-label-land {
-    right: 8%;
-    bottom: 10%;
+    left: 7%;
+    top: 8%;
 }
 
 .map-pin {
-    position: absolute;
-    z-index: 4;
-    display: grid;
-    width: 46px;
-    height: 46px;
-    place-items: center;
-    border: 4px solid var(--white);
-    border-radius: 50% 50% 50% 10%;
-    color: var(--white);
-    background: var(--neutral);
-    box-shadow: 0 8px 20px rgba(6, 43, 66, 0.25);
-    transform: translate(-50%, -50%) rotate(-45deg);
-    transition: scale 160ms ease;
+    cursor: pointer;
 }
 
-.map-pin:hover {
-    scale: 1.1;
+.map-pin-dot {
+    stroke: var(--white);
+    stroke-width: 24px;
+    filter: drop-shadow(0 12px 16px rgba(6, 43, 66, 0.3));
+    transition: r 160ms ease;
 }
 
-.map-pin span {
-    transform: rotate(45deg);
-    font-size: 0.7rem;
+.map-pin-target {
+    fill: transparent;
+    pointer-events: all;
+}
+
+.map-pin text {
+    fill: var(--white);
+    font-family: "Sora", sans-serif;
+    font-size: 112px;
     font-weight: 800;
+    text-anchor: middle;
+    dominant-baseline: central;
+    pointer-events: none;
 }
 
-.map-pin-success {
-    background: var(--success);
+.map-pin-success .map-pin-dot {
+    fill: var(--success);
 }
 
-.map-pin-warning {
-    background: var(--warning);
+.map-pin-warning .map-pin-dot {
+    fill: var(--warning);
 }
 
-.map-pin-neutral {
-    background: var(--neutral);
+.map-pin-neutral .map-pin-dot {
+    fill: var(--neutral);
+}
+
+.map-pin:hover .map-pin-dot,
+.map-pin:focus .map-pin-dot {
+    r: 145px;
+}
+
+.map-pin:focus {
+    outline: none;
+}
+
+.map-pin:focus .map-pin-target {
+    fill: rgba(6, 43, 66, 0.16);
 }
 
 .map-summary {
@@ -1264,10 +1265,6 @@ h3 {
         grid-template-columns: minmax(0, 1fr);
     }
 
-    .coast-map {
-        min-height: 500px;
-    }
-
     .comparison-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -1352,13 +1349,7 @@ h3 {
     }
 
     .coast-map {
-        min-height: 420px;
         border-radius: 18px;
-    }
-
-    .map-pin {
-        width: 42px;
-        height: 42px;
     }
 
     .metrics {

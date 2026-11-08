@@ -27,16 +27,26 @@
 </div>
 
 <div class="map-layout">
-    <section class="coast-map" aria-label="Mapa esquemático dos postos de Ipanema">
-        <span class="map-label map-label-water">Oceano Atlântico</span>
+    <section class="coast-map" aria-label="Esquema geográfico aproximado da orla de Ipanema, não é mapa de navegação">
+        <svg class="coast-map-art" viewBox="0 0 3900 3000" role="group" aria-label="Postos de coleta distribuídos aproximadamente ao longo da costa">
+            <rect width="3900" height="3000" fill="#e9dfc1" />
+            <path d="M0 1420 C300 1395 420 1350 571 1336 C900 1287 1200 1244 1479 1236 C1750 1230 1920 1285 2142 1314 C2320 1337 2450 1325 2601 1325 C2880 1325 3090 1410 3325 1492 C3550 1570 3720 1600 3900 1620 L3900 3000 L0 3000 Z" fill="#cfe9e8" />
+            <path d="M0 1420 C300 1395 420 1350 571 1336 C900 1287 1200 1244 1479 1236 C1750 1230 1920 1285 2142 1314 C2320 1337 2450 1325 2601 1325 C2880 1325 3090 1410 3325 1492 C3550 1570 3720 1600 3900 1620" fill="none" stroke="#fff7e5" stroke-width="120" />
+            <path d="M0 1550 C300 1525 420 1480 571 1466 C900 1417 1200 1374 1479 1366 C1750 1360 1920 1415 2142 1444 C2320 1467 2450 1455 2601 1455 C2880 1455 3090 1540 3325 1622 C3550 1700 3720 1730 3900 1750" fill="none" stroke="#ddc99e" stroke-width="65" />
+            <path d="M0 420 H3900 M0 850 H3900 M680 0 V1080 M1480 0 V1080 M2320 0 V1080 M3160 0 V1080" fill="none" stroke="#ffffff" stroke-opacity=".36" stroke-width="20" />
+            <path d="M120 2100 C760 2010 1330 2170 1940 2070 S3190 2000 3780 2110 M80 2540 C820 2440 1430 2610 2130 2490 S3260 2410 3820 2530" fill="none" stroke="#ffffff" stroke-opacity=".32" stroke-width="25" />
+            {% for item in items %}
+            {% with c=item.conditions r=item.recommendation %}
+            <a class="map-pin map-pin-{{ r.tone }}" href="{% url 'detalhes_praia' c.beach.slug %}?perfil={{ profile }}" aria-label="{{ c.beach.display_name }}: {{ r.label }}" focusable="true">
+                <circle class="map-pin-target" cx="{{ c.beach.map_x }}" cy="{{ c.beach.map_y }}" r="230" />
+                <circle class="map-pin-dot" cx="{{ c.beach.map_x }}" cy="{{ c.beach.map_y }}" r="125" />
+                <text x="{{ c.beach.map_x }}" y="{{ c.beach.map_y }}">{{ c.beach.posto|slice:"6:" }}</text>
+            </a>
+            {% endwith %}
+            {% endfor %}
+        </svg>
         <span class="map-label map-label-land">Ipanema</span>
-        {% for item in items %}
-        {% with c=item.conditions r=item.recommendation %}
-        <a class="map-pin map-pin-{{ r.tone }}" href="{% url 'detalhes_praia' c.beach.slug %}?perfil={{ profile }}" style="left: {{ c.beach.map_x }}%; top: {{ c.beach.map_y }}%;" aria-label="{{ c.beach.display_name }}: {{ r.label }}">
-            <span>{{ c.beach.posto|slice:"6:" }}</span>
-        </a>
-        {% endwith %}
-        {% endfor %}
+        <span class="map-label map-label-water">Oceano Atlântico</span>
     </section>
 
     <aside class="map-summary" aria-label="Pontos ordenados pela recomendação">
