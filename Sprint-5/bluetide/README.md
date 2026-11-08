@@ -25,6 +25,9 @@ Open `http://127.0.0.1:8000/web/`.
 `DJANGO_DEBUG` defaults to `true` and must be `false` in production.
 `DJANGO_ALLOWED_HOSTS` is a comma-separated host list.
 `DJANGO_DB_PATH` optionally selects a SQLite file for isolated validation.
+`DJANGO_SECURE_SSL_REDIRECT`, `DJANGO_SESSION_COOKIE_SECURE`, and `DJANGO_CSRF_COOKIE_SECURE` enable the corresponding production HTTPS protections.
+`DJANGO_SECURE_HSTS_SECONDS` sets the HSTS duration and should only be enabled after HTTPS is confirmed for the entire domain.
+`DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS` and `DJANGO_SECURE_HSTS_PRELOAD` should only be enabled when every subdomain is permanently HTTPS-ready.
 
 The accepted water-quality schema is demonstrated in `bluetideapp/fixtures/conditions.json`.
 The local fixture uses relative ages so automated checks stay deterministic.
@@ -69,6 +72,12 @@ export BLUETIDE_HTTP_TIMEOUT=4
 export DJANGO_SECRET_KEY='set-this-outside-the-repository'
 export DJANGO_DEBUG=false
 export DJANGO_ALLOWED_HOSTS='bluetide.example.com'
+export DJANGO_SECURE_SSL_REDIRECT=true
+export DJANGO_SESSION_COOKIE_SECURE=true
+export DJANGO_CSRF_COOKIE_SECURE=true
+export DJANGO_SECURE_HSTS_SECONDS=31536000
+export DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS=true
+export DJANGO_SECURE_HSTS_PRELOAD=true
 python manage.py check --deploy
 python manage.py runserver 127.0.0.1:8000
 curl --fail --silent --show-error http://127.0.0.1:8000/web/ >/dev/null
