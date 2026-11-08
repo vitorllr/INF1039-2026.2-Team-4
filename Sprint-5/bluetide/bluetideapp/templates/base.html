@@ -1,0 +1,98 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0b3c5d">
+    <title>{% block title %}BlueTide{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/design-system.css' %}?v=20261108">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+    {% with current=request.resolver_match.url_name %}
+    <div class="app-shell">
+        <aside class="sidebar" id="menu-principal" aria-label="Navegação principal">
+            <div class="brand-row">
+                <a class="brand" href="{% url 'mapa_web' %}" aria-label="BlueTide, início">
+                    <span class="brand-mark" aria-hidden="true">
+                        <svg viewBox="0 0 32 32" role="img"><path d="M4 18c4-7 8-10 12-10s8 3 12 10c-4-2-8-2-12 1s-8 3-12-1Z"/><path d="M6 23c4 2 7 2 10-1 3-2 6-2 10 0"/></svg>
+                    </span>
+                    <span>BlueTide</span>
+                </a>
+                <button class="icon-button sidebar-close" type="button" data-nav-close aria-label="Fechar menu">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+                </button>
+            </div>
+
+            <nav class="primary-nav">
+                <a class="nav-link {% if current == 'home' or current == 'mapa_web' or current == 'detalhes' or current == 'detalhes_praia' %}is-active{% endif %}" href="{% url 'mapa_web' %}" {% if current == 'home' or current == 'mapa_web' or current == 'detalhes' or current == 'detalhes_praia' %}aria-current="page"{% endif %}>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                    <span>Mapa</span>
+                </a>
+                <a class="nav-link {% if current == 'pesquisa' or current == 'filtros' or current == 'comparar' %}is-active{% endif %}" href="{% url 'pesquisa' %}" {% if current == 'pesquisa' or current == 'filtros' or current == 'comparar' %}aria-current="page"{% endif %}>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                    <span>Explorar</span>
+                </a>
+                <a class="nav-link {% if current == 'favoritos' %}is-active{% endif %}" href="{% url 'favoritos' %}" {% if current == 'favoritos' %}aria-current="page"{% endif %}>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5S4 16 4 9.7C4 6.6 7.8 5 10 7.4L12 10l2-2.6c2.2-2.4 6-0.8 6 2.3 0 6.3-8 10.8-8 10.8Z"/></svg>
+                    <span>Favoritos</span>
+                </a>
+                <a class="nav-link {% if current == 'perfil' %}is-active{% endif %}" href="{% url 'perfil' %}" {% if current == 'perfil' %}aria-current="page"{% endif %}>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+                    <span>Perfil</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p class="eyebrow">Apoio</p>
+                <a class="quiet-link" href="{% url 'alertas' %}">Alertas</a>
+                <a class="quiet-link" href="{% url 'duvidas' %}">Dúvidas frequentes</a>
+                <p class="source-note">Condições para decidir com calma, sem promessas além dos dados.</p>
+            </div>
+        </aside>
+
+        <button class="nav-scrim" type="button" data-nav-close aria-label="Fechar menu" aria-hidden="true" tabindex="-1"></button>
+
+        <div class="app-main">
+            <header class="mobile-header">
+                <button class="icon-button" type="button" data-nav-open aria-controls="menu-principal" aria-expanded="false" aria-label="Abrir menu">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+                </button>
+                <a class="brand brand-compact" href="{% url 'mapa_web' %}">BlueTide</a>
+                <a class="avatar" href="{% url 'perfil' %}" aria-label="Abrir perfil de Pedro">PS</a>
+            </header>
+
+            <main id="conteudo" class="page-frame" tabindex="-1">
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+
+        <nav class="bottom-nav" aria-label="Navegação principal no celular">
+            <a class="bottom-link {% if current == 'home' or current == 'mapa_web' or current == 'detalhes' or current == 'detalhes_praia' %}is-active{% endif %}" href="{% url 'mapa_web' %}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                <span>Mapa</span>
+            </a>
+            <a class="bottom-link {% if current == 'pesquisa' or current == 'filtros' or current == 'comparar' %}is-active{% endif %}" href="{% url 'pesquisa' %}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                <span>Explorar</span>
+            </a>
+            <a class="bottom-link {% if current == 'favoritos' %}is-active{% endif %}" href="{% url 'favoritos' %}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5S4 16 4 9.7C4 6.6 7.8 5 10 7.4L12 10l2-2.6c2.2-2.4 6-0.8 6 2.3 0 6.3-8 10.8-8 10.8Z"/></svg>
+                <span>Favoritos</span>
+            </a>
+            <a class="bottom-link {% if current == 'perfil' %}is-active{% endif %}" href="{% url 'perfil' %}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+                <span>Perfil</span>
+            </a>
+        </nav>
+    </div>
+    {% endwith %}
+    <script src="{% static 'js/app.js' %}?v=20261108" defer></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

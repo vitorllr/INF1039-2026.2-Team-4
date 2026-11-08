@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,12 +21,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure--d610)-hge0qe03lfuw2#z_8oa$ysk@*)@3hfsfq3m1ewx@eye"
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-bluetide-development-only")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "true").lower() == "true"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+    if host.strip()
+]
 
 
 # Application definition
@@ -77,7 +82,7 @@ WSGI_APPLICATION = "bluetide.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": os.getenv("DJANGO_DB_PATH", BASE_DIR / "db.sqlite3"),
     }
 }
 
@@ -104,9 +109,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "pt-br"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "America/Sao_Paulo"
 
 USE_I18N = True
 
@@ -125,3 +130,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 AUTH_USER_MODEL = 'bluetideapp.Usuario'
+
+# External data is opt-in. The default local fixture makes development and
+# automated tests deterministic and is visibly labelled in the product.
+BLUETIDE_DATA_MODE = os.getenv("BLUETIDE_DATA_MODE", "fixture").lower()
+BLUETIDE_HTTP_TIMEOUT = float(os.getenv("BLUETIDE_HTTP_TIMEOUT", "4.0"))
+BLUETIDE_WATER_DATA_FILE = os.getenv("BLUETIDE_WATER_DATA_FILE", "")
+BLUETIDE_DATA_CACHE_SECONDS = int(os.getenv("BLUETIDE_DATA_CACHE_SECONDS", "300"))

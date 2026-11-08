@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Comparar Ipanema | BlueTide{% endblock %}
+
+{% block content %}
+<header class="page-heading">
+    <div>
+        <p class="eyebrow">Decisão lado a lado</p>
+        <h1>Comparar Ipanema</h1>
+        <p>A mesma régua é aplicada a todos os pontos. Sem recomendação significa que o mínimo de segurança ou qualidade não foi atendido.</p>
+    </div>
+</header>
+
+{% include "_data_notice.html" %}
+
+<div class="section-heading">
+    <div><p class="eyebrow">Perfil de hoje</p><h2>{{ profile_label }}</h2></div>
+    <div class="profile-selector">
+        {% for value, label in profiles.items %}<a class="profile-link {% if profile == value %}is-active{% endif %}" href="?perfil={{ value }}">{{ label }}</a>{% endfor %}
+    </div>
+</div>
+
+<div class="comparison-grid">
+    {% for item in items %}
+    {% with c=item.conditions r=item.recommendation %}
+    <article class="card comparison-card {% if forloop.first and r.available %}is-best{% endif %}">
+        <div><p class="eyebrow">{{ c.beach.neighborhood }}</p><h2>{{ c.beach.posto }}</h2><p class="small muted">{{ c.beach.summary }}</p></div>
+        <div class="recommendation recommendation-{{ r.tone }}"><span class="badge badge-{{ r.tone }}">{{ r.label }}</span><p>{{ r.summary }}</p></div>
+        <div class="compare-row"><span>Qualidade</span><strong>{{ item.water_label }}</strong></div>
+        <div class="compare-row"><span>Boletim</span><strong>{{ item.water_age }}</strong></div>
+        <div class="compare-row"><span>Ondas</span><strong>{{ c.wave_height|floatformat:1|default_if_none:"-" }} m</strong></div>
+        <div class="compare-row"><span>Vento</span><strong>{% if c.wind_speed == None %}Indisponível{% else %}{{ c.wind_speed|floatformat:0 }} km/h{% endif %}</strong></div>
+        <div class="compare-row"><span>Chuva 24h</span><strong>{{ c.rain_24h|floatformat:1|default_if_none:"-" }} mm</strong></div>
+        <a class="button-secondary" href="{% url 'detalhes_praia' c.beach.slug %}?perfil={{ profile }}">Entender este ponto</a>
+    </article>
+    {% endwith %}
+    {% endfor %}
+</div>
+
+<div class="card" style="margin-top: 1rem;">
+    <p class="eyebrow">Decisão do Pedro</p>
+    <h2>O primeiro ponto disponível é a melhor correspondência</h2>
+    <p class="muted">A ordem nunca coloca um ponto sem boletim, com dado vencido ou com campo essencial ausente acima de uma alternativa comparável.</p>
+</div>
+{% endblock %}

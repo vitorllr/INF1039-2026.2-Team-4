@@ -30,5 +30,8 @@ urlpatterns = [
     path("favoritos/", views.favoritos, name="favoritos"),
     path("faq/", views.duvidas, name="duvidas"),
     path("alertas/", views.alertas, name="alertas"),
-    path("detalhes/", views.detalhes, name="detalhes")
+    path("filtros/", views.filtros, name="filtros"),
+    path("comparar/", views.comparar, name="comparar"),
+    path("detalhes/", views.detalhes, name="detalhes"),
+    path("praias/<slug:slug>/", views.detalhes, name="detalhes_praia"),
 ]

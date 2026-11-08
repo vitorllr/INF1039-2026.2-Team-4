@@ -1,164 +1,78 @@
-{% load static %}
-<!doctype html>
-<html lang="pt-BR">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Meu perfil</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet">
-    <link href="{% static 'css/perfil.css' %}" rel="stylesheet">
-</head>
+{% block title %}Perfil | BlueTide{% endblock %}
 
-<body>
-
-    <div class="celular d-flex flex-column">
-
-        <header class="topo d-flex justify-content-between align-items-center px-4 py-3 border-bottom">
-            <h1 class="m-0">Meu perfil</h1>
-            <div class="avatar rounded-circle d-flex align-items-center justify-content-center fw-semibold">MC</div>
-        </header>
-
-        <div class="px-3 pt-3 d-flex flex-column gap-3">
-
-
-            <div class="cartao d-flex align-items-center gap-3">
-                <div class="avatar-grande rounded-circle d-flex align-items-center justify-content-center fw-semibold">MC</div>
-                <div>
-                    <p class="nome m-0">Marina Costa</p>
-                    <p class="info m-0">marina.costa@email.com</p>
-                    <p class="info m-0">3 favoritas • 3 alertas ativos</p>
-                </div>
-            </div>
-
-
-            <div class="cartao">
-                <div class="linha-sep d-flex justify-content-between align-items-center py-2">
-                    <span>Usar minha localização (GPS)</span>
-                    <div class="toggle toggle-on d-flex align-items-center justify-content-end">
-                        <div class="bolinha"></div>
-                    </div>
-                </div>
-                <div class="linha-sep d-flex justify-content-between align-items-center py-2">
-                    <span>Economia de dados</span>
-                    <div class="toggle toggle-on d-flex align-items-center justify-content-end">
-                        <div class="bolinha"></div>
-                    </div>
-                </div>
-                <div class="d-flex justify-content-between align-items-center py-2">
-                    <span>Verificação em duas etapas</span>
-                    <div class="toggle toggle-off d-flex align-items-center justify-content-start">
-                        <div class="bolinha"></div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="cartao">
-                <p class="rotulo mb-2">COMO VOCÊ VAI À PRAIA</p>
-                <div class="row g-2">
-                    <div class="col-6">
-                        <div class="opcao">A pé</div>
-                    </div>
-                    <div class="col-6">
-                        <div class="opcao opcao-ativa">Bicicleta</div>
-                    </div>
-                    <div class="col-6">
-                        <div class="opcao">Metrô/ônibus</div>
-                    </div>
-                    <div class="col-6">
-                        <div class="opcao">Carro</div>
-                    </div>
-                </div>
-                <p class="mt-3 mb-0">Região: <span class="fw-bold">Rio de Janeiro (Zona Sul)</span></p>
-            </div>
-
-
-            <div class="cartao d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="icone-azul">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                            <path d="M13.5 21a1.5 1.5 0 0 1-3 0"></path>
-                        </svg>
-                    </span>
-                    <span>Alertas e notificações</span>
-                </div>
-                <span class="chevron">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 6 15 12 9 18"></path>
-                    </svg>
-                </span>
-            </div>
-
-
-            <div class="cartao d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="icone-azul">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="9"></circle>
-                            <path d="M9.5 9.5a2.5 2.5 0 0 1 4 2c0 1.5-2 2-2 3"></path>
-                            <path d="M12 17h0"></path>
-                        </svg>
-                    </span>
-                    <span>Dúvidas frequentes</span>
-                </div>
-                <span class="chevron">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 6 15 12 9 18"></path>
-                    </svg>
-                </span>
-            </div>
-
-
-            <div class="botao-sair d-flex align-items-center justify-content-center gap-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M15 17v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v2"></path>
-                    <path d="M19 12H9"></path>
-                    <path d="M16 9 19 12 16 15"></path>
-                </svg>
-                Sair da conta
-            </div>
-
-            <p class="versao text-center mt-1 mb-2">BlueTide • versão 1.0</p>
-
-        </div>
-
-        <nav class="menu d-flex justify-content-between px-4 py-3 mt-auto">
-            <div class="item-menu d-flex flex-column align-items-center gap-1">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"></path>
-                    <circle cx="12" cy="10" r="2.5"></circle>
-                </svg>
-                <span>Mapa</span>
-            </div>
-            <div class="item-menu d-flex flex-column align-items-center gap-1">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="7"></circle>
-                    <line x1="21" y1="21" x2="16.5" y2="16.5"></line>
-                </svg>
-                <span>Pesquisa</span>
-            </div>
-            <div class="item-menu d-flex flex-column align-items-center gap-1">
-                <span class="d-flex align-items-center gap-1">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 21s-7-4.5-9.5-8.5C1 10 2 6.5 5 6c2-.3 3.5 1 4.5 2.5C10.5 7 12 5.7 14 6c3 .5 4 4 2.5 6.5C19 16.5 12 21 12 21z"></path>
-                    </svg>
-                    <span class="badge-nav">3</span>
-                </span>
-                <span>Favoritos</span>
-            </div>
-            <div class="item-menu ativo d-flex flex-column align-items-center gap-1">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="8" r="4"></circle>
-                    <path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path>
-                </svg>
-                <span>Perfil</span>
-            </div>
-        </nav>
-
+{% block content %}
+<header class="page-heading">
+    <div>
+        <p class="eyebrow">Preferências pessoais</p>
+        <h1>Seu jeito de ir à praia</h1>
+        <p>Essas escolhas ajudam o BlueTide a ordenar os pontos, sem esconder nenhuma condição relevante.</p>
     </div>
-</body>
+</header>
 
-</html>
+<div class="grid-2">
+    <section class="card profile-hero" aria-labelledby="perfil-pedro">
+        <div class="profile-avatar" aria-hidden="true">PS</div>
+        <div>
+            <h2 id="perfil-pedro">Pedro Santos</h2>
+            <p class="muted">23 anos, Rio de Janeiro</p>
+            <p class="small muted">3 favoritas e alertas de segurança ativos</p>
+        </div>
+    </section>
+
+    <section class="card" aria-labelledby="preferencia-mar">
+        <p class="eyebrow">Recomendação</p>
+        <h2 id="preferencia-mar">O que você procura hoje?</h2>
+        <div class="preference-pills" aria-label="Perfil de praia preferido">
+            <span class="preference-pill is-selected">Banho tranquilo</span>
+            <span class="preference-pill">Surf iniciante</span>
+            <span class="preference-pill">Sem preferência</span>
+        </div>
+        <p class="small muted" style="margin: 1rem 0 0;">Você pode trocar esse perfil ao comparar os pontos de Ipanema.</p>
+    </section>
+</div>
+
+<div class="grid-2" style="margin-top: 1rem;">
+    <section class="card" aria-labelledby="configuracoes">
+        <h2 id="configuracoes">Configurações</h2>
+        <div class="settings-list">
+            <div class="settings-row">
+                <div><p>Usar minha localização</p><span class="small muted">Mostra primeiro os pontos mais próximos.</span></div>
+                <button class="switch" type="button" data-toggle aria-pressed="true" aria-label="Usar minha localização"></button>
+            </div>
+            <div class="settings-row">
+                <div><p>Economia de dados</p><span class="small muted">Reduz atualizações em segundo plano.</span></div>
+                <button class="switch" type="button" data-toggle aria-pressed="true" aria-label="Ativar economia de dados"></button>
+            </div>
+            <div class="settings-row">
+                <div><p>Alertas de mudança</p><span class="small muted">Avisa quando uma favorita perde a recomendação.</span></div>
+                <button class="switch" type="button" data-toggle aria-pressed="true" aria-label="Ativar alertas de mudança"></button>
+            </div>
+        </div>
+    </section>
+
+    <section class="card" aria-labelledby="deslocamento">
+        <p class="eyebrow">Deslocamento</p>
+        <h2 id="deslocamento">Como você vai?</h2>
+        <div class="preference-pills">
+            <span class="preference-pill">A pé</span>
+            <span class="preference-pill is-selected">Bicicleta</span>
+            <span class="preference-pill">Metrô ou ônibus</span>
+            <span class="preference-pill">Carro</span>
+        </div>
+        <p class="small muted" style="margin: 1rem 0 0;">Região padrão: Ipanema, Rio de Janeiro.</p>
+    </section>
+</div>
+
+<div class="grid-2" style="margin-top: 1rem;">
+    <a class="card link-card" href="{% url 'alertas' %}">
+        <div><p class="eyebrow">Notificações</p><h3>Gerenciar alertas</h3><p class="small muted">Qualidade da água, chuva e mar agitado.</p></div>
+        <span aria-hidden="true">→</span>
+    </a>
+    <a class="card link-card" href="{% url 'duvidas' %}">
+        <div><p class="eyebrow">Ajuda</p><h3>Entender os indicadores</h3><p class="small muted">Fontes, atualizações e limites dos dados.</p></div>
+        <span aria-hidden="true">→</span>
+    </a>
+</div>
+{% endblock %}

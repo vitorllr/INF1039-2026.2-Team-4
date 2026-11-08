@@ -1,0 +1,24 @@
+{
+  "points": {
+    "ipanema-posto-7": {
+      "water": {"status": "propria", "age_hours": 240, "source": "Boletim de demonstração INEA"},
+      "marine": {"age_minutes": 45, "wave_height": 1.3, "wave_period": 9, "sea_temperature": 23.0, "sea_level": 0.5, "air_temperature": 27.0, "rain_24h": 0.4, "wind_speed": 18.0}
+    },
+    "ipanema-posto-8": {
+      "water": {"status": "propria", "age_hours": 30, "source": "Boletim de demonstração INEA"},
+      "marine": {"age_minutes": 35, "wave_height": 0.6, "wave_period": 8, "sea_temperature": 23.5, "sea_level": 0.4, "air_temperature": 27.5, "rain_24h": 0.2, "wind_speed": 9.0}
+    },
+    "ipanema-posto-9": {
+      "water": {"status": "propria", "age_hours": 18, "source": "Boletim de demonstração INEA"},
+      "marine": {"age_minutes": 25, "wave_height": 0.9, "wave_period": 8, "sea_temperature": 23.0, "sea_level": 0.5, "air_temperature": 28.0, "rain_24h": 0.8, "wind_speed": 13.0}
+    },
+    "ipanema-posto-10": {
+      "water": {"status": null, "age_hours": null, "source": "Boletim de demonstração INEA"},
+      "marine": {"age_minutes": 30, "wave_height": 0.8, "wave_period": 8, "sea_temperature": 23.1, "sea_level": 0.5, "air_temperature": 27.0, "rain_24h": 0.6, "wind_speed": 11.0}
+    },
+    "ipanema-posto-11": {
+      "water": {"status": "propria", "age_hours": 22, "source": "Boletim de demonstração INEA"},
+      "marine": {"age_minutes": 28, "wave_height": 0.7, "wave_period": 7, "sea_temperature": 22.8, "sea_level": 0.4, "air_temperature": 27.0, "rain_24h": 0.4, "wind_speed": null}
+    }
+  }
+}
