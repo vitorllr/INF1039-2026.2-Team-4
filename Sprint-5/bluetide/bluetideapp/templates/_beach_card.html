@@ -1,17 +1,27 @@
 {% with c=item.conditions r=item.recommendation %}
-<article class="card beach-card">
+<article class="card beach-card" data-favorite-card data-slug="{{ c.beach.slug }}">
     <div class="beach-card-head">
         <div>
             <p class="eyebrow">{{ c.beach.neighborhood }}</p>
             <h2 class="beach-title">{{ c.beach.display_name }}</h2>
             <p class="small muted">{{ c.beach.summary }}</p>
         </div>
-        <button class="heart" type="button" aria-label="{% if item.favorite %}Remover{% else %}Adicionar{% endif %} {{ c.beach.display_name }} dos favoritos">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5S4 16 4 9.7C4 6.6 7.8 5 10 7.4L12 10l2-2.6c2.2-2.4 6-0.8 6 2.3 0 6.3-8 10.8-8 10.8Z"/></svg>
-        </button>
+        <form class="heart-form" method="post" action="{% if item.favorite %}{% url 'favorite_remove' c.beach.slug %}{% else %}{% url 'favorite_restore' c.beach.slug %}{% endif %}" data-favorite-form data-favorite="{% if item.favorite %}true{% else %}false{% endif %}" data-name="{{ c.beach.display_name }}" data-remove-url="{% url 'favorite_remove' c.beach.slug %}" data-restore-url="{% url 'favorite_restore' c.beach.slug %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button class="heart{% if item.favorite %} is-favorite{% endif %}" type="submit" aria-label="{% if item.favorite %}Remover {{ c.beach.display_name }} dos favoritos{% else %}Adicionar {{ c.beach.display_name }} aos favoritos{% endif %}" title="{% if item.favorite %}Remover dos favoritos{% else %}Adicionar aos favoritos{% endif %}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5S4 16 4 9.7C4 6.6 7.8 5 10 7.4L12 10l2-2.6c2.2-2.4 6-0.8 6 2.3 0 6.3-8 10.8-8 10.8Z"/></svg>
+            </button>
+        </form>
     </div>
 
-    <div><span class="badge badge-{{ item.water_tone }}">{{ item.water_label }} · {{ item.water_age }}</span></div>
+    <div class="badge-row">
+        <span class="badge badge-{{ item.water_tone }}">{{ item.water_label }} · {{ item.water_age }}</span>
+        <span class="badge badge-occupancy badge-occupancy-{{ item.occupancy_tone }}">
+            <span class="occupancy-meter" aria-hidden="true"><i></i><i></i><i></i></span>
+            {{ item.occupancy_label }}{% if item.occupancy_tone != "unknown" %} · {{ item.occupancy_age }}{% endif %}
+        </span>
+    </div>
 
     <div class="metrics" aria-label="Condições resumidas">
         <div class="metric"><span class="metric-label">Ondas</span><span class="metric-value">{{ c.wave_height|floatformat:1|default_if_none:"-" }} m</span></div>

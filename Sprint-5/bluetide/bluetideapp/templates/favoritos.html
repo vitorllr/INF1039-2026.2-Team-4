@@ -7,19 +7,43 @@
     <div>
         <p class="eyebrow">Acesso rápido</p>
         <h1>Favoritos</h1>
-        <p>Os pontos que Pedro acompanha, já ordenados pelas condições de hoje.</p>
+        <p>Os pontos que você acompanha, já ordenados pelas condições de hoje.</p>
     </div>
-    <a class="button" href="{% url 'comparar' %}?perfil={{ profile }}{% for item in items %}&ponto={{ item.conditions.beach.slug }}{% endfor %}">Comparar favoritos</a>
+    <a class="button" data-compare-favorites data-compare-base="{% url 'comparar' %}?perfil={{ profile }}" href="{% url 'comparar' %}?perfil={{ profile }}{% for item in items %}&ponto={{ item.conditions.beach.slug }}{% endfor %}" {% if not items %}hidden{% endif %}>Comparar favoritos</a>
 </header>
 
 {% include "_data_notice.html" %}
 
+<section class="card badge-legend" aria-labelledby="badge-legend-title">
+    <h2 class="badge-legend-title" id="badge-legend-title">Como ler os selos</h2>
+    <dl class="badge-legend-items">
+        <div>
+            <dt><span class="badge badge-success">Água própria</span></dt>
+            <dd><strong>Balneabilidade.</strong> Resultado do último boletim da água. Verde, laranja e vermelho são usados só para água e segurança.</dd>
+        </div>
+        <div>
+            <dt><span class="badge badge-occupancy badge-occupancy-medium"><span class="occupancy-meter" aria-hidden="true"><i></i><i></i><i></i></span>Ocupação média</span></dt>
+            <dd><strong>Ocupação da areia.</strong> Estimativa de lotação: uma barra é baixa, duas é média e três é alta.</dd>
+        </div>
+    </dl>
+</section>
+
 <div class="section-heading">
-    <div><p class="eyebrow">Perfil aplicado</p><h2>{{ profile_label }}</h2></div>
+    <div>
+        <p class="eyebrow">Perfil aplicado</p>
+        <h2>{{ profile_label }}</h2>
+        <p>Para remover, toque no coração. Você terá 10 segundos para desfazer.</p>
+    </div>
     <a class="button-quiet" href="{% url 'pesquisa' %}?perfil={{ profile }}">Adicionar outro ponto →</a>
 </div>
 
-<div class="beach-grid">
+<div class="beach-grid" data-favorites-grid>
     {% for item in items %}{% include "_beach_card.html" %}{% endfor %}
+</div>
+
+<div class="card empty-state" data-favorites-empty {% if items %}hidden{% endif %}>
+    <h2>Nenhum favorito por enquanto</h2>
+    <p>Explore os pontos e toque no coração para acompanhar os que você mais visita.</p>
+    <a class="button-secondary" href="{% url 'pesquisa' %}?perfil={{ profile }}">Explorar pontos</a>
 </div>
 {% endblock %}

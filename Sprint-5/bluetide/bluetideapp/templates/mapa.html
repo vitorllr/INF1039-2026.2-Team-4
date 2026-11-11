@@ -27,27 +27,49 @@
 </div>
 
 <div class="map-layout">
-    <section class="coast-map" aria-label="Esquema geográfico aproximado da orla de Ipanema, não é mapa de navegação">
-        <svg class="coast-map-art" viewBox="0 0 3900 3000" role="group" aria-label="Postos de coleta distribuídos aproximadamente ao longo da costa">
-            <rect width="3900" height="3000" fill="#e9dfc1" />
-            <path d="M0 1420 C300 1395 420 1350 571 1336 C900 1287 1200 1244 1479 1236 C1750 1230 1920 1285 2142 1314 C2320 1337 2450 1325 2601 1325 C2880 1325 3090 1410 3325 1492 C3550 1570 3720 1600 3900 1620 L3900 3000 L0 3000 Z" fill="#cfe9e8" />
-            <path d="M0 1420 C300 1395 420 1350 571 1336 C900 1287 1200 1244 1479 1236 C1750 1230 1920 1285 2142 1314 C2320 1337 2450 1325 2601 1325 C2880 1325 3090 1410 3325 1492 C3550 1570 3720 1600 3900 1620" fill="none" stroke="#fff7e5" stroke-width="120" />
-            <path d="M0 1550 C300 1525 420 1480 571 1466 C900 1417 1200 1374 1479 1366 C1750 1360 1920 1415 2142 1444 C2320 1467 2450 1455 2601 1455 C2880 1455 3090 1540 3325 1622 C3550 1700 3720 1730 3900 1750" fill="none" stroke="#ddc99e" stroke-width="65" />
-            <path d="M0 420 H3900 M0 850 H3900 M680 0 V1080 M1480 0 V1080 M2320 0 V1080 M3160 0 V1080" fill="none" stroke="#ffffff" stroke-opacity=".36" stroke-width="20" />
-            <path d="M120 2100 C760 2010 1330 2170 1940 2070 S3190 2000 3780 2110 M80 2540 C820 2440 1430 2610 2130 2490 S3260 2410 3820 2530" fill="none" stroke="#ffffff" stroke-opacity=".32" stroke-width="25" />
-            {% for item in items %}
-            {% with c=item.conditions r=item.recommendation %}
-            <a class="map-pin map-pin-{{ r.tone }}" href="{% url 'detalhes_praia' c.beach.slug %}?perfil={{ profile }}" aria-label="{{ c.beach.display_name }}: {{ r.label }}" focusable="true">
-                <circle class="map-pin-target" cx="{{ c.beach.map_x }}" cy="{{ c.beach.map_y }}" r="230" />
-                <circle class="map-pin-dot" cx="{{ c.beach.map_x }}" cy="{{ c.beach.map_y }}" r="125" />
-                <text x="{{ c.beach.map_x }}" y="{{ c.beach.map_y }}">{{ c.beach.posto|slice:"6:" }}</text>
-            </a>
-            {% endwith %}
-            {% endfor %}
-        </svg>
-        <span class="map-label map-label-land">Ipanema</span>
-        <span class="map-label map-label-water">Oceano Atlântico</span>
-    </section>
+    <div class="map-column">
+        <section class="coast-map" aria-label="Esquema geográfico aproximado da orla de Ipanema, não é mapa de navegação">
+            <svg class="coast-map-art" viewBox="0 0 3900 3000" role="group" aria-label="Postos de coleta distribuídos aproximadamente ao longo da costa">
+                <rect width="3900" height="3000" fill="#e9dfc1" />
+                <path d="M0 1420 C300 1395 420 1350 571 1336 C900 1287 1200 1244 1479 1236 C1750 1230 1920 1285 2142 1314 C2320 1337 2450 1325 2601 1325 C2880 1325 3090 1410 3325 1492 C3550 1570 3720 1600 3900 1620 L3900 3000 L0 3000 Z" fill="#cfe9e8" />
+                <path d="M0 1420 C300 1395 420 1350 571 1336 C900 1287 1200 1244 1479 1236 C1750 1230 1920 1285 2142 1314 C2320 1337 2450 1325 2601 1325 C2880 1325 3090 1410 3325 1492 C3550 1570 3720 1600 3900 1620" fill="none" stroke="#fff7e5" stroke-width="120" />
+                <path d="M0 1550 C300 1525 420 1480 571 1466 C900 1417 1200 1374 1479 1366 C1750 1360 1920 1415 2142 1444 C2320 1467 2450 1455 2601 1455 C2880 1455 3090 1540 3325 1622 C3550 1700 3720 1730 3900 1750" fill="none" stroke="#ddc99e" stroke-width="65" />
+                <path d="M0 420 H3900 M0 850 H3900 M680 0 V1080 M1480 0 V1080 M2320 0 V1080 M3160 0 V1080" fill="none" stroke="#ffffff" stroke-opacity=".36" stroke-width="20" />
+                <path d="M120 2100 C760 2010 1330 2170 1940 2070 S3190 2000 3780 2110 M80 2540 C820 2440 1430 2610 2130 2490 S3260 2410 3820 2530" fill="none" stroke="#ffffff" stroke-opacity=".32" stroke-width="25" />
+                {% for item in items %}
+                {% with c=item.conditions r=item.recommendation %}
+                <a class="map-pin map-pin-{{ r.tone }}" href="{% url 'detalhes_praia' c.beach.slug %}?perfil={{ profile }}" aria-label="{{ c.beach.display_name }}: {{ r.label }}" focusable="true">
+                    <circle class="map-pin-target" cx="{{ c.beach.map_x }}" cy="{{ c.beach.map_y }}" r="230" />
+                    <circle class="map-pin-dot" cx="{{ c.beach.map_x }}" cy="{{ c.beach.map_y }}" r="125" />
+                    <text x="{{ c.beach.map_x }}" y="{{ c.beach.map_y }}">{{ c.beach.posto|slice:"6:" }}</text>
+                    <g class="map-pin-badge" transform="translate({{ c.beach.map_x|add:100 }} {{ c.beach.map_y|add:-100 }})">{% include "_map_pin_glyph.html" with tone=r.tone %}</g>
+                </a>
+                {% endwith %}
+                {% endfor %}
+            </svg>
+            <span class="map-label map-label-land">Ipanema</span>
+            <span class="map-label map-label-water">Oceano Atlântico</span>
+        </section>
+
+        <section class="card map-legend" aria-labelledby="map-legend-title">
+            <h2 class="map-legend-title" id="map-legend-title">Legenda do mapa</h2>
+            <ul class="map-legend-items">
+                <li>
+                    <svg class="legend-pin legend-pin-success" viewBox="-150 -190 340 340" aria-hidden="true"><circle class="map-pin-dot" r="125" /><g class="map-pin-badge" transform="translate(100 -100)">{% include "_map_pin_glyph.html" with tone="success" %}</g></svg>
+                    <span><strong>Melhor escolha ou boa alternativa</strong><small>Água própria, dados em dia e mar compatível com o seu perfil.</small></span>
+                </li>
+                <li>
+                    <svg class="legend-pin legend-pin-warning" viewBox="-150 -190 340 340" aria-hidden="true"><circle class="map-pin-dot" r="125" /><g class="map-pin-badge" transform="translate(100 -100)">{% include "_map_pin_glyph.html" with tone="warning" %}</g></svg>
+                    <span><strong>Escolha com atenção</strong><small>Dados válidos, mas mar, chuva ou vento não favorecem o seu perfil.</small></span>
+                </li>
+                <li>
+                    <svg class="legend-pin legend-pin-neutral" viewBox="-150 -190 340 340" aria-hidden="true"><circle class="map-pin-dot" r="125" /><g class="map-pin-badge" transform="translate(100 -100)">{% include "_map_pin_glyph.html" with tone="neutral" %}</g></svg>
+                    <span><strong>Sem recomendação</strong><small>Boletim ausente ou vencido, água imprópria ou dados incompletos.</small></span>
+                </li>
+            </ul>
+            <p class="map-legend-note">O número dentro do marcador é o posto de salva-vidas. Toque em um marcador para ver os detalhes.</p>
+        </section>
+    </div>
 
     <aside class="map-summary" aria-label="Pontos ordenados pela recomendação">
         <div class="card">

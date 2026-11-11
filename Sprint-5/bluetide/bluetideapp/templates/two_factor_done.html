@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Verificação ativada | BlueTide{% endblock %}
+
+{% block content %}
+<header class="page-heading">
+    <div>
+        <p class="eyebrow">Segurança da conta</p>
+        <h1>Verificação ativada</h1>
+        <p>Código confirmado. A partir do próximo login, a conta pede a senha e o código do autenticador.</p>
+    </div>
+</header>
+
+<ol class="setup-steps" aria-label="Etapas da configuração">
+    <li class="is-done"><span>✓</span>Conectar o app</li>
+    <li class="is-done"><span>✓</span>Confirmar o código</li>
+    <li class="is-current"><span>3</span>Guardar códigos de recuperação</li>
+</ol>
+
+<section class="card recovery-card" aria-labelledby="recovery-title">
+    <p class="eyebrow">Etapa 3</p>
+    <h2 id="recovery-title">Guarde seus códigos de recuperação</h2>
+    <p>Se você perder o celular, cada código permite entrar uma única vez. Eles <strong>não serão mostrados de novo</strong>.</p>
+    <ul class="recovery-codes" data-sensitive data-recovery-codes>
+        {% for code in recovery_codes %}<li><code>{{ code }}</code></li>{% endfor %}
+    </ul>
+    <div class="recovery-actions">
+        <button class="button-secondary" type="button" data-copy-codes data-copy-feedback="Códigos copiados">Copiar códigos</button>
+        <button class="button-secondary" type="button" data-download-codes>Baixar arquivo .txt</button>
+    </div>
+    <a class="button button-block" href="{% url 'perfil' %}">Já guardei, voltar ao perfil</a>
+</section>
+{% endblock %}

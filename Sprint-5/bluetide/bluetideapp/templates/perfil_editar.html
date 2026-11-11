@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Editar perfil | BlueTide{% endblock %}
+
+{% block content %}
+{% with user=request.user %}
+<a class="back-link" href="{% url 'perfil' %}">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    Voltar ao perfil
+</a>
+
+<header class="page-heading">
+    <div>
+        <p class="eyebrow">Perfil</p>
+        <h1>Editar dados</h1>
+        <p>Nada muda até você salvar. Se algo estiver errado, os campos preenchidos continuam aqui.</p>
+    </div>
+</header>
+
+<form method="post" enctype="multipart/form-data" class="edit-form" novalidate>
+    {% csrf_token %}
+
+    {% if form.errors %}
+    <div class="error-summary" role="alert" tabindex="-1" data-error-summary>
+        <p class="error-summary-title">Revise {{ form.errors|length }} campo{{ form.errors|length|pluralize }} antes de salvar:</p>
+        <ul>
+            {% for field in form %}{% if field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }}: {{ field.errors|join:" " }}</a></li>{% endif %}{% endfor %}
+        </ul>
+        {% if photo_dropped %}<p class="error-summary-note">A foto escolhida não foi mantida. <a href="#{{ form.foto.id_for_label }}">Escolha a foto de novo</a> antes de salvar.</p>{% endif %}
+    </div>
+    {% endif %}
+
+    <section class="card form-section" aria-labelledby="dados-pessoais">
+        <h2 id="dados-pessoais">Dados pessoais</h2>
+
+        <div class="photo-field{% if form.foto.errors %} has-error{% endif %}">
+            <span class="profile-avatar photo-preview" data-photo-preview>
+                {% if user.foto %}<img src="{{ user.foto.url }}" alt="">{% else %}<span>{{ user.iniciais }}</span>{% endif %}
+            </span>
+            <div class="photo-controls">
+                <label class="field-label" id="{{ form.foto.auto_id }}_label" for="{{ form.foto.id_for_label }}">{{ form.foto.label }}</label>
+                <input class="file-input" type="file" aria-labelledby="{{ form.foto.auto_id }}_label" name="{{ form.foto.html_name }}" id="{{ form.foto.id_for_label }}" accept="image/jpeg,image/png,image/webp" aria-describedby="{{ form.foto.auto_id }}_helptext{% if form.foto.errors %} {{ form.foto.auto_id }}_errors{% endif %}{% if photo_dropped %} {{ form.foto.auto_id }}_notice{% endif %}"{% if form.foto.errors %} aria-invalid="true"{% endif %} data-photo-input>
+                <div class="photo-picker" aria-hidden="true">
+                    <label class="button-secondary photo-pick" for="{{ form.foto.id_for_label }}">{% if user.foto %}Trocar foto{% else %}Escolher foto{% endif %}</label>
+                    <span class="photo-filename" data-photo-name></span>
+                </div>
+                <p class="field-help" id="{{ form.foto.auto_id }}_helptext">{{ form.foto.help_text }}</p>
+                {% if user.foto %}
+                <label class="checkbox-inline"><input type="checkbox" name="{{ form.foto.html_name }}-clear" id="{{ form.foto.html_name }}-clear_id"> Remover foto atual</label>
+                {% endif %}
+                {% if form.foto.errors %}<p class="field-error" id="{{ form.foto.auto_id }}_errors">{{ form.foto.errors|join:" " }}</p>{% endif %}
+                {% if photo_dropped %}<p class="field-notice" id="{{ form.foto.auto_id }}_notice" data-photo-notice>A foto escolhida não foi mantida porque os dados não foram salvos. Escolha a foto de novo.</p>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-grid">
+            {% include "_field.html" with field=form.nome extra_class="field-span-2" %}
+            {% include "_field.html" with field=form.email extra_class="field-span-2" %}
+            <div class="field-span-2" data-email-confirm>
+                {% include "_field.html" with field=form.senha_atual %}
+            </div>
+            {% include "_field.html" with field=form.cidade %}
+            {% include "_field.html" with field=form.estado %}
+        </div>
+    </section>
+
+    <section class="card form-section" id="preferencias-form" aria-labelledby="preferencias-titulo">
+        <h2 id="preferencias-titulo">Preferências</h2>
+        <p class="form-section-lead">Cada opção mostra o que muda no aplicativo. Alertas de segurança e de qualidade da água aparecem sempre.</p>
+
+        <fieldset class="choice-group">
+            <legend>Perfil de praia</legend>
+            <div class="choice-list">
+                {% for choice, effect in profile_choices %}
+                <label class="choice-card" for="{{ choice.id_for_label }}">
+                    {{ choice.tag }}
+                    <span><strong>{{ choice.choice_label }}</strong><small>{{ effect }}</small></span>
+                </label>
+                {% endfor %}
+            </div>
+        </fieldset>
+
+        <fieldset class="choice-group">
+            <legend>Como você costuma ir</legend>
+            <p class="choice-help">{{ transport_effect }}</p>
+            <div class="choice-pills">
+                {% for choice in form.meio_transporte_preferido %}
+                <label class="choice-pill" for="{{ choice.id_for_label }}">{{ choice.tag }}<span>{{ choice.choice_label }}</span></label>
+                {% endfor %}
+            </div>
+        </fieldset>
+
+        <fieldset class="choice-group">
+            <legend>Ajustes</legend>
+            <div class="toggle-list">
+                <label class="toggle-row" for="{{ form.usar_localizacao_celular.id_for_label }}">
+                    <span><strong>Usar minha localização</strong><small>{{ setting_effects.usar_localizacao_celular }}</small></span>
+                    {{ form.usar_localizacao_celular }}
+                </label>
+                <label class="toggle-row" for="{{ form.economia_dados.id_for_label }}">
+                    <span><strong>Economia de dados</strong><small>{{ setting_effects.economia_dados }}</small></span>
+                    {{ form.economia_dados }}
+                </label>
+                <label class="toggle-row" for="{{ form.alertas_mudanca.id_for_label }}">
+                    <span><strong>Alertas de mudança</strong><small>{{ setting_effects.alertas_mudanca }}</small></span>
+                    {{ form.alertas_mudanca }}
+                </label>
+            </div>
+        </fieldset>
+    </section>
+
+    <div class="form-actions">
+        <a class="button-secondary" href="{% url 'perfil' %}">Cancelar</a>
+        <button class="button" type="submit">Salvar alterações</button>
+    </div>
+</form>
+{% endwith %}
+{% endblock %}

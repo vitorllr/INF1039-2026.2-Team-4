@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Confirmar código | BlueTide{% endblock %}
+
+{% block content %}
+<a class="back-link" href="{% url 'login' %}">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    Voltar ao login
+</a>
+
+<div class="auth-layout">
+    <header class="auth-intro">
+        <p class="eyebrow">Segunda etapa</p>
+        <h1>Confirme que é você</h1>
+        <p>A senha de <strong>{{ account_email }}</strong> foi aceita. Agora digite o código de 6 dígitos do seu aplicativo autenticador.</p>
+    </header>
+
+    <section class="card auth-card" aria-label="Confirmação do código">
+        <form method="post" class="auth-form" novalidate>
+            {% csrf_token %}
+            {% include "_field.html" with field=form.code extra_class="field-code" %}
+            <button class="button button-block" type="submit">Confirmar e entrar</button>
+        </form>
+        <p class="auth-footnote">O código muda a cada 30 segundos. Se ele expirar, use o próximo.</p>
+    </section>
+</div>
+{% endblock %}

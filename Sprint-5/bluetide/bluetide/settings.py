@@ -79,6 +79,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "bluetideapp.context_processors.favorite_undo",
             ],
         },
     },
@@ -133,6 +134,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "static/"
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -141,6 +144,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 AUTH_USER_MODEL = 'bluetideapp.Usuario'
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "perfil"
 
 # External data is opt-in. The default local fixture makes development and
 # automated tests deterministic and is visibly labelled in the product.

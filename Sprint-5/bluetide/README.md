@@ -15,6 +15,27 @@ python manage.py runserver
 
 Open `http://127.0.0.1:8000/web/`.
 
+## Accounts and the demo persona
+
+Map, search, comparison and details stay open without an account.
+An account adds saved favorites, editable profile data and two-step verification.
+
+Create or reset the fictional Pedro account without storing a password in the repository.
+
+```bash
+BLUETIDE_DEMO_PASSWORD='choose-a-local-password' python manage.py criar_conta_demo
+```
+
+Without the variable, the command asks for the password, or `--generate-password` prints a random one once.
+The account is `pedro@example.com` and every run resets its name, e-mail, photo, preferences, favorites and two-step verification.
+
+Two-step verification uses standard RFC 6238 codes (SHA-1, 6 digits, 30 seconds), so any authenticator app works.
+It only turns on after the user confirms a valid code, a used code cannot be replayed, and the eight recovery codes are stored hashed and shown only once.
+The QR code is generated locally by `segno`, so the secret never leaves the server.
+
+Profile photos are saved under `media/`, which is ignored by git.
+Django serves `media/` only when `DJANGO_DEBUG=true`, so a production deployment must serve it from its web server or object storage.
+
 ## Data configuration
 
 `BLUETIDE_DATA_MODE` accepts `fixture` or `live` and defaults to `fixture`.
@@ -44,6 +65,7 @@ Run the focused tests first.
 ```bash
 python manage.py test bluetideapp.tests.RecommendationTests bluetideapp.tests.ProviderTests -v 2
 python manage.py test bluetideapp.tests.ViewTests -v 2
+python manage.py test bluetideapp.tests.MapAndFavoritesHeuristicTests bluetideapp.tests.LoginTests bluetideapp.tests.TwoFactorLoginTests bluetideapp.tests.ProfileTests bluetideapp.tests.TwoFactorSetupTests -v 2
 ```
 
 Then run the complete checks.

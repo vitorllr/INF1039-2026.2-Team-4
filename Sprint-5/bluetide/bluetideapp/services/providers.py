@@ -31,6 +31,9 @@ class Conditions:
     air_temperature: float | None
     rain_24h: float | None
     wind_speed: float | None
+    occupancy_level: str | None
+    occupancy_observed_at: datetime | None
+    occupancy_source: str
     origin: str
     provider_error: str | None = None
 
@@ -49,6 +52,7 @@ class FixtureConditionsProvider:
         raw = payload["points"].get(beach.slug, {})
         water = raw.get("water", {})
         marine = raw.get("marine", {})
+        occupancy = raw.get("occupancy", {})
         return Conditions(
             beach=beach,
             water_status=water.get("status"),
@@ -62,6 +66,12 @@ class FixtureConditionsProvider:
             air_temperature=self._number(marine.get("air_temperature")),
             rain_24h=self._number(marine.get("rain_24h")),
             wind_speed=self._number(marine.get("wind_speed")),
+            occupancy_level=occupancy.get("level"),
+            occupancy_observed_at=self._relative_time(
+                now,
+                self._minutes_to_hours(occupancy.get("age_minutes")),
+            ),
+            occupancy_source=occupancy.get("source", "Estimativa não informada"),
             origin="fixture",
         )
 

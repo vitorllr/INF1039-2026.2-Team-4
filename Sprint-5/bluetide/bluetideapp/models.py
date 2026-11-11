@@ -5,19 +5,56 @@ from django.db import models
 
 
 class Usuario(AbstractUser):
+    PERFIL_CHOICES = [
+        ("tranquilo", "Banho tranquilo"),
+        ("surf", "Surf iniciante"),
+        ("neutro", "Sem preferência"),
+    ]
+    TRANSPORTE_CHOICES = [
+        ("ape", "A pé"),
+        ("bicicleta", "Bicicleta"),
+        ("transporte_publico", "Metrô ou ônibus"),
+        ("carro", "Carro"),
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nome = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
+    foto = models.FileField(upload_to="avatars/%Y/%m/", blank=True)
     cidade = models.CharField(max_length=100, blank=True)
     estado = models.CharField(max_length=2, blank=True)
-    meio_transporte_preferido = models.CharField(max_length=50, blank=True)
+    perfil_praia = models.CharField(
+        max_length=20, choices=PERFIL_CHOICES, default="tranquilo"
+    )
+    meio_transporte_preferido = models.CharField(
+        max_length=50,
+        choices=TRANSPORTE_CHOICES,
+        default="bicicleta",
+    )
     latitude_padrao = models.FloatField(null=True, blank=True)
     longitude_padrao = models.FloatField(null=True, blank=True)
     usar_localizacao_celular = models.BooleanField(default=False)
+    economia_dados = models.BooleanField(default=True)
+    alertas_mudanca = models.BooleanField(default=True)
+    pontos_favoritos = models.JSONField(default=list, blank=True)
+    two_factor_secret = models.CharField(max_length=64, blank=True, editable=False)
+    two_factor_enabled = models.BooleanField(default=False)
+    two_factor_last_used_step = models.BigIntegerField(
+        null=True, blank=True, editable=False
+    )
+    two_factor_recovery_codes = models.JSONField(
+        default=list, blank=True, editable=False
+    )
     data_criacao = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.nome or self.username
+
+    @property
+    def iniciais(self):
+        partes = (self.nome or self.username).split()
+        letras = partes[0][:1] + (partes[-1][:1] if len(partes) > 1 else "")
+        return letras.upper()
 
 
 class Praia(models.Model):
@@ -53,7 +90,9 @@ class CondicaoAgua(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    posto = models.ForeignKey(PostoColeta, on_delete=models.CASCADE, related_name="condicoes_agua")
+    posto = models.ForeignKey(
+        PostoColeta, on_delete=models.CASCADE, related_name="condicoes_agua"
+    )
     data_checagem = models.DateTimeField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
     fonte = models.CharField(max_length=100)
@@ -69,7 +108,9 @@ class CondicaoClimaMar(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    praia = models.ForeignKey(Praia, on_delete=models.CASCADE, related_name="condicoes_clima_mar")
+    praia = models.ForeignKey(
+        Praia, on_delete=models.CASCADE, related_name="condicoes_clima_mar"
+    )
     data_hora = models.DateTimeField()
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
     temperatura = models.FloatField(null=True, blank=True)
@@ -100,8 +141,12 @@ class Lotacao(models.Model):
 
 class Favorito(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="favoritos")
-    praia = models.ForeignKey(Praia, on_delete=models.CASCADE, related_name="favoritada_por")
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="favoritos"
+    )
+    praia = models.ForeignKey(
+        Praia, on_delete=models.CASCADE, related_name="favoritada_por"
+    )
     data_adicao = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -118,8 +163,12 @@ class Alerta(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="alertas")
-    praia = models.ForeignKey(Praia, on_delete=models.CASCADE, null=True, blank=True, related_name="alertas")
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="alertas"
+    )
+    praia = models.ForeignKey(
+        Praia, on_delete=models.CASCADE, null=True, blank=True, related_name="alertas"
+    )
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
     ativo = models.BooleanField(default=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
@@ -131,11 +180,17 @@ class PreferenciaPraia(models.Model):
         ("manual", "Manual"),
     ]
 
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="preferencias")
-    praia = models.ForeignKey(Praia, on_delete=models.CASCADE, related_name="preferida_por")
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="preferencias"
+    )
+    praia = models.ForeignKey(
+        Praia, on_delete=models.CASCADE, related_name="preferida_por"
+    )
     origem = models.CharField(max_length=20, choices=ORIGEM_CHOICES)
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["usuario", "praia"], name="preferencia_unica"),
+            models.UniqueConstraint(
+                fields=["usuario", "praia"], name="preferencia_unica"
+            ),
         ]

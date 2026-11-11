@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Sair da conta | BlueTide{% endblock %}
+
+{% block content %}
+<section class="card confirm-panel" aria-labelledby="logout-title">
+    {% include "_logout_confirm_body.html" with title_id="logout-title" %}
+    <form method="post" action="{% url 'logout' %}" class="confirm-actions">
+        {% csrf_token %}
+        <a class="button-secondary" href="{% url 'perfil' %}">Cancelar</a>
+        <button class="button-danger" type="submit">Sair da conta</button>
+    </form>
+</section>
+{% endblock %}

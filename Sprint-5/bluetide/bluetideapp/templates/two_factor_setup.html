@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Verificação em duas etapas | BlueTide{% endblock %}
+
+{% block content %}
+<a class="back-link" href="{% url 'perfil' %}">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    Voltar ao perfil
+</a>
+
+{% if enabled %}
+<header class="page-heading">
+    <div>
+        <p class="eyebrow">Segurança da conta</p>
+        <h1>Verificação em duas etapas</h1>
+        <p>Depois da senha, o login pede o código do seu aplicativo autenticador.</p>
+    </div>
+</header>
+
+<div class="setup-grid">
+    <section class="card setup-status" aria-labelledby="status-title">
+        <span class="seal seal-success" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.5 3 8.3 7 9.5 4-1.2 7-5 7-9.5V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+        </span>
+        <h2 id="status-title">Proteção ativa</h2>
+        <p class="muted">Restam {{ recovery_count }} código{{ recovery_count|pluralize }} de recuperação para entrar se você perder o celular.</p>
+    </section>
+
+    <section class="card" aria-labelledby="disable-title">
+        <h2 id="disable-title">Desativar verificação</h2>
+        <p class="muted">Sua conta volta a pedir só a senha. Confirme a senha atual para continuar.</p>
+        <form method="post" class="auth-form" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="action" value="disable">
+            {% include "_field.html" with field=disable_form.password %}
+            <button class="button-danger" type="submit">Desativar verificação</button>
+        </form>
+    </section>
+</div>
+{% else %}
+<header class="page-heading">
+    <div>
+        <p class="eyebrow">Segurança da conta</p>
+        <h1>Ativar verificação em duas etapas</h1>
+        <p>A proteção fica <strong>desativada</strong> até você confirmar um código do autenticador.</p>
+    </div>
+</header>
+
+<ol class="setup-steps" aria-label="Etapas da configuração">
+    <li class="is-current"><span>1</span>Conectar o app</li>
+    <li class="is-current"><span>2</span>Confirmar o código</li>
+    <li><span>3</span>Guardar códigos de recuperação</li>
+</ol>
+
+<div class="setup-grid">
+    <section class="card setup-card" aria-labelledby="connect-title">
+        <p class="eyebrow">Etapa 1</p>
+        <h2 id="connect-title">Conecte seu aplicativo autenticador</h2>
+        <p class="muted">No Google Authenticator, Microsoft Authenticator ou similar, adicione uma conta e escaneie o código.</p>
+        <div class="qr-frame" data-sensitive>{{ qr_svg|safe }}</div>
+        <div class="secret-panel">
+            <p class="secret-label" id="secret-label">Sem câmera? Digite esta chave no aplicativo:</p>
+            <code class="secret-code" aria-labelledby="secret-label" data-sensitive>{{ grouped_secret }}</code>
+            <button class="button-secondary" type="button" data-copy-value="{{ secret }}" data-copy-feedback="Chave copiada">Copiar chave</button>
+        </div>
+    </section>
+
+    <section class="card setup-card" aria-labelledby="confirm-title">
+        <p class="eyebrow">Etapa 2</p>
+        <h2 id="confirm-title">Digite o código de 6 dígitos</h2>
+        <p class="muted">Use o código que aparece agora no aplicativo para provar que a conexão funcionou.</p>
+        <form method="post" class="auth-form" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="action" value="activate">
+            {% include "_field.html" with field=code_form.code extra_class="field-code" %}
+            <button class="button button-block" type="submit">Confirmar e ativar</button>
+        </form>
+        <form method="post" class="restart-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="restart">
+            <button class="button-quiet" type="submit">Gerar outra chave</button>
+        </form>
+    </section>
+</div>
+{% endif %}
+{% endblock %}

@@ -9,7 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/design-system.css' %}?v=20261108">
+    <link rel="stylesheet" href="{% static 'css/design-system.css' %}?v=20261111">
+    <script>document.documentElement.classList.add("js");</script>
     {% block extra_head %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
@@ -42,7 +43,7 @@
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5S4 16 4 9.7C4 6.6 7.8 5 10 7.4L12 10l2-2.6c2.2-2.4 6-0.8 6 2.3 0 6.3-8 10.8-8 10.8Z"/></svg>
                     <span>Favoritos</span>
                 </a>
-                <a class="nav-link {% if current == 'perfil' %}is-active{% endif %}" href="{% url 'perfil' %}" {% if current == 'perfil' %}aria-current="page"{% endif %}>
+                <a class="nav-link {% if current == 'perfil' or current == 'perfil_editar' or current == 'two_factor_setup' or current == 'logout' %}is-active{% endif %}" href="{% url 'perfil' %}" {% if current == 'perfil' %}aria-current="page"{% endif %}>
                     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
                     <span>Perfil</span>
                 </a>
@@ -52,6 +53,9 @@
                 <p class="eyebrow">Apoio</p>
                 <a class="quiet-link" href="{% url 'alertas' %}">Alertas</a>
                 <a class="quiet-link" href="{% url 'duvidas' %}">Dúvidas frequentes</a>
+                {% if not request.user.is_authenticated %}
+                <a class="quiet-link" href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}">Entrar na conta</a>
+                {% endif %}
                 <p class="source-note">Condições para decidir com calma, sem promessas além dos dados.</p>
             </div>
         </aside>
@@ -64,10 +68,23 @@
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
                 </button>
                 <a class="brand brand-compact" href="{% url 'mapa_web' %}">BlueTide</a>
-                <a class="avatar" href="{% url 'perfil' %}" aria-label="Abrir perfil de Pedro">PS</a>
+                {% if request.user.is_authenticated %}
+                <a class="avatar{% if request.user.foto %} avatar-photo{% endif %}" href="{% url 'perfil' %}" aria-label="Abrir perfil de {{ request.user.nome|default:request.user.username }}">{% if request.user.foto %}<img src="{{ request.user.foto.url }}" alt="">{% else %}{{ request.user.iniciais }}{% endif %}</a>
+                {% elif current == 'login' or current == 'login_verify' %}
+                <span class="header-spacer" aria-hidden="true"></span>
+                {% else %}
+                <a class="login-chip" href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}">Entrar</a>
+                {% endif %}
             </header>
 
             <main id="conteudo" class="page-frame" tabindex="-1">
+                {% if messages %}
+                <div class="message-stack">
+                    {% for message in messages %}
+                    <p class="message message-{{ message.tags|default:'info' }}" role="{% if message.level >= 40 %}alert{% else %}status{% endif %}">{{ message }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
                 {% block content %}{% endblock %}
             </main>
         </div>
@@ -85,14 +102,28 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5S4 16 4 9.7C4 6.6 7.8 5 10 7.4L12 10l2-2.6c2.2-2.4 6-0.8 6 2.3 0 6.3-8 10.8-8 10.8Z"/></svg>
                 <span>Favoritos</span>
             </a>
-            <a class="bottom-link {% if current == 'perfil' %}is-active{% endif %}" href="{% url 'perfil' %}">
+            <a class="bottom-link {% if current == 'perfil' or current == 'perfil_editar' or current == 'two_factor_setup' or current == 'logout' %}is-active{% endif %}" href="{% url 'perfil' %}">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
                 <span>Perfil</span>
             </a>
         </nav>
+
+        <div class="snackbar{% if favorite_undo %} is-visible is-static{% endif %}" data-snackbar>
+            <p class="snackbar-text" data-snackbar-text>{% if favorite_undo %}{{ favorite_undo.name }} saiu dos favoritos.{% endif %}</p>
+            <form class="snackbar-undo" method="post" action="{{ favorite_undo.restore_url|default:'' }}" data-snackbar-undo {% if not favorite_undo %}hidden{% endif %}>
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button class="snackbar-action" type="submit">Desfazer</button>
+            </form>
+            <button class="snackbar-close" type="button" data-snackbar-close aria-label="Fechar aviso">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+            </button>
+            <span class="snackbar-progress" data-snackbar-progress aria-hidden="true"></span>
+        </div>
+        <div class="visually-hidden" aria-live="polite" data-live-region>{% if favorite_undo %}{{ favorite_undo.name }} saiu dos favoritos. Use Desfazer para restaurar.{% endif %}</div>
     </div>
     {% endwith %}
-    <script src="{% static 'js/app.js' %}?v=20261108" defer></script>
+    <script src="{% static 'js/app.js' %}?v=20261111" defer></script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

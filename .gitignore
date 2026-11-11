@@ -4,3 +4,5 @@ db.sqlite3
 .venv/
 venv/
 .DS_Store
+# Uploaded files such as profile photos stay out of the repository.
+Sprint-5/bluetide/media/

@@ -3,69 +3,100 @@
 {% block title %}Perfil | BlueTide{% endblock %}
 
 {% block content %}
+{% with user=request.user %}
 <header class="page-heading">
     <div>
-        <p class="eyebrow">Preferências pessoais</p>
-        <h1>Seu jeito de ir à praia</h1>
-        <p>Essas escolhas ajudam o BlueTide a ordenar os pontos, sem esconder nenhuma condição relevante.</p>
+        <p class="eyebrow">Sua conta</p>
+        <h1>Perfil</h1>
+        <p>Seus dados, o efeito de cada preferência e a segurança da conta.</p>
     </div>
 </header>
 
-<div class="grid-2">
-    <section class="card profile-hero" aria-labelledby="perfil-pedro">
-        <div class="profile-avatar" aria-hidden="true">PS</div>
-        <div>
-            <h2 id="perfil-pedro">Pedro Santos</h2>
-            <p class="muted">23 anos, Rio de Janeiro</p>
-            <p class="small muted">3 favoritas e alertas de segurança ativos</p>
+<section class="card profile-hero" aria-labelledby="perfil-nome">
+    {% if user.foto %}
+    <img class="profile-avatar profile-avatar-photo" src="{{ user.foto.url }}" alt="Foto de {{ user.nome }}">
+    {% else %}
+    <span class="profile-avatar" aria-hidden="true">{{ user.iniciais }}</span>
+    {% endif %}
+    <div class="profile-identity">
+        <h2 id="perfil-nome">{{ user.nome|default:user.username }}</h2>
+        <p class="profile-detail">{{ user.email }}</p>
+        <p class="profile-detail">{% if user.cidade %}{{ user.cidade }}{% if user.estado %}, {{ user.estado }}{% endif %}{% else %}Região não informada{% endif %}</p>
+    </div>
+    <a class="button-secondary profile-edit" href="{% url 'perfil_editar' %}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4ZM13.5 6.5l4 4"/></svg>
+        Editar dados
+    </a>
+</section>
+
+<div class="profile-grid">
+    <section class="card" aria-labelledby="preferencias">
+        <div class="card-heading">
+            <div>
+                <p class="eyebrow">Preferências</p>
+                <h2 id="preferencias">O que cada escolha muda</h2>
+            </div>
+            <a class="button-quiet" href="{% url 'perfil_editar' %}#preferencias-form">Alterar</a>
         </div>
+        <dl class="preference-list">
+            <div class="preference-item">
+                <dt>Perfil de praia</dt>
+                <dd class="preference-value">{{ user.get_perfil_praia_display }}</dd>
+                <dd class="preference-effect">{{ effects.perfil_praia }}</dd>
+            </div>
+            <div class="preference-item">
+                <dt>Como você costuma ir</dt>
+                <dd class="preference-value">{{ user.get_meio_transporte_preferido_display }}</dd>
+                <dd class="preference-effect">{{ effects.meio_transporte_preferido }}</dd>
+            </div>
+            <div class="preference-item">
+                <dt>Usar minha localização</dt>
+                <dd class="preference-value{% if not user.usar_localizacao_celular %} is-off{% endif %}">{% if user.usar_localizacao_celular %}Ativada{% else %}Desativada{% endif %}</dd>
+                <dd class="preference-effect">{{ effects.usar_localizacao_celular }}</dd>
+            </div>
+            <div class="preference-item">
+                <dt>Economia de dados</dt>
+                <dd class="preference-value{% if not user.economia_dados %} is-off{% endif %}">{% if user.economia_dados %}Ativada{% else %}Desativada{% endif %}</dd>
+                <dd class="preference-effect">{{ effects.economia_dados }}</dd>
+            </div>
+            <div class="preference-item">
+                <dt>Alertas de mudança</dt>
+                <dd class="preference-value{% if not user.alertas_mudanca %} is-off{% endif %}">{% if user.alertas_mudanca %}Ativados{% else %}Desativados{% endif %}</dd>
+                <dd class="preference-effect">{{ effects.alertas_mudanca }}</dd>
+            </div>
+        </dl>
+        <p class="preference-footnote">Nenhuma preferência esconde alertas de segurança ou de qualidade da água.</p>
     </section>
 
-    <section class="card" aria-labelledby="preferencia-mar">
-        <p class="eyebrow">Recomendação</p>
-        <h2 id="preferencia-mar">O que você procura hoje?</h2>
-        <div class="preference-pills" aria-label="Perfil de praia preferido">
-            <span class="preference-pill is-selected">Banho tranquilo</span>
-            <span class="preference-pill">Surf iniciante</span>
-            <span class="preference-pill">Sem preferência</span>
-        </div>
-        <p class="small muted" style="margin: 1rem 0 0;">Você pode trocar esse perfil ao comparar os pontos de Ipanema.</p>
-    </section>
+    <div class="profile-side">
+        <section class="card security-card" aria-labelledby="seguranca">
+            <p class="eyebrow">Segurança</p>
+            <div class="security-heading">
+                <h2 id="seguranca">Verificação em duas etapas</h2>
+                <span class="status-pill {% if user.two_factor_enabled %}status-on{% else %}status-off{% endif %}">{% if user.two_factor_enabled %}Ativa{% else %}Desativada{% endif %}</span>
+            </div>
+            {% if user.two_factor_enabled %}
+            <p>O login pede a senha e um código do seu autenticador. Restam {{ recovery_count }} código{{ recovery_count|pluralize }} de recuperação.</p>
+            <a class="button-secondary button-block" href="{% url 'two_factor_setup' %}">Gerenciar verificação</a>
+            {% else %}
+            <p>Proteja a conta com um código do celular além da senha. Ela só é ativada depois que você confirmar um código válido.</p>
+            <a class="button button-block" href="{% url 'two_factor_setup' %}">Configurar verificação</a>
+            {% endif %}
+        </section>
+
+        <section class="card account-card" aria-labelledby="sessao">
+            <p class="eyebrow">Sessão</p>
+            <h2 id="sessao">Sair deste aparelho</h2>
+            <p>Você pode continuar consultando as praias sem conta.</p>
+            <a class="button-danger-quiet button-block" href="{% url 'logout' %}" data-dialog-open="logout-dialog">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11"/></svg>
+                Sair da conta
+            </a>
+        </section>
+    </div>
 </div>
 
-<div class="grid-2" style="margin-top: 1rem;">
-    <section class="card" aria-labelledby="configuracoes">
-        <h2 id="configuracoes">Configurações</h2>
-        <div class="settings-list">
-            <div class="settings-row">
-                <div><p>Usar minha localização</p><span class="small muted">Mostra primeiro os pontos mais próximos.</span></div>
-                <button class="switch" type="button" data-toggle aria-pressed="true" aria-label="Usar minha localização"></button>
-            </div>
-            <div class="settings-row">
-                <div><p>Economia de dados</p><span class="small muted">Reduz atualizações em segundo plano.</span></div>
-                <button class="switch" type="button" data-toggle aria-pressed="true" aria-label="Ativar economia de dados"></button>
-            </div>
-            <div class="settings-row">
-                <div><p>Alertas de mudança</p><span class="small muted">Avisa quando uma favorita perde a recomendação.</span></div>
-                <button class="switch" type="button" data-toggle aria-pressed="true" aria-label="Ativar alertas de mudança"></button>
-            </div>
-        </div>
-    </section>
-
-    <section class="card" aria-labelledby="deslocamento">
-        <p class="eyebrow">Deslocamento</p>
-        <h2 id="deslocamento">Como você vai?</h2>
-        <div class="preference-pills">
-            <span class="preference-pill">A pé</span>
-            <span class="preference-pill is-selected">Bicicleta</span>
-            <span class="preference-pill">Metrô ou ônibus</span>
-            <span class="preference-pill">Carro</span>
-        </div>
-        <p class="small muted" style="margin: 1rem 0 0;">Região padrão: Ipanema, Rio de Janeiro.</p>
-    </section>
-</div>
-
-<div class="grid-2" style="margin-top: 1rem;">
+<div class="grid-2 profile-links">
     <a class="card link-card" href="{% url 'alertas' %}">
         <div><p class="eyebrow">Notificações</p><h3>Gerenciar alertas</h3><p class="small muted">Qualidade da água, chuva e mar agitado.</p></div>
         <span aria-hidden="true">→</span>
@@ -75,4 +106,14 @@
         <span aria-hidden="true">→</span>
     </a>
 </div>
+
+<dialog class="dialog" id="logout-dialog" aria-labelledby="logout-dialog-title">
+    {% include "_logout_confirm_body.html" with title_id="logout-dialog-title" %}
+    <form method="post" action="{% url 'logout' %}" class="confirm-actions">
+        {% csrf_token %}
+        <button class="button-secondary" type="button" data-dialog-close autofocus>Cancelar</button>
+        <button class="button-danger" type="submit">Sair da conta</button>
+    </form>
+</dialog>
+{% endwith %}
 {% endblock %}
