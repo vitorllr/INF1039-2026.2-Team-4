@@ -416,6 +416,16 @@ class MapAndFavoritesHeuristicTests(TestCase):
         for reserved in ("--success", "--warning", "--danger", "--neutral"):
             self.assertNotIn(reserved, occupancy_rule)
 
+    def test_fixed_bars_do_not_cover_a_field_that_was_scrolled_to(self):
+        # On a phone the error summary link used to park the field under the
+        # sticky header, and keyboard focus could land under the bottom bar.
+        css = (Path(__file__).parent / "static/css/design-system.css").read_text()
+        tablet = css.split("@media (max-width: 980px) {\n    /* The sticky header", 1)[1]
+        phone = css.split("@media (max-width: 680px) {\n    /* Same for the fixed", 1)[1]
+
+        self.assertIn("scroll-padding-top: 7.5rem;", tablet.split("}", 1)[0])
+        self.assertIn("scroll-padding-bottom: calc(74px", phone.split("}", 1)[0])
+
     def test_removing_a_favorite_without_javascript_offers_a_real_undo(self):
         response = self.client.post(
             "/favoritos/ipanema-posto-8/remover/", {"next": "/favoritos/"}, follow=True
