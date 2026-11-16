@@ -132,8 +132,8 @@
                             </svg>
                             ONDA &amp; MARÉ
                         </p>
-                        <p class="numero m-0 mt-2"><span class="numero-grande">0,8</span> m</p>
-                        <p class="info m-0 mt-2">Período 8s • Mar calmo<br>Maré 0,4 m (Enchente)<br>Próxima alta: 1,1 m às 15:40</p>
+                        <p class="numero m-0 mt-2"><span class="numero-grande">{{ mar.wave_height|floatformat:1 }}</span> m</p>
+                        <p class="info m-0 mt-2">Período {{ mar.wave_period|floatformat:0 }}s • Mar calmo<br>Maré {{ mar.sea_level_height_msl|floatformat:1 }} m (Enchente)<br>Próxima alta: 1,1 m às 15:40</p>
                     </div>
                 </div>
 
@@ -177,7 +177,7 @@
                             CLIMA &amp; UV
                         </p>
                         <p class="numero m-0 mt-2"><span class="numero-grande">28</span> °C</p>
-                        <p class="info m-0 mt-2">Ensolarado • Água 22 °C • UV 8 (Muito alto)</p>
+                        <p class="info m-0 mt-2">Ensolarado • Água {{ mar.sea_surface_temperature|floatformat:0 }} °C • UV 8 (Muito alto)</p>
                     </div>
                 </div>
 
@@ -209,7 +209,7 @@
                 </div>
                 <div class="resumo-item borda-lados">
                     <p class="rotulo m-0">MARÉ</p>
-                    <p class="resumo-valor m-0 mt-1">0,4 m</p>
+                    <p class="resumo-valor m-0 mt-1">{{ mar.sea_level_height_msl|floatformat:1 }} m</p>
                 </div>
                 <div class="resumo-item">
                     <p class="rotulo m-0">IDADE DO LAUDO</p>
