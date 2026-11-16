@@ -1,11 +1,3 @@
-"""Regra de recomendação do BlueTide: verde, amarelo ou vermelho para um ponto de coleta.
-
-A explicação de cada regra está em logica-recomendacao.pdf, nesta mesma pasta.
-Os valores marcados como "premissa" são chute inicial da equipe e precisam de validação.
-
-Para rodar os exemplos do PDF: python recomendacao.py
-"""
-
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 
