@@ -1,0 +1,213 @@
+{
+  "gerado_em": "2026-11-16T15:46:56.917643+00:00",
+  "fontes": {
+    "observada": "https://websempre.rio.rj.gov.br/json/chuvas",
+    "modelada_e_previsao": "https://api.open-meteo.com/v1/forecast"
+  },
+  "chuva_por_praia": {
+    "Leme": {
+      "chuva": {
+        "fonte": "alerta_rio",
+        "qualidade": "observada",
+        "estacao": "Urca",
+        "distancia_km": 0.9,
+        "lido_em": "2026-11-16T12:40:00-03:00",
+        "chuva_1h_mm": 0.0,
+        "chuva_3h_mm": 0.0,
+        "chuva_24h_mm": 1.8,
+        "chuva_96h_mm": 1.8
+      },
+      "previsao": {
+        "previsao_6h_mm": 3.8,
+        "previsao_24h_mm": 7.5
+      }
+    },
+    "Copacabana": {
+      "chuva": {
+        "fonte": "alerta_rio",
+        "qualidade": "observada",
+        "estacao": "Copacabana",
+        "distancia_km": 1.9,
+        "lido_em": "2026-11-16T12:40:00-03:00",
+        "chuva_1h_mm": 0.0,
+        "chuva_3h_mm": 0.0,
+        "chuva_24h_mm": 6.2,
+        "chuva_96h_mm": 6.2
+      },
+      "previsao": {
+        "previsao_6h_mm": 3.8,
+        "previsao_24h_mm": 7.5
+      }
+    },
+    "Arpoador": {
+      "chuva": {
+        "fonte": "alerta_rio",
+        "qualidade": "observada",
+        "estacao": "Copacabana",
+        "distancia_km": 0.4,
+        "lido_em": "2026-11-16T12:40:00-03:00",
+        "chuva_1h_mm": 0.0,
+        "chuva_3h_mm": 0.0,
+        "chuva_24h_mm": 6.2,
+        "chuva_96h_mm": 6.2
+      },
+      "previsao": {
+        "previsao_6h_mm": 3.8,
+        "previsao_24h_mm": 7.5
+      }
+    },
+    "Ipanema": {
+      "chuva": {
+        "fonte": "alerta_rio",
+        "qualidade": "observada",
+        "estacao": "Copacabana",
+        "distancia_km": 1.6,
+        "lido_em": "2026-11-16T12:40:00-03:00",
+        "chuva_1h_mm": 0.0,
+        "chuva_3h_mm": 0.0,
+        "chuva_24h_mm": 6.2,
+        "chuva_96h_mm": 6.2
+      },
+      "previsao": {
+        "previsao_6h_mm": 3.8,
+        "previsao_24h_mm": 7.5
+      }
+    },
+    "Leblon": {
+      "chuva": {
+        "fonte": "alerta_rio",
+        "qualidade": "observada",
+        "estacao": "Vidigal",
+        "distancia_km": 1.2,
+        "lido_em": "2026-11-16T12:40:00-03:00",
+        "chuva_1h_mm": 0.0,
+        "chuva_3h_mm": 0.0,
+        "chuva_24h_mm": 4.0,
+        "chuva_96h_mm": 4.0
+      },
+      "previsao": {
+        "previsao_6h_mm": 3.8,
+        "previsao_24h_mm": 7.5
+      }
+    },
+    "São Conrado": {
+      "chuva": {
+        "fonte": "alerta_rio",
+        "qualidade": "observada",
+        "estacao": "Rocinha",
+        "distancia_km": 2.6,
+        "lido_em": "2026-11-16T12:40:00-03:00",
+        "chuva_1h_mm": 0.0,
+        "chuva_3h_mm": 0.0,
+        "chuva_24h_mm": 2.4,
+        "chuva_96h_mm": 2.4
+      },
+      "previsao": {
+        "previsao_6h_mm": 3.8,
+        "previsao_24h_mm": 7.5
+      }
+    },
+    "Barra da Tijuca": {
+      "chuva": {
+        "fonte": "alerta_rio",
+        "qualidade": "observada",
+        "estacao": "Barra/Riocentro",
+        "distancia_km": 4.6,
+        "lido_em": "2026-11-16T12:40:00-03:00",
+        "chuva_1h_mm": 0.0,
+        "chuva_3h_mm": 0.0,
+        "chuva_24h_mm": 3.0,
+        "chuva_96h_mm": 4.8
+      },
+      "previsao": {
+        "previsao_6h_mm": 7.8,
+        "previsao_24h_mm": 11.2
+      }
+    },
+    "Recreio": {
+      "chuva": {
+        "fonte": "alerta_rio",
+        "qualidade": "observada",
+        "estacao": "Recreio dos Bandeirantes",
+        "distancia_km": 3.2,
+        "lido_em": "2026-11-16T12:40:00-03:00",
+        "chuva_1h_mm": 0.0,
+        "chuva_3h_mm": 0.0,
+        "chuva_24h_mm": 3.2,
+        "chuva_96h_mm": 3.2
+      },
+      "previsao": {
+        "previsao_6h_mm": 3.2,
+        "previsao_24h_mm": 7.0
+      }
+    },
+    "Urca": {
+      "chuva": {
+        "fonte": "alerta_rio",
+        "qualidade": "observada",
+        "estacao": "Urca",
+        "distancia_km": 1.1,
+        "lido_em": "2026-11-16T12:40:00-03:00",
+        "chuva_1h_mm": 0.0,
+        "chuva_3h_mm": 0.0,
+        "chuva_24h_mm": 1.8,
+        "chuva_96h_mm": 1.8
+      },
+      "previsao": {
+        "previsao_6h_mm": 3.8,
+        "previsao_24h_mm": 7.5
+      }
+    },
+    "Vermelha": {
+      "chuva": {
+        "fonte": "alerta_rio",
+        "qualidade": "observada",
+        "estacao": "Urca",
+        "distancia_km": 0.2,
+        "lido_em": "2026-11-16T12:40:00-03:00",
+        "chuva_1h_mm": 0.0,
+        "chuva_3h_mm": 0.0,
+        "chuva_24h_mm": 1.8,
+        "chuva_96h_mm": 1.8
+      },
+      "previsao": {
+        "previsao_6h_mm": 3.8,
+        "previsao_24h_mm": 7.5
+      }
+    },
+    "Botafogo": {
+      "chuva": {
+        "fonte": "alerta_rio",
+        "qualidade": "observada",
+        "estacao": "Laranjeiras",
+        "distancia_km": 0.7,
+        "lido_em": "2026-11-16T12:40:00-03:00",
+        "chuva_1h_mm": 0.0,
+        "chuva_3h_mm": 0.0,
+        "chuva_24h_mm": 1.2,
+        "chuva_96h_mm": 1.2
+      },
+      "previsao": {
+        "previsao_6h_mm": 3.8,
+        "previsao_24h_mm": 7.5
+      }
+    },
+    "Flamengo": {
+      "chuva": {
+        "fonte": "alerta_rio",
+        "qualidade": "observada",
+        "estacao": "Laranjeiras",
+        "distancia_km": 1.8,
+        "lido_em": "2026-11-16T12:40:00-03:00",
+        "chuva_1h_mm": 0.0,
+        "chuva_3h_mm": 0.0,
+        "chuva_24h_mm": 1.2,
+        "chuva_96h_mm": 1.2
+      },
+      "previsao": {
+        "previsao_6h_mm": 3.8,
+        "previsao_24h_mm": 7.5
+      }
+    }
+  }
+}
