@@ -718,6 +718,21 @@ h3 {
     gap: 0.7rem;
 }
 
+/* A legend sits on the fieldset border by default. Floating it keeps the title inside the card. */
+.filter-group > legend {
+    float: left;
+    width: 100%;
+    padding: 0;
+}
+
+.filter-group > legend + * {
+    clear: both;
+}
+
+.filter-group > legend h2 {
+    margin: 0;
+}
+
 .filter-option {
     display: flex;
     min-width: 0;
