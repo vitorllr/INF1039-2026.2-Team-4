@@ -1,0 +1,32 @@
+{% with c=item.conditions r=item.recommendation %}
+<article class="card beach-card">
+    <div class="beach-card-head">
+        <div>
+            <p class="eyebrow">{{ c.beach.neighborhood }}</p>
+            <h2 class="beach-title">{{ c.beach.display_name }}</h2>
+            <p class="small muted">{{ c.beach.summary }}</p>
+        </div>
+        <button class="heart" type="button" aria-label="{% if item.favorite %}Remover{% else %}Adicionar{% endif %} {{ c.beach.display_name }} dos favoritos">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5S4 16 4 9.7C4 6.6 7.8 5 10 7.4L12 10l2-2.6c2.2-2.4 6-0.8 6 2.3 0 6.3-8 10.8-8 10.8Z"/></svg>
+        </button>
+    </div>
+
+    <div><span class="badge badge-{{ item.water_tone }}">{{ item.water_label }} · {{ item.water_age }}</span></div>
+
+    <div class="metrics" aria-label="Condições resumidas">
+        <div class="metric"><span class="metric-label">Ondas</span><span class="metric-value">{{ c.wave_height|floatformat:1|default_if_none:"-" }} m</span></div>
+        <div class="metric"><span class="metric-label">Vento</span><span class="metric-value">{% if c.wind_speed == None %}Indisp.{% else %}{{ c.wind_speed|floatformat:0 }} km/h{% endif %}</span></div>
+        <div class="metric"><span class="metric-label">Chuva 24h</span><span class="metric-value">{{ c.rain_24h|floatformat:1|default_if_none:"-" }} mm</span></div>
+    </div>
+
+    <div class="recommendation recommendation-{{ r.tone }}">
+        <span class="badge badge-{{ r.tone }}">{{ r.label }}</span>
+        <p>{{ r.summary }}</p>
+    </div>
+
+    <div class="beach-card-actions">
+        <a class="button-secondary" href="{% url 'detalhes_praia' c.beach.slug %}?perfil={{ profile }}">Ver detalhes</a>
+        <a class="button" href="{% url 'comparar' %}?perfil={{ profile }}">Comparar</a>
+    </div>
+</article>
+{% endwith %}
