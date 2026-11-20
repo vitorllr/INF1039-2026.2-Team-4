@@ -3,6 +3,26 @@
 BlueTide compares beach conditions by collection point and only recommends a point when the minimum quality and freshness data are available.
 The default setup uses deterministic demonstration data and labels that mode in every data-driven flow.
 
+## Live weather data is off by default
+
+The details screen used to call the Open-Meteo marine API on every request.
+That call now lives in `bluetideapp/services/providers.py`, with the same endpoint, the same Ipanema Posto 9 coordinates and the same four marine fields (wave height, wave period, sea surface temperature and sea level).
+It only runs when the app is started in live mode, so by default the details screen shows demonstration values and the "Modo demonstração" notice.
+
+To turn live data on, start the server with the variables below.
+
+```bash
+export BLUETIDE_DATA_MODE=live
+export BLUETIDE_WATER_DATA_FILE=/path/to/boletim-atual.json
+python manage.py runserver
+```
+
+`BLUETIDE_DATA_MODE=live` alone is enough to fetch the marine and weather values from Open-Meteo.
+Without `BLUETIDE_WATER_DATA_FILE` the screens show the "Atualização incompleta" notice and every card reads "Sem recomendação", because there is no official water-quality bulletin to rely on.
+The details screen also shows the "Atualização ao vivo falhou" notice with the same reason.
+The expected file format is the one in `bluetideapp/fixtures/conditions.json`.
+The remaining variables are described in the next sections.
+
 ## Local setup
 
 ```bash
