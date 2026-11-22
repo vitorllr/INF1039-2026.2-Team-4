@@ -1,97 +1,31 @@
-<!doctype html>
-<html lang="pt-BR">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Alertas</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet">
-    <link href="../static/css/alertas.css" rel="stylesheet">
-</head>
+{% block title %}Alertas | BlueTide{% endblock %}
 
-<body>
-
-    <div class="celular d-flex flex-column">
-        <header class="topo d-flex justify-content-between align-items-center px-4 py-3 border-bottom">
-            <div class="d-flex align-items-center gap-3">
-                <svg class="seta" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M15 5 8 12l7 7"></path>
-                </svg>
-                <h1 class="m-0">Alertas</h1>
-            </div>
-            <div class="avatar rounded-circle d-flex align-items-center justify-content-center fw-semibold">MC</div>
-        </header>
-
-        <div class="px-3 pt-3 d-flex flex-column gap-3">
-            <h2 class="titulo-secao m-0">Meus alertas</h2>
-
-            <div class="cartao d-flex justify-content-between align-items-center gap-3">
-                <div>
-                    <h3 class="nome-alerta m-0">Alerta sanitário das favoritas</h3>
-                    <p class="info m-0 mt-1">Minhas favoritas • Push imediato • Som discreto</p>
-                </div>
-                <div class="interruptor ligado d-flex align-items-center justify-content-end">
-                    <div class="bolinha"></div>
-                </div>
-            </div>
-
-            <div class="cartao d-flex justify-content-between align-items-center gap-3">
-                <div>
-                    <h3 class="nome-alerta m-0">Ressaca e bandeira vermelha</h3>
-                    <p class="info m-0 mt-1">Toda a orla oceânica • Push com prioridade alta</p>
-                </div>
-                <div class="interruptor ligado d-flex align-items-center justify-content-end">
-                    <div class="bolinha"></div>
-                </div>
-            </div>
-
-            <div class="cartao d-flex justify-content-between align-items-center gap-3">
-                <div>
-                    <h3 class="nome-alerta m-0">Aviso pós-chuva intensa</h3>
-                    <p class="info m-0 mt-1">Minhas favoritas • Automático com base no Alerta Rio</p>
-                </div>
-                <div class="interruptor ligado d-flex align-items-center justify-content-end">
-                    <div class="bolinha"></div>
-                </div>
-            </div>
-
-            <div class="cartao d-flex justify-content-between align-items-center gap-3">
-                <div>
-                    <h3 class="nome-alerta m-0">Boletim matinal de fim de semana</h3>
-                    <p class="info m-0 mt-1">Minhas favoritas • Sábados e domingos às 08:00</p>
-                </div>
-                <div class="interruptor d-flex align-items-center">
-                    <div class="bolinha"> </div>
-                </div>
-            </div>
-
-            <div class="d-flex justify-content-between align-items-center mt-2">
-                <h2 class="titulo-secao m-0">Histórico</h2>
-                <a href="alertas.html" class="link-lidas d-inline-flex align-items-center gap-2 fw-semibold">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M2 13l4 4 8-9"></path>
-                        <path d="M10 15l1 1 8-9"></path>
-                    </svg>
-                    Marcar todas como lidas
-                </a>
-            </div>
-
-            <div class="cartao cartao-historico">
-                <h3 class="nome-alerta m-0">Atenção sanitária</h3>
-                <p class="texto-historico mt-2 mb-2">Copacabana (Posto 4) entrou em status de Atenção devido ao escoamento pluvial após chuva localizada.</p>
-                <p class="info m-0">Ontem às 16:40 • Boletim Extraordinário INEA #089</p>
-            </div>
-
-            <div class="cartao cartao-historico">
-                <h3 class="nome-alerta m-0">Própria para banho</h3>
-                <p class="texto-historico mt-2 mb-2">Ipanema e Leblon liberadas para banho e práticas aquáticas nos postos 9 a 12.</p>
-                <p class="info m-0">Sexta às 08:30 • Boletim Regular Semanal</p>
-            </div>
-
-        </div>
-
+{% block content %}
+<header class="page-heading">
+    <div>
+        <p class="eyebrow">Acompanhar mudanças</p>
+        <h1>Alertas</h1>
+        <p>Escolha quais mudanças merecem interromper seu dia. Alertas não substituem a orientação dos salva-vidas.</p>
     </div>
-</body>
+</header>
 
-</html>
+<section aria-labelledby="meus-alertas">
+    <div class="section-heading"><h2 id="meus-alertas">Meus alertas</h2><p>3 ativos</p></div>
+    <div class="grid-2">
+        <article class="card alert-card"><div><h3>Qualidade da água nas favoritas</h3><p class="small muted">Notifica quando um ponto fica impróprio ou sem boletim recente.</p></div><button class="switch" type="button" data-toggle aria-pressed="true" aria-label="Ativar qualidade da água nas favoritas"></button></article>
+        <article class="card alert-card"><div><h3>Ressaca e bandeira vermelha</h3><p class="small muted">Prioridade alta para toda a orla oceânica.</p></div><button class="switch" type="button" data-toggle aria-pressed="true" aria-label="Ativar alerta de ressaca"></button></article>
+        <article class="card alert-card"><div><h3>Aviso depois de chuva intensa</h3><p class="small muted">Lembra que uma coleta anterior à chuva pode não refletir o momento.</p></div><button class="switch" type="button" data-toggle aria-pressed="true" aria-label="Ativar aviso depois de chuva intensa"></button></article>
+        <article class="card alert-card"><div><h3>Resumo de fim de semana</h3><p class="small muted">Sábados e domingos às 8h.</p></div><button class="switch" type="button" data-toggle aria-pressed="false" aria-label="Ativar resumo de fim de semana"></button></article>
+    </div>
+</section>
+
+<section aria-labelledby="historico-alertas">
+    <div class="section-heading"><h2 id="historico-alertas">Histórico</h2><button class="button-quiet" type="button">Marcar como lidos</button></div>
+    <div class="grid-2">
+        <article class="card history-card"><span class="badge badge-warning">Atenção sanitária</span><h3 style="margin-top: 0.8rem;">Chuva alterou a leitura do Posto 8</h3><p class="muted">A recomendação foi suspensa até haver dados mínimos atualizados.</p><p class="small muted" style="margin-bottom: 0;">Ontem, 16h40</p></article>
+        <article class="card history-card"><span class="badge badge-success">Dados atualizados</span><h3 style="margin-top: 0.8rem;">Novo boletim para o Posto 9</h3><p class="muted">O ponto voltou a ter condições suficientes para comparação.</p><p class="small muted" style="margin-bottom: 0;">Sexta, 8h30</p></article>
+    </div>
+</section>
+{% endblock %}
