@@ -28,7 +28,7 @@
             <div class="condition-grid">
                 <div class="condition-tile"><span class="metric-label">Ondas</span><strong class="condition-value">{{ c.wave_height|floatformat:1|default_if_none:"-" }} m</strong><p class="small muted">Período {{ c.wave_period|floatformat:0|default_if_none:"-" }} s</p></div>
                 <div class="condition-tile"><span class="metric-label">Vento</span><strong class="condition-value">{% if c.wind_speed == None %}Indisponível{% else %}{{ c.wind_speed|floatformat:0 }} km/h{% endif %}</strong><p class="small muted">Valor necessário para a recomendação</p></div>
-                <div class="condition-tile"><span class="metric-label">Água</span><strong class="condition-value">{{ c.sea_temperature|floatformat:1|default_if_none:"-" }} °C</strong><p class="small muted">{% if c.tide_high == None %}Maré sem dado{% elif c.tide_high %}Maré alta{% else %}Maré não alta{% endif %}</p></div>
+                <div class="condition-tile"><span class="metric-label">Água</span><strong class="condition-value">{{ c.sea_temperature|floatformat:1|default_if_none:"-" }} °C</strong><p class="small muted">{% if c.high_tide == None %}Maré sem dado{% elif c.high_tide %}Maré alta{% else %}Maré não alta{% endif %}</p></div>
                 <div class="condition-tile"><span class="metric-label">Chuva em 24h</span><strong class="condition-value">{{ c.rain_24h|floatformat:1|default_if_none:"-" }} mm</strong><p class="small muted">Ar {{ c.air_temperature|floatformat:1|default_if_none:"-" }} °C</p></div>
             </div>
         </section>
@@ -39,16 +39,18 @@
         <h2 id="recomendacao-ponto">Recomendação</h2>
         <div class="recommendation recommendation-{{ r.tone }}">
             <span class="badge badge-{{ r.tone }}">{{ r.label }}</span>
-            <span class="confidence-note">{{ r.confidence_label }}</span>
             <p>{{ r.summary }}</p>
         </div>
-        <p class="small muted" style="margin: 1rem 0 0;">Por quê</p>
-        <ul class="reason-list" style="margin-top: 0.5rem;">{% for reason in r.reasons %}<li>{{ reason|capfirst }}</li>{% endfor %}</ul>
+        {% if r.reasons %}
+        <ul class="reason-list">{% for reason in r.reasons %}<li>{{ reason }}</li>{% endfor %}</ul>
         <p class="small muted" style="margin: 0.9rem 0 0;">{{ profile_priority }}</p>
+        {% else %}
+        <ul class="reason-list">{% for blocker in r.blockers %}<li>{{ blocker }}</li>{% endfor %}</ul>
+        {% endif %}
         <div class="source-stack">
             <div class="source-row"><strong>Água</strong><span>{{ c.water_source }} · {{ item.water_age }}</span></div>
             {% if c.water_point %}<div class="source-row"><strong>Ponto do INEA</strong><span>{{ c.water_point|capfirst }}. É o ponto mais próximo, não o posto exato.</span></div>{% endif %}
-            <div class="source-row"><strong>Maré</strong><span>{{ c.tide_source }}{% if c.tide_note %} · {{ c.tide_note }}{% endif %}</span></div>
+            <div class="source-row"><strong>Maré</strong><span>{% if c.high_tide == None %}Sem dado{% if c.tide_note %} · {{ c.tide_note }}{% endif %}{% elif c.high_tide %}Alta{% else %}Não alta{% endif %}</span></div>
             <div class="source-row"><strong>Mar e clima</strong><span>{% if c.origin == 'live' %}Open-Meteo{% elif c.origin == 'fallback' %}Apoio local{% else %}Demonstração local{% endif %} · {{ item.marine_age }}</span></div>
         </div>
         <div class="footer-actions">

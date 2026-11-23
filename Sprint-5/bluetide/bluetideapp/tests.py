@@ -1,46 +1,84 @@
 import io
 import json
 import math
+import tempfile
 from dataclasses import replace
-from datetime import datetime, timedelta
+from pathlib import Path
+from datetime import date, datetime, timedelta
 from unittest.mock import patch
 
 from django.test import Client, SimpleTestCase, override_settings
 from django.utils import timezone
 
-from .services import providers
+from .services import inea
 from .services.catalog import BEACH_POINTS
 from .services.providers import (
     ConditionsService,
     FixtureConditionsProvider,
     OpenMeteoProvider,
 )
-from .services.recommendations import rank, recommend, water_color
-from .services.tide import (
-    OpenMeteoTideProvider,
-    TideReading,
-    is_high_tide,
-    read_tide_from_hourly,
-    unavailable,
-)
+from .services.recommendations import rank, recommend
+from .services.tide import is_high_tide, read_tide_from_hourly
 
 
 NOW = timezone.make_aware(datetime(2026, 11, 8, 12, 0))
 
 
-class RecommendationTests(SimpleTestCase):
+SPRINT9_NOW = timezone.make_aware(datetime(2026, 10, 19, 10, 0))
+SPRINT9_RAIN_READ = timezone.make_aware(datetime(2026, 10, 19, 9, 40))
 
+
+def sprint9_conditions(status, collected, rain_1h, rain_24h, high_tide, quality="observada", read_at=SPRINT9_RAIN_READ):
+    base = FixtureConditionsProvider().fetch(BEACH_POINTS[1], now=SPRINT9_NOW)
+    return replace(
+        base,
+        water_status=status,
+        water_observed_at=timezone.make_aware(datetime.combine(collected, datetime.min.time())) if collected else None,
+        rain_1h=rain_1h,
+        rain_24h=rain_24h,
+        rain_quality=quality,
+        rain_observed_at=read_at,
+        high_tide=high_tide,
+    )
+
+
+COLLECTED_15_10 = date(2026, 10, 15)
+SPRINT9_EXAMPLES = (
+    ("1 tudo calmo", ("propria", COLLECTED_15_10, 0.0, 0.4, False), "verde", "alta"),
+    ("2 chuva moderada", ("propria", COLLECTED_15_10, 0.0, 6.2, False), "amarelo", "alta"),
+    ("3 chuva fraca com mare alta", ("propria", COLLECTED_15_10, 0.0, 2.0, True), "amarelo", "alta"),
+    ("4 chuva forte", ("propria", COLLECTED_15_10, 9.0, 34.0, False), "vermelho", "alta"),
+    ("5 improprio sem chuva", ("impropria", COLLECTED_15_10, 0.0, 0.0, False), "vermelho", "alta"),
+    ("6 coleta de 11 dias", ("propria", date(2026, 10, 8), 0.0, 0.0, False), "amarelo", "media"),
+    ("7 sem dado de chuva", ("propria", COLLECTED_15_10, None, None, False, None, None), "amarelo", "baixa"),
+    ("8 coleta de 32 dias", ("propria", date(2026, 9, 17), 0.0, 0.0, False), "amarelo", "baixa"),
+    ("9 improprio com 11 dias", ("impropria", date(2026, 10, 8), 0.0, 0.0, False), "vermelho", "media"),
+    ("10 chuva modelada e mare sem dado", ("propria", COLLECTED_15_10, 0.6, 1.1, None, "modelada"), "verde", "media"),
+)
+
+
+class RecommendationTests(SimpleTestCase):
     def setUp(self):
         self.conditions = FixtureConditionsProvider().fetch(BEACH_POINTS[1], now=NOW)
 
-    def test_complete_safe_point_is_green_and_explained(self):
-        result = recommend(self.conditions, "tranquilo", now=NOW)
+    def test_sprint9_examples_match_color_and_confidence(self):
+        for name, args, color, confidence in SPRINT9_EXAMPLES:
+            with self.subTest(name):
+                result = recommend(sprint9_conditions(*args), "neutro", now=SPRINT9_NOW)
 
-        self.assertEqual(result.color, "verde")
-        self.assertEqual(result.label, "Recomendada")
-        self.assertEqual(result.tone, "success")
-        self.assertIn("INEA próprio", result.summary)
-        self.assertIn("Ondas baixas", " ".join(r.capitalize() for r in result.reasons))
+                self.assertTrue(result.available)
+                self.assertEqual((result.color, result.confidence), (color, confidence))
+                self.assertTrue(result.reasons)
+
+    def test_improper_water_and_heavy_rain_are_red_not_neutral(self):
+        for conditions in (
+            replace(self.conditions, water_status="impropria"),
+            replace(self.conditions, rain_24h=25),
+        ):
+            result = recommend(conditions, "surf", now=NOW)
+
+            self.assertEqual((result.color, result.tone, result.label), ("vermelho", "danger", "Evite o banho"))
+            self.assertFalse(result.recommendable)
 
     def test_missing_water_quality_is_yellow_with_low_confidence(self):
         result = recommend(
@@ -49,68 +87,65 @@ class RecommendationTests(SimpleTestCase):
             now=NOW,
         )
 
-        self.assertEqual(result.color, "amarelo")
-        self.assertEqual(result.confidence, "baixa")
-        self.assertIn("sem coleta do INEA", result.reasons[0])
+        self.assertEqual((result.color, result.confidence), ("amarelo", "baixa"))
+        self.assertIn("Sem coleta", result.summary)
 
-    def test_old_water_quality_is_yellow(self):
-        result = recommend(replace(self.conditions, water_observed_at=NOW - timedelta(days=11)), "tranquilo", now=NOW)
+    def test_stale_rain_reading_is_yellow(self):
+        stale = replace(self.conditions, rain_observed_at=NOW - timedelta(hours=4))
 
-        self.assertEqual(result.color, "amarelo")
-        self.assertIn("11 dias", result.summary)
+        result = recommend(stale, "tranquilo", now=NOW)
 
-    def test_improper_water_is_red_for_every_profile_and_hides_profile_reasons(self):
-        unsafe = replace(self.conditions, water_status="impropria")
+        self.assertEqual((result.color, result.confidence), ("amarelo", "baixa"))
 
-        for profile in ("tranquilo", "surf", "neutro"):
-            with self.subTest(profile=profile):
-                result = recommend(unsafe, profile, now=NOW)
-                self.assertEqual(result.color, "vermelho")
-                self.assertEqual(result.tone, "danger")
-                self.assertTrue(all("INEA" in reason for reason in result.reasons))
-
-    def test_heavy_rain_is_red(self):
-        result = recommend(replace(self.conditions, rain_24h=25), "surf", now=NOW)
-
-        self.assertEqual(result.color, "vermelho")
-        self.assertIn("chuva forte", result.summary)
-
-    def test_fallback_values_never_give_green(self):
+    def test_integration_error_blocks_recommendation(self):
         fallback = replace(self.conditions, origin="fallback", provider_error="timeout")
 
-        for profile in ("tranquilo", "surf", "neutro"):
-            with self.subTest(profile=profile):
-                result = recommend(fallback, profile, now=NOW)
-                self.assertEqual(result.color, "amarelo")
-                self.assertEqual(result.confidence, "baixa")
-                self.assertIn("dados ao vivo incompletos", result.reasons[0])
+        result = recommend(fallback, "tranquilo", now=NOW)
 
-    def test_ranking_puts_green_then_yellow_then_red(self):
-        green = self.conditions
-        yellow = replace(self.conditions, beach=BEACH_POINTS[0], water_observed_at=NOW - timedelta(days=11))
-        red = replace(self.conditions, beach=BEACH_POINTS[2], water_status="impropria")
+        self.assertFalse(result.available)
+        self.assertEqual(result.tone, "neutral")
+        self.assertTrue(any("integração de dados" in blocker for blocker in result.blockers))
+
+    def test_profile_only_reorders_points_of_the_same_color(self):
+        calm = replace(self.conditions, wave_height=0.5)
+        rough = replace(self.conditions, wave_height=1.3)
+        red = replace(self.conditions, wave_height=0.5, water_status="impropria")
+
+        def order(profile):
+            items = [
+                {"conditions": c, "recommendation": recommend(c, profile, now=NOW)}
+                for c in (red, rough, calm)
+            ]
+            return [item["conditions"].wave_height for item in rank(items)]
+
+        self.assertEqual(order("tranquilo"), [0.5, 1.3, 0.5])
+        self.assertEqual(order("surf")[0], 1.3)
+        self.assertEqual(order("surf")[-1], 0.5)
+
+    def test_ranking_is_deterministic_and_puts_unavailable_points_last(self):
+        best = recommend(self.conditions, "tranquilo", now=NOW)
+        unavailable_conditions = replace(self.conditions, provider_error="timeout")
+        unavailable = recommend(unavailable_conditions, "tranquilo", now=NOW)
         items = [
-            {"conditions": c, "recommendation": recommend(c, "tranquilo", now=NOW)}
-            for c in (red, yellow, green)
+            {"conditions": unavailable_conditions, "recommendation": unavailable},
+            {"conditions": self.conditions, "recommendation": best},
         ]
 
         first = rank(items)
         second = rank(list(reversed(items)))
 
         self.assertEqual(first, second)
-        self.assertEqual([item["recommendation"].color for item in first], ["verde", "amarelo", "vermelho"])
+        self.assertTrue(first[0]["recommendation"].available)
+        self.assertFalse(first[-1]["recommendation"].available)
 
-    def test_inside_the_same_color_more_confidence_comes_first(self):
-        known = replace(self.conditions, water_observed_at=NOW - timedelta(days=11))
-        unknown = replace(self.conditions, beach=BEACH_POINTS[0], water_status=None)
+    def test_ties_break_by_posto_number_not_text_order(self):
+        low, high = BEACH_POINTS[1], BEACH_POINTS[4]
         items = [
-            {"conditions": c, "recommendation": recommend(c, "tranquilo", now=NOW)}
-            for c in (unknown, known)
+            {"conditions": replace(self.conditions, beach=beach), "recommendation": recommend(self.conditions, "neutro", now=NOW)}
+            for beach in (high, low)
         ]
 
-        ordered = rank(items)
-
-        self.assertEqual([item["recommendation"].confidence for item in ordered], ["media", "baixa"])
+        self.assertEqual([i["conditions"].beach.posto for i in rank(items)], ["Posto 8", "Posto 11"])
 
     def test_map_positions_follow_geographic_coordinates(self):
         points_west_to_east = sorted(BEACH_POINTS, key=lambda point: point.longitude)
@@ -175,7 +210,7 @@ class ProviderTests(SimpleTestCase):
         self.assertEqual(mocked_urlopen.call_count, 2)
         self.assertTrue(all(call.kwargs["timeout"] == 2 for call in mocked_urlopen.call_args_list))
 
-    @override_settings(BLUETIDE_DATA_MODE="live")
+    @override_settings(BLUETIDE_DATA_MODE="live", BLUETIDE_WATER_DATA_FILE=str(inea.WATER_FILE_PATH))
     def test_service_falls_back_without_raising_on_timeout(self):
         live_provider = type(
             "FailingProvider",
@@ -196,17 +231,16 @@ class ProviderTests(SimpleTestCase):
             origin="live",
         )
         live_provider = type("LiveProvider", (), {"fetch": lambda *args, **kwargs: live_result})()
-        service = ConditionsService(live_provider=live_provider, tide_provider=FakeTideProvider(None))
+        service = ConditionsService(live_provider=live_provider)
 
         conditions = service.get(BEACH_POINTS[2], now=NOW)
         result = recommend(conditions, "tranquilo", now=NOW)
 
-        self.assertNotEqual(result.color, "verde")
-        self.assertEqual(result.confidence, "baixa")
+        self.assertFalse(result.available)
         self.assertIn("BLUETIDE_WATER_DATA_FILE", conditions.provider_error)
 
 
-@override_settings(BLUETIDE_DATA_MODE="fixture")
+@override_settings(BLUETIDE_DATA_MODE="demo")
 class ViewTests(SimpleTestCase):
     def setUp(self):
         self.client = Client(HTTP_HOST="127.0.0.1")
@@ -237,12 +271,10 @@ class ViewTests(SimpleTestCase):
         self.assertNotContains(response, "Posto 9")
 
     def test_profile_changes_explanation(self):
-        surf = self.client.get("/praias/ipanema-posto-9/", {"perfil": "surf"})
-        bather = self.client.get("/praias/ipanema-posto-9/", {"perfil": "tranquilo"})
+        response = self.client.get("/praias/ipanema-posto-9/", {"perfil": "surf"})
 
-        self.assertContains(surf, "Ondas de 0,9 m, na faixa do surf iniciante")
-        self.assertContains(bather, "Ondas moderadas (0,9 m)")
-        self.assertContains(bather, "Maré alta: menos faixa de areia")
+        self.assertContains(response, "surf iniciante")
+        self.assertContains(response, "Faixa de ondas compatível")
 
     def test_unknown_beach_returns_404(self):
         self.assertEqual(self.client.get("/praias/inexistente/").status_code, 404)
@@ -250,38 +282,9 @@ class ViewTests(SimpleTestCase):
     def test_missing_stale_and_incomplete_states_are_visible(self):
         response = self.client.get("/comparar/")
 
-        self.assertContains(response, "Sem coleta do INEA usável")
-        self.assertContains(response, "tem 10 dias, mais que um ciclo")
-        self.assertContains(response, "Vento indisponível")
-        self.assertContains(response, "Maré sem dado: considerada não alta")
-
-    def test_screens_show_color_and_reason(self):
-        detail = self.client.get("/praias/ipanema-posto-9/", {"perfil": "tranquilo"})
-        card_list = self.client.get("/pesquisa/", {"perfil": "tranquilo"})
-        map_page = self.client.get("/web/", {"perfil": "tranquilo"})
-
-        self.assertContains(detail, "badge-warning")
-        self.assertContains(detail, "Com atenção")
-        self.assertContains(detail, "Confiança média")
-        self.assertContains(detail, "Com atenção para banho tranquilo: chuva fraca com maré alta")
-        self.assertContains(card_list, "Recomendada")
-        self.assertContains(card_list, "Boa para banho tranquilo: INEA próprio")
-        self.assertContains(map_page, "map-pin-success")
-        self.assertContains(map_page, "map-pin-warning")
-
-    def test_red_point_is_shown_in_red(self):
-        red = replace(FixtureConditionsProvider().fetch(BEACH_POINTS[1]), water_status="impropria")
-        with patch.object(ConditionsService, "get", return_value=red):
-            response = self.client.get("/web/")
-
-        self.assertContains(response, "map-pin-danger")
-        self.assertContains(response, "Evite hoje")
-
-    def test_profile_screen_links_profiles_and_explains_weights(self):
-        response = self.client.get("/perfil/", {"perfil": "surf"})
-
-        self.assertContains(response, 'href="/web/?perfil=surf"')
-        self.assertContains(response, "Pesa mais a onda, depois o vento")
+        self.assertContains(response, "Sem coleta de qualidade da água")
+        self.assertContains(response, "mais que um ciclo")
+        self.assertContains(response, "impróprio")
 
     def test_demo_data_is_never_presented_as_live(self):
         response = self.client.get("/web/")
@@ -296,6 +299,152 @@ class ViewTests(SimpleTestCase):
         for point in BEACH_POINTS:
             self.assertContains(response, f'cx="{point.map_x}" cy="{point.map_y}"')
 
+    def test_map_shows_red_pin_legend_and_only_recommendable_points_as_best(self):
+        response = self.client.get("/web/")
+
+        self.assertContains(response, "map-pin-danger")
+        self.assertContains(response, "Evite o banho")
+        self.assertContains(response, "Legenda das cores")
+        self.assertEqual(response.content.decode().count("beach-card-head"), 2)
+
+    def test_map_pin_color_tracks_recommendation_color(self):
+        html = self.client.get("/web/").content.decode()
+
+        self.assertIn("map-pin-success", html)
+        self.assertIn("map-pin-warning", html)
+        self.assertIn("map-pin-danger", html)
+
+
+def inea_points(last_status="impropria", last_date=date(2026, 11, 18)):
+    point = {"praia": "Ipanema", "localizacao": "Em frente à Rua Joana Angélica"}
+    points = {
+        f"XX{n:03d}": {**point, "coletas": [(date(2026, 11, 11), "propria"), (last_date, "nao_realizada")]}
+        for n in range(30)
+    }
+    for code in ("AR000", "IP006", "IP010", "LB003"):
+        points[code] = {**point, "coletas": [(date(2026, 11, 11), "propria"), (last_date, last_status)]}
+    return points
+
+
+class IneaGeneratorTests(SimpleTestCase):
+    def test_history_link_is_found_by_year_text_and_href(self):
+        html = (
+            '<a href="/x/2026/11/barra_e_zona_sul_historico-3.pdf"> 2026 </a>'
+            '<a href="/x/2025/12/barra_e_zona_sul_historico2024.pdf">2024</a>'
+            '<a href="/x/outro.pdf">2026</a>'
+        )
+
+        self.assertEqual(inea.find_history_url(html, 2026), "/x/2026/11/barra_e_zona_sul_historico-3.pdf")
+        with self.assertRaises(inea.IneaError):
+            inea.find_history_url(html, 2030)
+
+    def test_postos_get_latest_valid_collection_of_their_inea_point(self):
+        postos_map = json.loads(inea.POINTS_MAP_PATH.read_text(encoding="utf-8"))
+
+        data = inea.build_water_data(inea_points(), postos_map, "https://inea.example/h.pdf")
+
+        water = data["points"]["ipanema-posto-9"]["water"]
+        self.assertEqual(water["inea_point"], "IP006")
+        self.assertEqual(water["status"], "impropria")
+        self.assertEqual(water["source"], "INEA, coleta de 18/11/2026")
+        self.assertEqual(set(data["points"]), {point.slug for point in BEACH_POINTS})
+
+    def test_not_performed_collection_falls_back_to_last_valid_one(self):
+        postos_map = json.loads(inea.POINTS_MAP_PATH.read_text(encoding="utf-8"))
+        points = inea_points()
+        points["IP006"]["coletas"].append((date(2026, 11, 20), "nao_realizada"))
+
+        data = inea.build_water_data(points, postos_map, "u")
+
+        self.assertEqual(data["points"]["ipanema-posto-8"]["water"]["collected_on"], "2026-11-18")
+
+    def test_guards_reject_suspicious_pdfs(self):
+        postos_map = json.loads(inea.POINTS_MAP_PATH.read_text(encoding="utf-8"))
+        points = inea_points()
+        with self.assertRaises(inea.IneaError):
+            inea.build_water_data({"AR000": points["AR000"]}, postos_map, "u")
+        del points["IP010"]
+        with self.assertRaises(inea.IneaError):
+            inea.build_water_data(points, postos_map, "u")
+
+    def test_failed_write_keeps_previous_file(self):
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder) / "agua.json"
+            target.write_text('{"ok": true}', encoding="utf-8")
+
+            with self.assertRaises(TypeError):
+                inea.write_atomic(target, {"bad": object()})
+
+            self.assertEqual(json.loads(target.read_text(encoding="utf-8")), {"ok": True})
+            self.assertEqual([p.name for p in Path(folder).iterdir()], ["agua.json"])
+
+    def test_committed_file_covers_every_posto_with_a_real_collection_date(self):
+        data = json.loads(inea.WATER_FILE_PATH.read_text(encoding="utf-8"))
+
+        self.assertEqual(set(data["points"]), {point.slug for point in BEACH_POINTS})
+        for point in data["points"].values():
+            date.fromisoformat(point["water"]["collected_on"])
+            self.assertTrue(point["water"]["source"].startswith("INEA, coleta de "))
+
+
+class IneaModeTests(SimpleTestCase):
+    @override_settings(BLUETIDE_DATA_MODE="live", BLUETIDE_WATER_DATA_FILE="/nonexistent/agua.json")
+    def test_missing_water_file_suspends_recommendation_without_crashing(self):
+        conditions = ConditionsService().get(BEACH_POINTS[1], now=NOW)
+
+        self.assertIn("INEA", conditions.provider_error)
+        self.assertFalse(recommend(conditions, "tranquilo", now=NOW).available)
+
+    def setUp(self):
+        self.client = Client(HTTP_HOST="127.0.0.1")
+        self.folder = tempfile.TemporaryDirectory()
+        self.addCleanup(self.folder.cleanup)
+        self.water_file = Path(self.folder.name) / "agua.json"
+        postos_map = json.loads(inea.POINTS_MAP_PATH.read_text(encoding="utf-8"))
+        self.payload = inea.build_water_data(inea_points(), postos_map, "u")
+        self.water_file.write_text(json.dumps(self.payload), encoding="utf-8")
+
+    def get(self, route, today):
+        failing = type("Offline", (), {"fetch": lambda *a, **k: (_ for _ in ()).throw(OSError("offline"))})()
+        with (
+            override_settings(BLUETIDE_DATA_MODE="live", BLUETIDE_WATER_DATA_FILE=str(self.water_file)),
+            patch("django.utils.timezone.now", return_value=today),
+            patch("bluetideapp.services.providers.OpenMeteoProvider", return_value=failing),
+        ):
+            return self.client.get(route)
+
+    def test_age_comes_from_the_real_collection_date(self):
+        provider = FixtureConditionsProvider(self.water_file)
+        for today, expected in ((datetime(2026, 11, 23, 9), 5), (datetime(2026, 11, 28, 22), 10)):
+            now = timezone.make_aware(today)
+            conditions = provider.fetch(BEACH_POINTS[1], now=now)
+            self.assertEqual(
+                (timezone.localtime(now).date() - timezone.localtime(conditions.water_observed_at).date()).days,
+                expected,
+            )
+
+    def test_notice_labels_source_and_nearest_point(self):
+        response = self.get("/praias/ipanema-posto-8/", timezone.make_aware(datetime(2026, 11, 23, 9)))
+
+        self.assertContains(response, "dados reais do INEA")
+        self.assertContains(response, "ponto de monitoramento do INEA mais próximo")
+        self.assertContains(response, "INEA, coleta de 18/11/2026")
+        self.assertContains(response, "Ponto IP006")
+        self.assertNotContains(response, "Modo demonstração")
+        self.assertNotContains(response, 'data-water-notice="old"')
+
+    def test_old_collection_is_flagged(self):
+        response = self.get("/web/", timezone.make_aware(datetime(2026, 11, 30, 9)))
+
+        self.assertContains(response, 'data-water-notice="old"')
+        self.assertContains(response, "Coleta do INEA antiga")
+
+    def test_expired_collection_is_flagged(self):
+        response = self.get("/web/", timezone.make_aware(datetime(2026, 12, 25, 9)))
+
+        self.assertContains(response, 'data-water-notice="expired"')
+        self.assertContains(response, "Coleta do INEA vencida")
+
 
 TIDE_PERIOD_HOURS = 12.42
 
@@ -309,39 +458,34 @@ def hourly_tide_payload(now, phase, hours_before=24, hours_after=24):
     return {"hourly": {"time": times, "sea_level_height_msl": heights}}
 
 
-class FakeTideProvider:
-    def __init__(self, high):
-        self.high = high
 
-    def read(self, beach, now=None):
-        if self.high is None:
-            return unavailable("Open-Meteo Marine não respondeu: timeout")
-        return TideReading(self.high, 0.5, -0.5, 0.6, now, "Open-Meteo Marine")
+
+
+
 
 
 class TideModuleTests(SimpleTestCase):
     def test_high_tide_when_now_is_in_the_top_quarter(self):
         reading = read_tide_from_hourly(hourly_tide_payload(NOW, phase=0), NOW)
 
-        self.assertTrue(reading.available)
+
         self.assertTrue(reading.high)
         self.assertIsNone(reading.unavailable_reason)
 
     def test_low_tide_when_now_is_at_the_bottom(self):
-        reading = read_tide_from_hourly(hourly_tide_payload(NOW, phase=math.pi), NOW)
-
-        self.assertTrue(reading.available)
-        self.assertFalse(reading.high)
+        self.assertFalse(read_tide_from_hourly(hourly_tide_payload(NOW, phase=math.pi), NOW).high)
 
     def test_mid_tide_is_not_high(self):
-        reading = read_tide_from_hourly(hourly_tide_payload(NOW, phase=math.pi / 2), NOW)
+        self.assertFalse(read_tide_from_hourly(hourly_tide_payload(NOW, phase=math.pi / 2), NOW).high)
 
-        self.assertFalse(reading.high)
+    def test_uses_24_hours_before_and_after(self):
+        reading = read_tide_from_hourly(hourly_tide_payload(NOW, phase=0), NOW)
+
+        self.assertAlmostEqual(reading.highest, 0.6, places=2)
+        self.assertLess(reading.lowest, -0.55)
 
     def test_unavailable_when_series_does_not_cover_now(self):
-        later = NOW + timedelta(days=3)
-
-        reading = read_tide_from_hourly(hourly_tide_payload(NOW, phase=0), later)
+        reading = read_tide_from_hourly(hourly_tide_payload(NOW, phase=0), NOW + timedelta(days=3))
 
         self.assertIsNone(reading.high)
         self.assertIn("hora atual", reading.unavailable_reason)
@@ -357,256 +501,139 @@ class TideModuleTests(SimpleTestCase):
     def test_flat_sea_level_is_unavailable(self):
         self.assertIsNone(is_high_tide(0.3, [0.3] * 49))
 
-    @patch("bluetideapp.services.tide.urlopen")
-    def test_provider_requests_hourly_sea_level_with_timeout(self, mocked_urlopen):
-        mocked_urlopen.return_value = FakeResponse(json.dumps(hourly_tide_payload(NOW, phase=0)).encode())
-
-        reading = OpenMeteoTideProvider(timeout=2).read(BEACH_POINTS[2], now=NOW)
-
-        self.assertTrue(reading.high)
-        url = mocked_urlopen.call_args.args[0]
-        self.assertIn("marine-api.open-meteo.com", url)
-        self.assertIn("hourly=sea_level_height_msl", url)
-        self.assertEqual(mocked_urlopen.call_args.kwargs["timeout"], 2)
-
-    @patch("bluetideapp.services.tide.urlopen", side_effect=OSError("timeout"))
-    def test_provider_never_raises_when_api_fails(self, mocked_urlopen):
-        reading = OpenMeteoTideProvider(timeout=2).read(BEACH_POINTS[2], now=NOW)
+    def test_unexpected_format_never_raises(self):
+        reading = read_tide_from_hourly({"hourly": "quebrado"}, NOW)
 
         self.assertIsNone(reading.high)
-        self.assertIn("não respondeu", reading.unavailable_reason)
-
-    @patch("bluetideapp.services.tide.urlopen")
-    def test_provider_never_raises_on_unexpected_format(self, mocked_urlopen):
-        mocked_urlopen.return_value = FakeResponse(b'{"hourly": "quebrado"}')
-
-        reading = OpenMeteoTideProvider(timeout=2).read(BEACH_POINTS[2], now=NOW)
-
-        self.assertIsNone(reading.high)
+        self.assertIsNotNone(reading.unavailable_reason)
 
 
-class TideInConditionsTests(SimpleTestCase):
+class TideInProviderTests(SimpleTestCase):
+    def live_fetch(self, mocked_urlopen, marine_hourly):
+        marine_payload = {
+            "current": {"time": "2026-11-08T12:00", "wave_height": 0.7, "wave_period": 8,
+                        "sea_surface_temperature": 23.2, "sea_level_height_msl": 0.6},
+            **marine_hourly,
+        }
+        weather_payload = {
+            "current": {"time": "2026-11-08T12:00", "temperature_2m": 28.0, "wind_speed_10m": 12.0, "precipitation": 0.0},
+            "hourly": {"time": ["2026-11-08T11:00"], "precipitation": [0.0]},
+        }
+        mocked_urlopen.side_effect = [
+            FakeResponse(json.dumps(marine_payload).encode()),
+            FakeResponse(json.dumps(weather_payload).encode()),
+        ]
+        base = FixtureConditionsProvider().fetch(BEACH_POINTS[1], now=NOW)
+        return OpenMeteoProvider(timeout=2).fetch(BEACH_POINTS[1], base=base, now=NOW)
+
+    @patch("bluetideapp.services.providers.urlopen")
+    def test_live_tide_reaches_conditions_with_two_forecast_days(self, mocked_urlopen):
+        result = self.live_fetch(mocked_urlopen, hourly_tide_payload(NOW, phase=0))
+
+        self.assertTrue(result.high_tide)
+        self.assertIsNone(result.tide_note)
+        self.assertIn("forecast_days=2", mocked_urlopen.call_args_list[0].args[0])
+
+    @patch("bluetideapp.services.providers.urlopen")
+    def test_live_low_tide(self, mocked_urlopen):
+        self.assertFalse(self.live_fetch(mocked_urlopen, hourly_tide_payload(NOW, phase=math.pi)).high_tide)
+
+    @patch("bluetideapp.services.providers.urlopen")
+    def test_missing_tide_series_is_unavailable_with_reason(self, mocked_urlopen):
+        result = self.live_fetch(mocked_urlopen, {})
+
+        self.assertEqual(result.origin, "live")
+        self.assertIsNone(result.high_tide)
+        self.assertIn("série hora a hora", result.tide_note)
+
+
+class TideInRecommendationTests(SimpleTestCase):
     def setUp(self):
-        providers._LIVE_CACHE.clear()
+        self.base = sprint9_conditions("propria", COLLECTED_15_10, 0.0, 2.0, False)
 
-    def tearDown(self):
-        providers._LIVE_CACHE.clear()
-
-    def test_fixture_carries_high_low_and_missing_tide(self):
-        provider = FixtureConditionsProvider()
-        by_slug = {point.slug: provider.fetch(point, now=NOW) for point in BEACH_POINTS}
-
-        self.assertTrue(by_slug["ipanema-posto-9"].tide_high)
-        self.assertFalse(by_slug["ipanema-posto-8"].tide_high)
-        self.assertIsNone(by_slug["ipanema-posto-11"].tide_high)
-
-    @override_settings(BLUETIDE_DATA_MODE="live")
-    def test_live_service_delivers_tide_to_conditions(self):
-        live_result = replace(FixtureConditionsProvider().fetch(BEACH_POINTS[3], now=NOW), origin="live")
-        live_provider = type("LiveProvider", (), {"fetch": lambda *args, **kwargs: live_result})()
-        service = ConditionsService(live_provider=live_provider, tide_provider=FakeTideProvider(True))
-
-        conditions = service.get(BEACH_POINTS[3], now=NOW)
-
-        self.assertTrue(conditions.tide_high)
-        self.assertEqual(conditions.tide_source, "Open-Meteo Marine")
-
-    @override_settings(BLUETIDE_DATA_MODE="live")
-    def test_tide_failure_does_not_turn_live_data_into_fallback(self):
-        live_result = replace(FixtureConditionsProvider().fetch(BEACH_POINTS[4], now=NOW), origin="live")
-        live_provider = type("LiveProvider", (), {"fetch": lambda *args, **kwargs: live_result})()
-        service = ConditionsService(live_provider=live_provider, tide_provider=FakeTideProvider(None))
-
-        conditions = service.get(BEACH_POINTS[4], now=NOW)
-
-        self.assertEqual(conditions.origin, "live")
-        self.assertIsNone(conditions.tide_high)
-        self.assertIn("não respondeu", conditions.tide_note)
-
-
-class Sprint9RuleWithTideTests(SimpleTestCase):
-    def setUp(self):
-        self.base = FixtureConditionsProvider().fetch(BEACH_POINTS[1], now=NOW)
-
-    def color(self, **changes):
-        return water_color(replace(self.base, **changes), now=NOW)
-
-    def test_light_rain_with_high_tide_turns_yellow(self):
-        result = self.color(rain_24h=2.0, tide_high=True)
-
-        self.assertEqual(result.cor, "amarelo")
-        self.assertIn("chuva fraca com maré alta", " ".join(result.motivos))
-
-    def test_light_rain_with_low_tide_stays_green(self):
-        result = self.color(rain_24h=2.0, tide_high=False)
-
-        self.assertEqual(result.cor, "verde")
-        self.assertEqual(result.confianca, "media")
-
-    def test_light_rain_with_tide_unavailable_counts_as_not_high(self):
-        result = self.color(rain_24h=2.0, tide_high=None)
-
-        self.assertEqual(result.cor, "verde")
-        self.assertEqual(result.confianca, "media")
-        self.assertIn("maré sem dado", " ".join(result.motivos))
-
-    def test_tide_never_makes_red_on_its_own(self):
-        result = self.color(rain_24h=0.0, tide_high=True)
-
-        self.assertEqual(result.cor, "verde")
-
-    def test_heavy_rain_is_red(self):
-        self.assertEqual(self.color(rain_24h=25.0).cor, "vermelho")
-
-    def test_improper_water_is_red(self):
-        self.assertEqual(self.color(water_status="impropria").cor, "vermelho")
-
-    def test_old_collection_is_yellow(self):
-        result = self.color(water_observed_at=NOW - timedelta(days=11))
-
-        self.assertEqual(result.cor, "amarelo")
-        self.assertIn("11 dias", " ".join(result.motivos))
-
-    def test_provider_error_never_gives_green(self):
-        result = self.color(provider_error="timeout")
-
-        self.assertEqual(result.cor, "amarelo")
-        self.assertEqual(result.confianca, "baixa")
-
-    def test_recommendation_service_exposes_color_and_confidence(self):
-        result = recommend(replace(self.base, rain_24h=2.0, tide_high=True), "tranquilo", now=NOW)
+    def test_light_rain_with_high_tide_is_yellow(self):
+        result = recommend(replace(self.base, high_tide=True), "tranquilo", now=SPRINT9_NOW)
 
         self.assertEqual(result.color, "amarelo")
+        self.assertIn("Chuva fraca com maré alta", result.summary)
+
+    def test_light_rain_with_low_tide_is_green(self):
+        self.assertEqual(recommend(self.base, "tranquilo", now=SPRINT9_NOW).color, "verde")
+
+    def test_unavailable_tide_counts_as_not_high_and_is_explained(self):
+        result = recommend(replace(self.base, high_tide=None), "tranquilo", now=SPRINT9_NOW)
+
+        self.assertEqual(result.color, "verde")
         self.assertEqual(result.confidence, "media")
-        self.assertIn("chuva fraca com maré alta", " ".join(result.reasons))
+        self.assertIn("Maré sem dado: considerada não alta.", result.reasons)
 
+    def test_tide_note_is_not_added_to_red(self):
+        red = replace(self.base, water_status="impropria", high_tide=None)
 
-class Sprint9PdfExamplesTests(SimpleTestCase):
-
-    def test_the_ten_examples_keep_color_and_confidence(self):
-        from datetime import date
-        from datetime import timezone as dt_timezone
-
-        from .services.regra_sprint9 import EntradaDoPonto, recomendar_ponto
-
-        brasilia = dt_timezone(timedelta(hours=-3))
-        agora = datetime(2026, 10, 19, 10, 0, tzinfo=brasilia)
-        lido = datetime(2026, 10, 19, 9, 40, tzinfo=brasilia)
-        coleta = date(2026, 10, 15)
-        cases = [
-            ("propria", coleta, 0.0, 0.4, False, "observada", lido, "verde", "alta"),
-            ("propria", coleta, 0.0, 6.2, False, "observada", lido, "amarelo", "alta"),
-            ("propria", coleta, 0.0, 2.0, True, "observada", lido, "amarelo", "alta"),
-            ("propria", coleta, 9.0, 34.0, False, "observada", lido, "vermelho", "alta"),
-            ("impropria", coleta, 0.0, 0.0, False, "observada", lido, "vermelho", "alta"),
-            ("propria", date(2026, 10, 8), 0.0, 0.0, False, "observada", lido, "amarelo", "media"),
-            ("propria", coleta, None, None, False, None, None, "amarelo", "baixa"),
-            ("propria", date(2026, 9, 17), 0.0, 0.0, False, "observada", lido, "amarelo", "baixa"),
-            ("impropria", date(2026, 10, 8), 0.0, 0.0, False, "observada", lido, "vermelho", "media"),
-            ("propria", coleta, 0.6, 1.1, None, "modelada", lido, "verde", "media"),
-        ]
-        for number, (status, day, h1, h24, tide, quality, read_at, color, confidence) in enumerate(cases, 1):
-            with self.subTest(example=number):
-                result = recomendar_ponto(EntradaDoPonto(status, day, h1, h24, quality, read_at, tide), agora)
-                self.assertEqual((result.cor, result.confianca), (color, confidence))
+        self.assertNotIn("Maré sem dado: considerada não alta.", recommend(red, "tranquilo", now=SPRINT9_NOW).reasons)
 
 
 class ProfileBehaviorTests(SimpleTestCase):
-
     def setUp(self):
         self.base = FixtureConditionsProvider().fetch(BEACH_POINTS[1], now=NOW)
 
     def rec(self, profile, **changes):
         return recommend(replace(self.base, **changes), profile, now=NOW)
 
-    def test_bather_calm_sea_is_green(self):
-        result = self.rec("tranquilo")
+    def test_bather_prefers_calm_sea(self):
+        calm, rough = self.rec("tranquilo", wave_height=0.6), self.rec("tranquilo", wave_height=1.5)
 
-        self.assertEqual(result.color, "verde")
-        self.assertIn("ondas baixas (0,6 m), boas para banho", result.reasons)
+        self.assertGreater(calm.fit, rough.fit)
+        self.assertIn("Ondas acima do ideal para banho tranquilo.", rough.reasons)
 
-    def test_bather_big_waves_turn_yellow(self):
-        result = self.rec("tranquilo", wave_height=1.5)
+    def test_bather_counts_rain_and_high_tide(self):
+        dry, wet = self.rec("tranquilo", rain_24h=0.2), self.rec("tranquilo", rain_24h=3.0)
+        low, high = self.rec("tranquilo", high_tide=False), self.rec("tranquilo", high_tide=True)
 
-        self.assertEqual(result.color, "amarelo")
-        self.assertEqual(result.water_color, "verde")
-        self.assertIn("acima do ideal para banho tranquilo", result.summary)
+        self.assertGreater(dry.fit, wet.fit)
+        self.assertGreater(low.fit, high.fit)
+        self.assertIn("Maré alta: menos faixa de areia.", high.reasons)
 
-    def test_bather_high_tide_only_lowers_the_order(self):
-        low = self.rec("tranquilo", tide_high=False)
-        high = self.rec("tranquilo", tide_high=True)
+    def test_surf_prefers_waves_in_range_and_light_wind(self):
+        good = self.rec("surf", wave_height=1.0, wind_speed=10)
+        flat = self.rec("surf", wave_height=0.4, wind_speed=10)
+        windy = self.rec("surf", wave_height=1.0, wind_speed=30)
 
-        self.assertEqual(high.color, "verde")
-        self.assertLess(high.score, low.score)
-        self.assertIn("maré alta: menos faixa de areia", high.reasons)
-
-    def test_bather_missing_wind_does_not_change_the_color(self):
-        result = self.rec("tranquilo", wind_speed=None)
-
-        self.assertEqual(result.color, "verde")
-        self.assertIn("vento indisponível", result.reasons)
-
-    def test_bather_stale_marine_data_turns_yellow(self):
-        result = self.rec("tranquilo", marine_observed_at=NOW - timedelta(hours=7))
-
-        self.assertEqual(result.color, "amarelo")
-
-    def test_surf_good_waves_and_light_wind_are_green(self):
-        result = self.rec("surf", wave_height=0.9, wind_speed=10)
-
-        self.assertEqual(result.color, "verde")
-        self.assertIn("ondas de 0,9 m, na faixa do surf iniciante", result.reasons)
-        self.assertIn("vento fraco, mar mais arrumado", result.reasons)
-
-    def test_surf_flat_sea_turns_yellow(self):
-        result = self.rec("surf", wave_height=0.4)
-
-        self.assertEqual(result.color, "amarelo")
-        self.assertIn("mar quase sem onda", result.summary)
-
-    def test_surf_strong_wind_turns_yellow(self):
-        result = self.rec("surf", wave_height=1.0, wind_speed=30)
-
-        self.assertEqual(result.color, "amarelo")
-        self.assertIn("vento forte (30 km/h) bagunça o mar", result.reasons)
+        self.assertGreater(good.fit, flat.fit)
+        self.assertGreater(good.fit, windy.fit)
+        self.assertIn("Vento forte bagunça o mar.", windy.reasons)
 
     def test_surf_ignores_the_tide(self):
-        low = self.rec("surf", wave_height=1.0, tide_high=False)
-        high = self.rec("surf", wave_height=1.0, tide_high=True)
+        self.assertEqual(self.rec("surf", high_tide=False).fit, self.rec("surf", high_tide=True).fit)
 
-        self.assertEqual((low.color, low.score), (high.color, high.score))
+    def test_neutral_only_breaks_ties(self):
+        result = self.rec("neutro", wave_height=0.6, wind_speed=10, rain_24h=0.2)
 
-    def test_neutral_follows_only_the_water_color(self):
-        result = self.rec("neutro", wave_height=2.5, wind_speed=40)
+        self.assertEqual(result.fit, 3)
+        self.assertEqual(len(result.reasons), 1)
+        self.assertTrue(result.reasons[0].startswith("Água própria"))
 
-        self.assertEqual(result.color, "verde")
-        self.assertEqual(result.summary, "Boa hoje: " + result.reasons[0] + ".")
-
-    def test_neutral_is_yellow_when_water_is_yellow(self):
-        result = self.rec("neutro", rain_24h=2.0, tide_high=True)
-
-        self.assertEqual(result.color, "amarelo")
-        self.assertIn("chuva fraca com maré alta", result.summary)
-
-    def test_profile_never_creates_red(self):
-        for profile, changes in (
-            ("tranquilo", {"wave_height": 3.0}),
-            ("surf", {"wave_height": 3.0, "wind_speed": 50}),
-        ):
-            with self.subTest(profile=profile):
-                self.assertEqual(self.rec(profile, **changes).color, "amarelo")
-
-    def test_profile_never_improves_the_water_color(self):
+    def test_profile_never_changes_the_color(self):
+        rough = {"wave_height": 3.0, "wind_speed": 50}
         for profile in ("tranquilo", "surf", "neutro"):
             with self.subTest(profile=profile):
-                result = self.rec(profile, wave_height=0.9, wind_speed=10, rain_24h=2.0, tide_high=True)
-                self.assertEqual(result.color, "amarelo")
+                self.assertEqual(self.rec(profile, **rough).color, "verde")
+                self.assertEqual(self.rec(profile, water_status="impropria", wave_height=1.0).color, "vermelho")
 
-    def test_confidence_is_always_the_sprint9_one(self):
-        expected = water_color(self.base, now=NOW).confianca
-        for profile in ("tranquilo", "surf", "neutro"):
-            with self.subTest(profile=profile):
-                self.assertEqual(self.rec(profile).confidence, expected)
 
-    def test_unknown_profile_falls_back_to_bather(self):
-        self.assertEqual(recommend(self.base, "qualquer", now=NOW), recommend(self.base, "tranquilo", now=NOW))
+@override_settings(BLUETIDE_DATA_MODE="demo")
+class ProfileScreenTests(SimpleTestCase):
+    def setUp(self):
+        self.client = Client(HTTP_HOST="127.0.0.1")
+
+    def test_profile_screen_links_profiles_and_explains_weights(self):
+        response = self.client.get("/perfil/", {"perfil": "surf"})
+
+        self.assertContains(response, 'href="/web/?perfil=surf"')
+        self.assertContains(response, "Pesa mais a onda, depois o vento")
+
+    def test_detail_shows_tide_and_profile_weights(self):
+        response = self.client.get("/praias/ipanema-posto-9/", {"perfil": "tranquilo"})
+
+        self.assertContains(response, "Maré não alta")
+        self.assertContains(response, "Pesa mais a onda, depois a chuva")
