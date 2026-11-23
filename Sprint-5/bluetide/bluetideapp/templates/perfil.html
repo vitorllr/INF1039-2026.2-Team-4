@@ -25,11 +25,14 @@
         <p class="eyebrow">Recomendação</p>
         <h2 id="preferencia-mar">O que você procura hoje?</h2>
         <div class="preference-pills" aria-label="Perfil de praia preferido">
-            <span class="preference-pill is-selected">Banho tranquilo</span>
-            <span class="preference-pill">Surf iniciante</span>
-            <span class="preference-pill">Sem preferência</span>
+            {% for value, label in profiles.items %}
+            <a class="preference-pill {% if value == profile %}is-selected{% endif %}" href="{% url 'mapa_web' %}?perfil={{ value }}">{{ label }}</a>
+            {% endfor %}
         </div>
-        <p class="small muted" style="margin: 1rem 0 0;">Você pode trocar esse perfil ao comparar os pontos de Ipanema.</p>
+        <ul class="reason-list">
+            {% for label, text in priorities %}<li><strong>{{ label }}:</strong> {{ text }}</li>{% endfor %}
+        </ul>
+        <p class="small muted" style="margin: 1rem 0 0;">O perfil nunca deixa verde um ponto que a água, a chuva ou a maré deixaram amarelo ou vermelho.</p>
     </section>
 </div>
 
