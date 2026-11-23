@@ -1,7 +1,7 @@
 import io
 import json
 from dataclasses import replace
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from unittest.mock import patch
 
 from django.test import Client, SimpleTestCase, override_settings
@@ -19,62 +19,107 @@ from .services.recommendations import rank, recommend
 NOW = timezone.make_aware(datetime(2026, 11, 8, 12, 0))
 
 
+SPRINT9_NOW = timezone.make_aware(datetime(2026, 10, 19, 10, 0))
+SPRINT9_RAIN_READ = timezone.make_aware(datetime(2026, 10, 19, 9, 40))
+
+
+def sprint9_conditions(status, collected, rain_1h, rain_24h, high_tide, quality="observada", read_at=SPRINT9_RAIN_READ):
+    base = FixtureConditionsProvider().fetch(BEACH_POINTS[1], now=SPRINT9_NOW)
+    return replace(
+        base,
+        water_status=status,
+        water_observed_at=timezone.make_aware(datetime.combine(collected, datetime.min.time())) if collected else None,
+        rain_1h=rain_1h,
+        rain_24h=rain_24h,
+        rain_quality=quality,
+        rain_observed_at=read_at,
+        high_tide=high_tide,
+    )
+
+
+COLLECTED_15_10 = date(2026, 10, 15)
+SPRINT9_EXAMPLES = (
+    ("1 tudo calmo", ("propria", COLLECTED_15_10, 0.0, 0.4, False), "verde", "alta"),
+    ("2 chuva moderada", ("propria", COLLECTED_15_10, 0.0, 6.2, False), "amarelo", "alta"),
+    ("3 chuva fraca com mare alta", ("propria", COLLECTED_15_10, 0.0, 2.0, True), "amarelo", "alta"),
+    ("4 chuva forte", ("propria", COLLECTED_15_10, 9.0, 34.0, False), "vermelho", "alta"),
+    ("5 improprio sem chuva", ("impropria", COLLECTED_15_10, 0.0, 0.0, False), "vermelho", "alta"),
+    ("6 coleta de 11 dias", ("propria", date(2026, 10, 8), 0.0, 0.0, False), "amarelo", "media"),
+    ("7 sem dado de chuva", ("propria", COLLECTED_15_10, None, None, False, None, None), "amarelo", "baixa"),
+    ("8 coleta de 32 dias", ("propria", date(2026, 9, 17), 0.0, 0.0, False), "amarelo", "baixa"),
+    ("9 improprio com 11 dias", ("impropria", date(2026, 10, 8), 0.0, 0.0, False), "vermelho", "media"),
+    ("10 chuva modelada e mare sem dado", ("propria", COLLECTED_15_10, 0.6, 1.1, None, "modelada"), "verde", "media"),
+)
+
+
 class RecommendationTests(SimpleTestCase):
     def setUp(self):
         self.conditions = FixtureConditionsProvider().fetch(BEACH_POINTS[1], now=NOW)
 
-    def test_complete_safe_point_is_explainable_and_recommended(self):
-        result = recommend(self.conditions, "tranquilo", now=NOW)
+    def test_sprint9_examples_match_color_and_confidence(self):
+        for name, args, color, confidence in SPRINT9_EXAMPLES:
+            with self.subTest(name):
+                result = recommend(sprint9_conditions(*args), "neutro", now=SPRINT9_NOW)
 
-        self.assertTrue(result.available)
-        self.assertEqual(result.label, "Melhor escolha")
-        self.assertGreaterEqual(len(result.reasons), 3)
-        self.assertIn("Ondas baixas", " ".join(result.reasons))
+                self.assertTrue(result.available)
+                self.assertEqual((result.color, result.confidence), (color, confidence))
+                self.assertTrue(result.reasons)
 
-    def test_missing_water_quality_blocks_recommendation(self):
+    def test_improper_water_and_heavy_rain_are_red_not_neutral(self):
+        for conditions in (
+            replace(self.conditions, water_status="impropria"),
+            replace(self.conditions, rain_24h=25),
+        ):
+            result = recommend(conditions, "surf", now=NOW)
+
+            self.assertEqual((result.color, result.tone, result.label), ("vermelho", "danger", "Evite o banho"))
+            self.assertFalse(result.recommendable)
+
+    def test_missing_water_quality_is_yellow_with_low_confidence(self):
         result = recommend(
             replace(self.conditions, water_status=None, water_observed_at=None),
             "tranquilo",
             now=NOW,
         )
 
-        self.assertFalse(result.available)
-        self.assertIn("Não há boletim", result.blockers[0])
+        self.assertEqual((result.color, result.confidence), ("amarelo", "baixa"))
+        self.assertIn("Sem coleta", result.summary)
 
-    def test_stale_water_quality_blocks_recommendation(self):
-        stale = replace(self.conditions, water_observed_at=NOW - timedelta(days=9))
+    def test_stale_rain_reading_is_yellow(self):
+        stale = replace(self.conditions, rain_observed_at=NOW - timedelta(hours=4))
 
         result = recommend(stale, "tranquilo", now=NOW)
 
-        self.assertFalse(result.available)
-        self.assertTrue(any("desatualizado" in blocker for blocker in result.blockers))
+        self.assertEqual((result.color, result.confidence), ("amarelo", "baixa"))
 
-    def test_incomplete_marine_fields_block_recommendation(self):
-        result = recommend(replace(self.conditions, wind_speed=None), "tranquilo", now=NOW)
-
-        self.assertFalse(result.available)
-        self.assertTrue(any("vento" in blocker for blocker in result.blockers))
-
-    def test_improper_water_and_heavy_rain_never_recommend(self):
-        unsafe = replace(self.conditions, water_status="impropria", rain_24h=25)
-
-        result = recommend(unsafe, "surf", now=NOW)
-
-        self.assertFalse(result.available)
-        self.assertTrue(any("imprópria" in blocker for blocker in result.blockers))
-        self.assertTrue(any("chuva intensa" in blocker for blocker in result.blockers))
-
-    def test_fallback_values_are_visible_but_not_recommended(self):
+    def test_integration_error_blocks_recommendation(self):
         fallback = replace(self.conditions, origin="fallback", provider_error="timeout")
 
         result = recommend(fallback, "tranquilo", now=NOW)
 
         self.assertFalse(result.available)
+        self.assertEqual(result.tone, "neutral")
         self.assertTrue(any("integração de dados" in blocker for blocker in result.blockers))
+
+    def test_profile_only_reorders_points_of_the_same_color(self):
+        calm = replace(self.conditions, wave_height=0.5)
+        rough = replace(self.conditions, wave_height=1.3)
+        red = replace(self.conditions, wave_height=0.5, water_status="impropria")
+
+        def order(profile):
+            items = [
+                {"conditions": c, "recommendation": recommend(c, profile, now=NOW)}
+                for c in (red, rough, calm)
+            ]
+            return [item["conditions"].wave_height for item in rank(items)]
+
+        self.assertEqual(order("tranquilo"), [0.5, 1.3, 0.5])
+        self.assertEqual(order("surf")[0], 1.3)
+        self.assertEqual(order("surf")[-1], 0.5)
 
     def test_ranking_is_deterministic_and_puts_unavailable_points_last(self):
         best = recommend(self.conditions, "tranquilo", now=NOW)
-        unavailable_conditions = replace(self.conditions, water_status=None)
+        unavailable_conditions = replace(self.conditions, provider_error="timeout")
         unavailable = recommend(unavailable_conditions, "tranquilo", now=NOW)
         items = [
             {"conditions": unavailable_conditions, "recommendation": unavailable},
@@ -87,6 +132,15 @@ class RecommendationTests(SimpleTestCase):
         self.assertEqual(first, second)
         self.assertTrue(first[0]["recommendation"].available)
         self.assertFalse(first[-1]["recommendation"].available)
+
+    def test_ties_break_by_posto_number_not_text_order(self):
+        low, high = BEACH_POINTS[1], BEACH_POINTS[4]
+        items = [
+            {"conditions": replace(self.conditions, beach=beach), "recommendation": recommend(self.conditions, "neutro", now=NOW)}
+            for beach in (high, low)
+        ]
+
+        self.assertEqual([i["conditions"].beach.posto for i in rank(items)], ["Posto 8", "Posto 11"])
 
     def test_map_positions_follow_geographic_coordinates(self):
         points_west_to_east = sorted(BEACH_POINTS, key=lambda point: point.longitude)
@@ -223,9 +277,9 @@ class ViewTests(SimpleTestCase):
     def test_missing_stale_and_incomplete_states_are_visible(self):
         response = self.client.get("/comparar/")
 
-        self.assertContains(response, "Não há boletim")
-        self.assertContains(response, "desatualizado")
-        self.assertContains(response, "Faltam dados essenciais")
+        self.assertContains(response, "Sem coleta de qualidade da água")
+        self.assertContains(response, "mais que um ciclo")
+        self.assertContains(response, "impróprio")
 
     def test_demo_data_is_never_presented_as_live(self):
         response = self.client.get("/web/")
@@ -239,3 +293,18 @@ class ViewTests(SimpleTestCase):
         self.assertContains(response, "não é mapa de navegação")
         for point in BEACH_POINTS:
             self.assertContains(response, f'cx="{point.map_x}" cy="{point.map_y}"')
+
+    def test_map_shows_red_pin_legend_and_only_recommendable_points_as_best(self):
+        response = self.client.get("/web/")
+
+        self.assertContains(response, "map-pin-danger")
+        self.assertContains(response, "Evite o banho")
+        self.assertContains(response, "Legenda das cores")
+        self.assertEqual(response.content.decode().count("beach-card-head"), 2)
+
+    def test_map_pin_color_tracks_recommendation_color(self):
+        html = self.client.get("/web/").content.decode()
+
+        self.assertIn("map-pin-success", html)
+        self.assertIn("map-pin-warning", html)
+        self.assertIn("map-pin-danger", html)

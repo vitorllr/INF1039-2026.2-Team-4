@@ -63,6 +63,7 @@ def _dataset(request):
     )
     return {
         "items": items,
+        "best": [item for item in items if item["recommendation"].recommendable][:2],
         "profile": profile,
         "profile_label": PROFILE_LABELS[profile],
         "profiles": PROFILE_LABELS,
