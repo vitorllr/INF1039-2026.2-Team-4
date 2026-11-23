@@ -3,7 +3,6 @@ from datetime import timedelta
 from django.conf import settings
 from django.http import Http404
 from django.shortcuts import render
-from django.urls import reverse
 from django.utils import timezone
 
 from .services.catalog import BEACH_POINTS, BEACH_POINTS_BY_SLUG
@@ -78,30 +77,8 @@ def home(request):
     return mapa_web(request)
 
 
-def _map_points(items, profile):
-    points = []
-    for item in items:
-        beach = item["conditions"].beach
-        recommendation = item["recommendation"]
-        points.append(
-            {
-                "slug": beach.slug,
-                "name": beach.display_name,
-                "posto": beach.posto.removeprefix("Posto "),
-                "lat": beach.latitude,
-                "lng": beach.longitude,
-                "tone": recommendation.tone,
-                "label": recommendation.label,
-                "url": f"{reverse('detalhes_praia', args=[beach.slug])}?perfil={profile}",
-            }
-        )
-    return points
-
-
 def mapa_web(request):
-    context = _dataset(request)
-    context["map_points"] = _map_points(context["items"], context["profile"])
-    return render(request, "mapa.html", context)
+    return render(request, "mapa.html", _dataset(request))
 
 
 def pesquisa(request):

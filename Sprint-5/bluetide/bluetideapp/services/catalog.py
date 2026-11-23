@@ -1,6 +1,18 @@
 from dataclasses import dataclass
 
 
+# A fixed local frame keeps the simplified coast diagram stable between loads.
+# Coordinates are WGS84 decimal degrees, projected to local meters. This diagram
+# is illustrative, not suitable for navigation.
+MAP_BOUNDS = {
+    "south": -23.002,
+    "north": -22.975,
+    "west": -43.226,
+    "east": -43.188,
+}
+MAP_METERS_PER_DEGREE_LATITUDE = 111_320
+MAP_METERS_PER_DEGREE_LONGITUDE = 102_478  # cos(22.99 degrees) * 111,320
+
 
 @dataclass(frozen=True)
 class BeachPoint:
@@ -15,6 +27,14 @@ class BeachPoint:
     @property
     def display_name(self) -> str:
         return f"{self.name} · {self.posto}"
+
+    @property
+    def map_x(self) -> int:
+        return round((self.longitude - MAP_BOUNDS["west"]) * MAP_METERS_PER_DEGREE_LONGITUDE)
+
+    @property
+    def map_y(self) -> int:
+        return round((MAP_BOUNDS["north"] - self.latitude) * MAP_METERS_PER_DEGREE_LATITUDE)
 
 
 BEACH_POINTS = (
