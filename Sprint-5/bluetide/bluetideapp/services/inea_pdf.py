@@ -131,3 +131,31 @@ def ler_historico(caminho_do_pdf):
                     if texto:
                         pontos[codigo]["coletas"].append((data, normalizar_status(texto)))
     return pontos
+
+
+def normalizar_codigo(codigo):
+    """O boletim do dia usa 4 caracteres (IP03) e o histórico usa 5 (IP003)."""
+    if re.fullmatch(r"[A-Z]{2}\d{2}", codigo):
+        return f"{codigo[:2]}0{codigo[2:]}"
+    return codigo
+
+
+def ler_ultimo_boletim(caminho_do_pdf):
+    """Lê o boletim de 1 página. Devolve (data do boletim, {codigo: status})."""
+    import pdfplumber
+
+    with pdfplumber.open(caminho_do_pdf) as pdf:
+        texto = "\n".join((pagina.extract_text() or "") for pagina in pdf.pages)
+
+    titulo = re.search(r"(\d{1,2}) de ([A-Za-zÀ-ÿ]+) de (\d{4})", texto)
+    if not titulo:
+        raise ValueError("Data do boletim não encontrada no título")
+    mes = NUMERO_DO_MES.get(titulo.group(2).lower())
+    if mes is None:
+        raise ValueError(f"Mês desconhecido no título do boletim: {titulo.group(2)!r}")
+    data = date(int(titulo.group(3)), mes, int(titulo.group(1)))
+
+    status = {}
+    for codigo, texto_do_status in re.findall(r"\b([A-Z]{2}\d{2,3})\s+(Própria|Imprópria|Não Realizada)", texto):
+        status[normalizar_codigo(codigo)] = normalizar_status(texto_do_status)
+    return data, status

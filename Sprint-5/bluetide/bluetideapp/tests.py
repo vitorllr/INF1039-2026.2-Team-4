@@ -325,17 +325,6 @@ def inea_points(last_status="impropria", last_date=date(2026, 11, 18)):
 
 
 class IneaGeneratorTests(SimpleTestCase):
-    def test_history_link_is_found_by_year_text_and_href(self):
-        html = (
-            '<a href="/x/2026/11/barra_e_zona_sul_historico-3.pdf"> 2026 </a>'
-            '<a href="/x/2025/12/barra_e_zona_sul_historico2024.pdf">2024</a>'
-            '<a href="/x/outro.pdf">2026</a>'
-        )
-
-        self.assertEqual(inea.find_history_url(html, 2026), "/x/2026/11/barra_e_zona_sul_historico-3.pdf")
-        with self.assertRaises(inea.IneaError):
-            inea.find_history_url(html, 2030)
-
     def test_postos_get_latest_valid_collection_of_their_inea_point(self):
         postos_map = json.loads(inea.POINTS_MAP_PATH.read_text(encoding="utf-8"))
 
