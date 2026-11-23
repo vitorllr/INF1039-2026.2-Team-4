@@ -31,6 +31,7 @@
         <div class="compare-row"><span>Ondas</span><strong>{{ c.wave_height|floatformat:1|default_if_none:"-" }} m</strong></div>
         <div class="compare-row"><span>Vento</span><strong>{% if c.wind_speed == None %}Indisponível{% else %}{{ c.wind_speed|floatformat:0 }} km/h{% endif %}</strong></div>
         <div class="compare-row"><span>Chuva 24h</span><strong>{{ c.rain_24h|floatformat:1|default_if_none:"-" }} mm</strong></div>
+        <div class="compare-row"><span>Maré</span><strong>{% if c.high_tide == None %}Sem dado{% elif c.high_tide %}Alta{% else %}Não alta{% endif %}</strong></div>
         <a class="button-secondary" href="{% url 'detalhes_praia' c.beach.slug %}?perfil={{ profile }}">Entender este ponto</a>
     </article>
     {% endwith %}
@@ -40,6 +41,6 @@
 <div class="card" style="margin-top: 1rem;">
     <p class="eyebrow">Decisão do Pedro</p>
     <h2>O primeiro ponto disponível é a melhor correspondência</h2>
-    <p class="muted">A ordem nunca coloca um ponto de cor pior (amarelo ou vermelho) acima de uma alternativa de cor melhor; o perfil só desempata.</p>
+    <p class="muted">A ordem nunca coloca um ponto de cor pior (amarelo ou vermelho) acima de uma alternativa de cor melhor; o perfil só desempata. {{ profile_priority }}</p>
 </div>
 {% endblock %}

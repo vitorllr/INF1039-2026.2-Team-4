@@ -1,5 +1,6 @@
 import io
 import json
+import math
 import tempfile
 from dataclasses import replace
 from pathlib import Path
@@ -17,6 +18,7 @@ from .services.providers import (
     OpenMeteoProvider,
 )
 from .services.recommendations import rank, recommend
+from .services.tide import is_high_tide, read_tide_from_hourly
 
 
 NOW = timezone.make_aware(datetime(2026, 11, 8, 12, 0))
@@ -442,3 +444,196 @@ class IneaModeTests(SimpleTestCase):
 
         self.assertContains(response, 'data-water-notice="expired"')
         self.assertContains(response, "Coleta do INEA vencida")
+
+
+TIDE_PERIOD_HOURS = 12.42
+
+
+def hourly_tide_payload(now, phase, hours_before=24, hours_after=24):
+    current_hour = timezone.localtime(now).replace(minute=0, second=0, microsecond=0, tzinfo=None)
+    times, heights = [], []
+    for k in range(-hours_before, hours_after + 1):
+        times.append((current_hour + timedelta(hours=k)).isoformat(timespec="minutes"))
+        heights.append(round(0.6 * math.cos(2 * math.pi * k / TIDE_PERIOD_HOURS + phase), 3))
+    return {"hourly": {"time": times, "sea_level_height_msl": heights}}
+
+
+
+
+
+
+
+
+class TideModuleTests(SimpleTestCase):
+    def test_high_tide_when_now_is_in_the_top_quarter(self):
+        reading = read_tide_from_hourly(hourly_tide_payload(NOW, phase=0), NOW)
+
+
+        self.assertTrue(reading.high)
+        self.assertIsNone(reading.unavailable_reason)
+
+    def test_low_tide_when_now_is_at_the_bottom(self):
+        self.assertFalse(read_tide_from_hourly(hourly_tide_payload(NOW, phase=math.pi), NOW).high)
+
+    def test_mid_tide_is_not_high(self):
+        self.assertFalse(read_tide_from_hourly(hourly_tide_payload(NOW, phase=math.pi / 2), NOW).high)
+
+    def test_uses_24_hours_before_and_after(self):
+        reading = read_tide_from_hourly(hourly_tide_payload(NOW, phase=0), NOW)
+
+        self.assertAlmostEqual(reading.highest, 0.6, places=2)
+        self.assertLess(reading.lowest, -0.55)
+
+    def test_unavailable_when_series_does_not_cover_now(self):
+        reading = read_tide_from_hourly(hourly_tide_payload(NOW, phase=0), NOW + timedelta(days=3))
+
+        self.assertIsNone(reading.high)
+        self.assertIn("hora atual", reading.unavailable_reason)
+
+    def test_unavailable_when_window_is_too_short(self):
+        payload = hourly_tide_payload(NOW, phase=0, hours_before=3, hours_after=3)
+
+        reading = read_tide_from_hourly(payload, NOW)
+
+        self.assertIsNone(reading.high)
+        self.assertIn("insuficientes", reading.unavailable_reason)
+
+    def test_flat_sea_level_is_unavailable(self):
+        self.assertIsNone(is_high_tide(0.3, [0.3] * 49))
+
+    def test_unexpected_format_never_raises(self):
+        reading = read_tide_from_hourly({"hourly": "quebrado"}, NOW)
+
+        self.assertIsNone(reading.high)
+        self.assertIsNotNone(reading.unavailable_reason)
+
+
+class TideInProviderTests(SimpleTestCase):
+    def live_fetch(self, mocked_urlopen, marine_hourly):
+        marine_payload = {
+            "current": {"time": "2026-11-08T12:00", "wave_height": 0.7, "wave_period": 8,
+                        "sea_surface_temperature": 23.2, "sea_level_height_msl": 0.6},
+            **marine_hourly,
+        }
+        weather_payload = {
+            "current": {"time": "2026-11-08T12:00", "temperature_2m": 28.0, "wind_speed_10m": 12.0, "precipitation": 0.0},
+            "hourly": {"time": ["2026-11-08T11:00"], "precipitation": [0.0]},
+        }
+        mocked_urlopen.side_effect = [
+            FakeResponse(json.dumps(marine_payload).encode()),
+            FakeResponse(json.dumps(weather_payload).encode()),
+        ]
+        base = FixtureConditionsProvider().fetch(BEACH_POINTS[1], now=NOW)
+        return OpenMeteoProvider(timeout=2).fetch(BEACH_POINTS[1], base=base, now=NOW)
+
+    @patch("bluetideapp.services.providers.urlopen")
+    def test_live_tide_reaches_conditions_with_two_forecast_days(self, mocked_urlopen):
+        result = self.live_fetch(mocked_urlopen, hourly_tide_payload(NOW, phase=0))
+
+        self.assertTrue(result.high_tide)
+        self.assertIsNone(result.tide_note)
+        self.assertIn("forecast_days=2", mocked_urlopen.call_args_list[0].args[0])
+
+    @patch("bluetideapp.services.providers.urlopen")
+    def test_live_low_tide(self, mocked_urlopen):
+        self.assertFalse(self.live_fetch(mocked_urlopen, hourly_tide_payload(NOW, phase=math.pi)).high_tide)
+
+    @patch("bluetideapp.services.providers.urlopen")
+    def test_missing_tide_series_is_unavailable_with_reason(self, mocked_urlopen):
+        result = self.live_fetch(mocked_urlopen, {})
+
+        self.assertEqual(result.origin, "live")
+        self.assertIsNone(result.high_tide)
+        self.assertIn("série hora a hora", result.tide_note)
+
+
+class TideInRecommendationTests(SimpleTestCase):
+    def setUp(self):
+        self.base = sprint9_conditions("propria", COLLECTED_15_10, 0.0, 2.0, False)
+
+    def test_light_rain_with_high_tide_is_yellow(self):
+        result = recommend(replace(self.base, high_tide=True), "tranquilo", now=SPRINT9_NOW)
+
+        self.assertEqual(result.color, "amarelo")
+        self.assertIn("Chuva fraca com maré alta", result.summary)
+
+    def test_light_rain_with_low_tide_is_green(self):
+        self.assertEqual(recommend(self.base, "tranquilo", now=SPRINT9_NOW).color, "verde")
+
+    def test_unavailable_tide_counts_as_not_high_and_is_explained(self):
+        result = recommend(replace(self.base, high_tide=None), "tranquilo", now=SPRINT9_NOW)
+
+        self.assertEqual(result.color, "verde")
+        self.assertEqual(result.confidence, "media")
+        self.assertIn("Maré sem dado: considerada não alta.", result.reasons)
+
+    def test_tide_note_is_not_added_to_red(self):
+        red = replace(self.base, water_status="impropria", high_tide=None)
+
+        self.assertNotIn("Maré sem dado: considerada não alta.", recommend(red, "tranquilo", now=SPRINT9_NOW).reasons)
+
+
+class ProfileBehaviorTests(SimpleTestCase):
+    def setUp(self):
+        self.base = FixtureConditionsProvider().fetch(BEACH_POINTS[1], now=NOW)
+
+    def rec(self, profile, **changes):
+        return recommend(replace(self.base, **changes), profile, now=NOW)
+
+    def test_bather_prefers_calm_sea(self):
+        calm, rough = self.rec("tranquilo", wave_height=0.6), self.rec("tranquilo", wave_height=1.5)
+
+        self.assertGreater(calm.fit, rough.fit)
+        self.assertIn("Ondas acima do ideal para banho tranquilo.", rough.reasons)
+
+    def test_bather_counts_rain_and_high_tide(self):
+        dry, wet = self.rec("tranquilo", rain_24h=0.2), self.rec("tranquilo", rain_24h=3.0)
+        low, high = self.rec("tranquilo", high_tide=False), self.rec("tranquilo", high_tide=True)
+
+        self.assertGreater(dry.fit, wet.fit)
+        self.assertGreater(low.fit, high.fit)
+        self.assertIn("Maré alta: menos faixa de areia.", high.reasons)
+
+    def test_surf_prefers_waves_in_range_and_light_wind(self):
+        good = self.rec("surf", wave_height=1.0, wind_speed=10)
+        flat = self.rec("surf", wave_height=0.4, wind_speed=10)
+        windy = self.rec("surf", wave_height=1.0, wind_speed=30)
+
+        self.assertGreater(good.fit, flat.fit)
+        self.assertGreater(good.fit, windy.fit)
+        self.assertIn("Vento forte bagunça o mar.", windy.reasons)
+
+    def test_surf_ignores_the_tide(self):
+        self.assertEqual(self.rec("surf", high_tide=False).fit, self.rec("surf", high_tide=True).fit)
+
+    def test_neutral_only_breaks_ties(self):
+        result = self.rec("neutro", wave_height=0.6, wind_speed=10, rain_24h=0.2)
+
+        self.assertEqual(result.fit, 3)
+        self.assertEqual(len(result.reasons), 1)
+        self.assertTrue(result.reasons[0].startswith("Água própria"))
+
+    def test_profile_never_changes_the_color(self):
+        rough = {"wave_height": 3.0, "wind_speed": 50}
+        for profile in ("tranquilo", "surf", "neutro"):
+            with self.subTest(profile=profile):
+                self.assertEqual(self.rec(profile, **rough).color, "verde")
+                self.assertEqual(self.rec(profile, water_status="impropria", wave_height=1.0).color, "vermelho")
+
+
+@override_settings(BLUETIDE_DATA_MODE="demo")
+class ProfileScreenTests(SimpleTestCase):
+    def setUp(self):
+        self.client = Client(HTTP_HOST="127.0.0.1")
+
+    def test_profile_screen_links_profiles_and_explains_weights(self):
+        response = self.client.get("/perfil/", {"perfil": "surf"})
+
+        self.assertContains(response, 'href="/web/?perfil=surf"')
+        self.assertContains(response, "Pesa mais a onda, depois o vento")
+
+    def test_detail_shows_tide_and_profile_weights(self):
+        response = self.client.get("/praias/ipanema-posto-9/", {"perfil": "tranquilo"})
+
+        self.assertContains(response, "Maré não alta")
+        self.assertContains(response, "Pesa mais a onda, depois a chuva")

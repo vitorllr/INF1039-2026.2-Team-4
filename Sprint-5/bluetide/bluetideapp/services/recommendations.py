@@ -31,6 +31,19 @@ PROFILE_LABELS = {
     "surf": "Surf iniciante",
     "neutro": "Sem preferência",
 }
+PROFILE_PRIORITIES = {
+    "tranquilo": "Pesa mais a onda, depois a chuva, o vento e, por último, a maré alta.",
+    "surf": "Pesa mais a onda, depois o vento. A chuva pesa pouco e a maré não entra.",
+    "neutro": "Vale só a cor. Onda, vento e chuva desempatam com o mesmo peso.",
+}
+
+CALM_WAVE_M = 0.8
+BATHER_MAX_WAVE_M = 1.2
+SURF_MIN_WAVE_M = 0.7
+SURF_MAX_WAVE_M = 1.4
+LIGHT_WIND_KMH = 15
+STRONG_WIND_KMH = 25
+DRY_RAIN_MM = 1.0
 
 
 @dataclass(frozen=True)
@@ -83,7 +96,7 @@ def recommend(conditions: Conditions, profile: str, now=None) -> Recommendation:
 
     reds, yellows = [], []
     if water != "sem_dado" and conditions.water_status == "impropria":
-        reds.append(f"Boletim: ponto impróprio na coleta de {collected} ({age_days} dias).")
+        reds.append(f"Boletim: ponto impróprio na coleta de {collected} ({_days(age_days)}).")
     if rain == "forte":
         reds.append(f"Chuva forte ({rain_text}).")
 
@@ -93,7 +106,7 @@ def recommend(conditions: Conditions, profile: str, now=None) -> Recommendation:
         if water == "sem_dado":
             yellows.append("Sem coleta de qualidade da água usável nos últimos 30 dias.")
         elif water == "antiga":
-            yellows.append(f"A coleta de {collected} tem {age_days} dias, mais que um ciclo.")
+            yellows.append(f"A coleta de {collected} tem {_days(age_days)}, mais que um ciclo.")
         if rain == "moderada":
             only_tide = (
                 conditions.high_tide
@@ -109,6 +122,9 @@ def recommend(conditions: Conditions, profile: str, now=None) -> Recommendation:
         else:
             color = GREEN
             reasons = [f"Água própria na coleta de {collected} e chuva baixa."]
+
+    if color != RED and conditions.high_tide is None:
+        reasons.append("Maré sem dado: considerada não alta.")
 
     fit, fit_reasons = _profile_fit(conditions, profile)
     label, tone = COLOR_PRESENTATION[color]
@@ -135,6 +151,10 @@ def rank(recommendations):
             _posto_number(item["conditions"].beach.posto),
         ),
     )
+
+
+def _days(count):
+    return f"{count} dia" if count == 1 else f"{count} dias"
 
 
 def _posto_number(posto: str) -> int:
@@ -189,39 +209,87 @@ def _rain_text(conditions):
 
 def _profile_fit(conditions, profile):
     """Preferência só ordena pontos de mesma cor; não muda a cor."""
+    return PROFILE_FIT[profile](conditions)
+
+
+def _bather_fit(conditions):
     fit, reasons = 0, []
-    wave, wind = conditions.wave_height, conditions.wind_speed
+    wave, wind, rain = conditions.wave_height, conditions.wind_speed, conditions.rain_24h
     if wave is None:
         fit -= 1
-    elif profile == "tranquilo":
-        if wave <= 0.8:
-            fit += 3
-            reasons.append("Ondas baixas combinam com banho tranquilo.")
-        elif wave <= 1.2:
-            fit += 1
-            reasons.append("Ondas moderadas pedem atenção ao entrar no mar.")
-        else:
-            fit -= 2
-            reasons.append("Ondas acima do ideal para banho tranquilo.")
-    elif profile == "surf":
-        if 0.7 <= wave <= 1.4:
-            fit += 3
-            reasons.append("Faixa de ondas compatível com surf iniciante.")
-        elif wave < 0.7:
-            fit += 1
-            reasons.append("Ondas pequenas podem limitar a prática de surf.")
-        else:
-            fit -= 2
-            reasons.append("Ondas acima da faixa escolhida para iniciantes.")
+    elif wave <= CALM_WAVE_M:
+        fit += 3
+        reasons.append("Ondas baixas combinam com banho tranquilo.")
+    elif wave <= BATHER_MAX_WAVE_M:
+        fit += 1
+        reasons.append("Ondas moderadas pedem atenção ao entrar no mar.")
+    else:
+        fit -= 2
+        reasons.append("Ondas acima do ideal para banho tranquilo.")
+
+    if rain is not None and rain < DRY_RAIN_MM:
+        fit += 2
+        reasons.append("Pouca chuva nas últimas 24 horas.")
 
     if wind is None:
         fit -= 1
-    elif wind <= 15:
-        fit += 2
+    elif wind <= LIGHT_WIND_KMH:
+        fit += 1
         reasons.append("Vento leve no momento.")
-    elif wind <= 25:
+    elif wind > STRONG_WIND_KMH:
+        fit -= 1
+        reasons.append("Vento forte deixa a praia desconfortável.")
+
+    if conditions.high_tide:
+        fit -= 1
+        reasons.append("Maré alta: menos faixa de areia.")
+    return fit, reasons
+
+
+def _surf_fit(conditions):
+    fit, reasons = 0, []
+    wave, wind, rain = conditions.wave_height, conditions.wind_speed, conditions.rain_24h
+    if wave is None:
+        fit -= 1
+    elif wave < SURF_MIN_WAVE_M:
+        reasons.append("Ondas pequenas podem limitar a prática de surf.")
+    elif wave <= SURF_MAX_WAVE_M:
+        fit += 3
+        reasons.append("Faixa de ondas compatível com surf iniciante.")
+    else:
+        fit -= 2
+        reasons.append("Ondas acima da faixa escolhida para iniciantes.")
+
+    if wind is None:
+        fit -= 1
+    elif wind <= LIGHT_WIND_KMH:
+        fit += 2
+        reasons.append("Vento fraco deixa o mar mais arrumado.")
+    elif wind <= STRONG_WIND_KMH:
         fit += 1
         reasons.append("Vento moderado no momento.")
     else:
-        reasons.append("Vento forte pode piorar o conforto e o mar.")
+        fit -= 2
+        reasons.append("Vento forte bagunça o mar.")
+
+    if rain is not None and rain < DRY_RAIN_MM:
+        fit += 1
     return fit, reasons
+
+
+def _neutral_fit(conditions):
+    fit = 0
+    if conditions.wave_height is not None and conditions.wave_height <= BATHER_MAX_WAVE_M:
+        fit += 1
+    if conditions.wind_speed is not None and conditions.wind_speed <= STRONG_WIND_KMH:
+        fit += 1
+    if conditions.rain_24h is not None and conditions.rain_24h < DRY_RAIN_MM:
+        fit += 1
+    return fit, []
+
+
+PROFILE_FIT = {
+    "tranquilo": _bather_fit,
+    "surf": _surf_fit,
+    "neutro": _neutral_fit,
+}
