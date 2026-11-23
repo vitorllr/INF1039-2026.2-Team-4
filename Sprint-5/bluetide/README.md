@@ -60,6 +60,56 @@ Each posto is mapped to the nearest INEA monitoring point in `bluetideapp/data/i
 INEA does not monitor by posto, so the app labels these as the nearest INEA point.
 The Sprint 9 rule marks a collection older than 9 days as old and older than 30 days as unusable, and the notice in the app says so.
 
+The command finds the "Último Boletim Divulgado" and the year-history links by link text, never by a fixed PDF address, and downloads with a 30 s timeout and a `User-Agent` that names the project.
+PDFs are cached by SHA-256 in `.inea-cache/` next to the output file (`--cache-dir` changes it).
+Before writing, it checks that at least 30 points and 10 collection dates were read, that every mapped point has a valid collection that is not in the future, and that no posto goes back in time compared with the current file.
+The write is atomic (temporary file, then rename).
+On any failure it writes nothing, prints the reason and exits with status 1.
+If neither the PDF nor the day changed since the last success it exits 0 without rewriting, and `--force` rewrites anyway.
+In January, when the new-year history is not on the page yet, it uses the previous year's history plus the one-page "Último Boletim Divulgado" and logs "plano B".
+
+### Scheduling
+
+INEA collects mostly on Wednesdays and publishes about a day later, so twice a day is enough.
+Each run makes 2 small requests.
+
+cron, at 10:00 and 17:00:
+
+```cron
+0 10,17 * * * cd /path/to/Sprint-5/bluetide && .venv/bin/python manage.py atualizar_agua_inea --output /var/lib/bluetide/agua.json >> /var/log/bluetide-inea.log 2>&1
+```
+
+launchd (macOS), saved as `~/Library/LaunchAgents/br.bluetide.inea.plist` and loaded with `launchctl load`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>br.bluetide.inea</string>
+  <key>WorkingDirectory</key><string>/path/to/Sprint-5/bluetide</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/path/to/Sprint-5/bluetide/.venv/bin/python</string>
+    <string>manage.py</string>
+    <string>atualizar_agua_inea</string>
+    <string>--output</string>
+    <string>/var/lib/bluetide/agua.json</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>10</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer></dict>
+  </array>
+  <key>StandardOutPath</key><string>/tmp/bluetide-inea.log</string>
+  <key>StandardErrorPath</key><string>/tmp/bluetide-inea.log</string>
+</dict>
+</plist>
+```
+
+Point `BLUETIDE_WATER_DATA_FILE` at the same output path when starting the app.
+Alert when the job exits non-zero or when `generated_at` in the file is more than 10 days old.
+
 Live marine and weather data come from Open-Meteo.
 If Open-Meteo fails, the UI keeps the supporting values visible but suspends recommendations.
 If the official water-quality file is missing, live weather alone cannot produce a recommendation.
