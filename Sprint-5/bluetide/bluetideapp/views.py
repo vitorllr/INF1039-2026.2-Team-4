@@ -11,6 +11,7 @@ from .services.recommendations import (
     FRESH_WATER_DAYS,
     MAX_WATER_DAYS,
     PROFILE_LABELS,
+    PROFILE_PRIORITIES,
     normalize_profile,
     rank,
     recommend,
@@ -61,6 +62,16 @@ def _water_notice(items, now):
     return {**notice, "level": level, "age_days": age_days, "oldest": oldest}
 
 
+def _profile_context(profile):
+    return {
+        "profile": profile,
+        "profile_label": PROFILE_LABELS[profile],
+        "profiles": PROFILE_LABELS,
+        "profile_priority": PROFILE_PRIORITIES[profile],
+        "priorities": [(PROFILE_LABELS[key], PROFILE_PRIORITIES[key]) for key in PROFILE_LABELS],
+    }
+
+
 def _dataset(request):
     now = timezone.now()
     profile = normalize_profile(request.GET.get("perfil"))
@@ -92,9 +103,7 @@ def _dataset(request):
     return {
         "items": items,
         "best": [item for item in items if item["recommendation"].recommendable][:2],
-        "profile": profile,
-        "profile_label": PROFILE_LABELS[profile],
-        "profiles": PROFILE_LABELS,
+        **_profile_context(profile),
         "data_mode": settings.BLUETIDE_DATA_MODE,
         "is_demo": is_demo_mode(),
         "water_notice": None if is_demo_mode() else _water_notice(items, now),
@@ -125,7 +134,8 @@ def pesquisa(request):
 
 
 def perfil(request):
-    return render(request, "perfil.html")
+    profile = normalize_profile(request.GET.get("perfil"))
+    return render(request, "perfil.html", _profile_context(profile))
 
 
 def favoritos(request):

@@ -96,7 +96,7 @@ def recommend(conditions: Conditions, profile: str, now=None) -> Recommendation:
 
     reds, yellows = [], []
     if water != "sem_dado" and conditions.water_status == "impropria":
-        reds.append(f"Boletim: ponto impróprio na coleta de {collected} ({age_days} dias).")
+        reds.append(f"Boletim: ponto impróprio na coleta de {collected} ({_days(age_days)}).")
     if rain == "forte":
         reds.append(f"Chuva forte ({rain_text}).")
 
@@ -106,7 +106,7 @@ def recommend(conditions: Conditions, profile: str, now=None) -> Recommendation:
         if water == "sem_dado":
             yellows.append("Sem coleta de qualidade da água usável nos últimos 30 dias.")
         elif water == "antiga":
-            yellows.append(f"A coleta de {collected} tem {age_days} dias, mais que um ciclo.")
+            yellows.append(f"A coleta de {collected} tem {_days(age_days)}, mais que um ciclo.")
         if rain == "moderada":
             only_tide = (
                 conditions.high_tide
@@ -151,6 +151,10 @@ def rank(recommendations):
             _posto_number(item["conditions"].beach.posto),
         ),
     )
+
+
+def _days(count):
+    return f"{count} dia" if count == 1 else f"{count} dias"
 
 
 def _posto_number(posto: str) -> int:
