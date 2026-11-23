@@ -48,6 +48,7 @@
         {% endif %}
         <div class="source-stack">
             <div class="source-row"><strong>Água</strong><span>{{ c.water_source }} · {{ item.water_age }}</span></div>
+            {% if c.water_point %}<div class="source-row"><strong>Ponto do INEA</strong><span>{{ c.water_point|capfirst }}. É o ponto mais próximo, não o posto exato.</span></div>{% endif %}
             <div class="source-row"><strong>Mar e clima</strong><span>{% if c.origin == 'live' %}Open-Meteo{% elif c.origin == 'fallback' %}Apoio local{% else %}Demonstração local{% endif %} · {{ item.marine_age }}</span></div>
         </div>
         <div class="footer-actions">

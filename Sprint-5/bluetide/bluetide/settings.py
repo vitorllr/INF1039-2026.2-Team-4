@@ -142,9 +142,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = 'bluetideapp.Usuario'
 
-# External data is opt-in. The default local fixture makes development and
-# automated tests deterministic and is visibly labelled in the product.
-BLUETIDE_DATA_MODE = os.getenv("BLUETIDE_DATA_MODE", "fixture").lower()
+# By default the app shows real INEA water quality (bluetideapp/data/agua_inea.json,
+# refreshed by `manage.py atualizar_agua_inea`) with live Open-Meteo sea and weather.
+# BLUETIDE_DATA_MODE=demo switches to the deterministic fixture used by tests and the demo video.
+BLUETIDE_DATA_MODE = os.getenv("BLUETIDE_DATA_MODE", "live").lower()
 BLUETIDE_HTTP_TIMEOUT = float(os.getenv("BLUETIDE_HTTP_TIMEOUT", "4.0"))
-BLUETIDE_WATER_DATA_FILE = os.getenv("BLUETIDE_WATER_DATA_FILE", "")
+BLUETIDE_WATER_DATA_FILE = os.getenv(
+    "BLUETIDE_WATER_DATA_FILE", str(BASE_DIR / "bluetideapp" / "data" / "agua_inea.json")
+)
 BLUETIDE_DATA_CACHE_SECONDS = int(os.getenv("BLUETIDE_DATA_CACHE_SECONDS", "300"))

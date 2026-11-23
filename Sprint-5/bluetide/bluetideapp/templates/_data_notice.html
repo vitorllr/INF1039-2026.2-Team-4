@@ -3,9 +3,28 @@
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16M6 16l3-5 3 3 3-6 3 8"/><circle cx="18" cy="6" r="2"/></svg>
     <p><strong>Modo demonstração.</strong> Os valores são locais e determinísticos para validar a experiência. Nenhum dado é apresentado como leitura oficial ao vivo.</p>
 </div>
-{% elif data_errors %}
+{% else %}
+{% if data_errors %}
 <div class="banner mode-banner" role="alert">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 4.5 2.8 18a2 2 0 0 0 1.8 3h14.8a2 2 0 0 0 1.8-3L13.7 4.5a2 2 0 0 0-3.4 0Z"/></svg>
     <p><strong>Atualização incompleta.</strong> A recomendação fica suspensa enquanto a fonte necessária não estiver disponível.</p>
 </div>
+{% endif %}
+{% if water_notice.level == "expired" %}
+<div class="banner mode-banner" role="alert" data-water-notice="expired">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 4.5 2.8 18a2 2 0 0 0 1.8 3h14.8a2 2 0 0 0 1.8-3L13.7 4.5a2 2 0 0 0-3.4 0Z"/></svg>
+    <p><strong>Coleta do INEA vencida.</strong> {% if water_notice.oldest %}A última coleta é de {{ water_notice.oldest|date:"d/m/Y" }}, há {{ water_notice.age_days }} dias, acima do limite de {{ water_notice.max_days }} dias.{% else %}Não há coleta do INEA disponível.{% endif %} A água fica sem dado e a recomendação perde confiança.</p>
+</div>
+{% elif water_notice.level == "old" %}
+<div class="banner mode-banner" role="alert" data-water-notice="old">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 4.5 2.8 18a2 2 0 0 0 1.8 3h14.8a2 2 0 0 0 1.8-3L13.7 4.5a2 2 0 0 0-3.4 0Z"/></svg>
+    <p><strong>Coleta do INEA antiga.</strong> A última coleta é de {{ water_notice.oldest|date:"d/m/Y" }}, há {{ water_notice.age_days }} dias, acima de {{ water_notice.fresh_days }} dias. Nenhum posto fica verde até o INEA publicar uma coleta nova.</p>
+</div>
+{% endif %}
+{% if water_notice %}
+<div class="banner mode-banner" role="status" data-water-notice="source">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16M6 16l3-5 3 3 3-6 3 8"/><circle cx="18" cy="6" r="2"/></svg>
+    <p><strong>Água: dados reais do INEA.</strong> O INEA não mede por posto. Cada posto mostra o ponto de monitoramento do INEA mais próximo, não o posto exato.{% if water_notice.oldest %} Coleta de {{ water_notice.oldest|date:"d/m/Y" }}.{% endif %}</p>
+</div>
+{% endif %}
 {% endif %}

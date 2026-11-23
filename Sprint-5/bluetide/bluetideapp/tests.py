@@ -1,12 +1,15 @@
 import io
 import json
+import tempfile
 from dataclasses import replace
+from pathlib import Path
 from datetime import date, datetime, timedelta
 from unittest.mock import patch
 
 from django.test import Client, SimpleTestCase, override_settings
 from django.utils import timezone
 
+from .services import inea
 from .services.catalog import BEACH_POINTS
 from .services.providers import (
     ConditionsService,
@@ -205,7 +208,7 @@ class ProviderTests(SimpleTestCase):
         self.assertEqual(mocked_urlopen.call_count, 2)
         self.assertTrue(all(call.kwargs["timeout"] == 2 for call in mocked_urlopen.call_args_list))
 
-    @override_settings(BLUETIDE_DATA_MODE="live")
+    @override_settings(BLUETIDE_DATA_MODE="live", BLUETIDE_WATER_DATA_FILE=str(inea.WATER_FILE_PATH))
     def test_service_falls_back_without_raising_on_timeout(self):
         live_provider = type(
             "FailingProvider",
@@ -235,7 +238,7 @@ class ProviderTests(SimpleTestCase):
         self.assertIn("BLUETIDE_WATER_DATA_FILE", conditions.provider_error)
 
 
-@override_settings(BLUETIDE_DATA_MODE="fixture")
+@override_settings(BLUETIDE_DATA_MODE="demo")
 class ViewTests(SimpleTestCase):
     def setUp(self):
         self.client = Client(HTTP_HOST="127.0.0.1")
@@ -308,3 +311,134 @@ class ViewTests(SimpleTestCase):
         self.assertIn("map-pin-success", html)
         self.assertIn("map-pin-warning", html)
         self.assertIn("map-pin-danger", html)
+
+
+def inea_points(last_status="impropria", last_date=date(2026, 11, 18)):
+    point = {"praia": "Ipanema", "localizacao": "Em frente à Rua Joana Angélica"}
+    points = {
+        f"XX{n:03d}": {**point, "coletas": [(date(2026, 11, 11), "propria"), (last_date, "nao_realizada")]}
+        for n in range(30)
+    }
+    for code in ("AR000", "IP006", "IP010", "LB003"):
+        points[code] = {**point, "coletas": [(date(2026, 11, 11), "propria"), (last_date, last_status)]}
+    return points
+
+
+class IneaGeneratorTests(SimpleTestCase):
+    def test_history_link_is_found_by_year_text_and_href(self):
+        html = (
+            '<a href="/x/2026/11/barra_e_zona_sul_historico-3.pdf"> 2026 </a>'
+            '<a href="/x/2025/12/barra_e_zona_sul_historico2024.pdf">2024</a>'
+            '<a href="/x/outro.pdf">2026</a>'
+        )
+
+        self.assertEqual(inea.find_history_url(html, 2026), "/x/2026/11/barra_e_zona_sul_historico-3.pdf")
+        with self.assertRaises(inea.IneaError):
+            inea.find_history_url(html, 2030)
+
+    def test_postos_get_latest_valid_collection_of_their_inea_point(self):
+        postos_map = json.loads(inea.POINTS_MAP_PATH.read_text(encoding="utf-8"))
+
+        data = inea.build_water_data(inea_points(), postos_map, "https://inea.example/h.pdf")
+
+        water = data["points"]["ipanema-posto-9"]["water"]
+        self.assertEqual(water["inea_point"], "IP006")
+        self.assertEqual(water["status"], "impropria")
+        self.assertEqual(water["source"], "INEA, coleta de 18/11/2026")
+        self.assertEqual(set(data["points"]), {point.slug for point in BEACH_POINTS})
+
+    def test_not_performed_collection_falls_back_to_last_valid_one(self):
+        postos_map = json.loads(inea.POINTS_MAP_PATH.read_text(encoding="utf-8"))
+        points = inea_points()
+        points["IP006"]["coletas"].append((date(2026, 11, 20), "nao_realizada"))
+
+        data = inea.build_water_data(points, postos_map, "u")
+
+        self.assertEqual(data["points"]["ipanema-posto-8"]["water"]["collected_on"], "2026-11-18")
+
+    def test_guards_reject_suspicious_pdfs(self):
+        postos_map = json.loads(inea.POINTS_MAP_PATH.read_text(encoding="utf-8"))
+        points = inea_points()
+        with self.assertRaises(inea.IneaError):
+            inea.build_water_data({"AR000": points["AR000"]}, postos_map, "u")
+        del points["IP010"]
+        with self.assertRaises(inea.IneaError):
+            inea.build_water_data(points, postos_map, "u")
+
+    def test_failed_write_keeps_previous_file(self):
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder) / "agua.json"
+            target.write_text('{"ok": true}', encoding="utf-8")
+
+            with self.assertRaises(TypeError):
+                inea.write_atomic(target, {"bad": object()})
+
+            self.assertEqual(json.loads(target.read_text(encoding="utf-8")), {"ok": True})
+            self.assertEqual([p.name for p in Path(folder).iterdir()], ["agua.json"])
+
+    def test_committed_file_covers_every_posto_with_a_real_collection_date(self):
+        data = json.loads(inea.WATER_FILE_PATH.read_text(encoding="utf-8"))
+
+        self.assertEqual(set(data["points"]), {point.slug for point in BEACH_POINTS})
+        for point in data["points"].values():
+            date.fromisoformat(point["water"]["collected_on"])
+            self.assertTrue(point["water"]["source"].startswith("INEA, coleta de "))
+
+
+class IneaModeTests(SimpleTestCase):
+    @override_settings(BLUETIDE_DATA_MODE="live", BLUETIDE_WATER_DATA_FILE="/nonexistent/agua.json")
+    def test_missing_water_file_suspends_recommendation_without_crashing(self):
+        conditions = ConditionsService().get(BEACH_POINTS[1], now=NOW)
+
+        self.assertIn("INEA", conditions.provider_error)
+        self.assertFalse(recommend(conditions, "tranquilo", now=NOW).available)
+
+    def setUp(self):
+        self.client = Client(HTTP_HOST="127.0.0.1")
+        self.folder = tempfile.TemporaryDirectory()
+        self.addCleanup(self.folder.cleanup)
+        self.water_file = Path(self.folder.name) / "agua.json"
+        postos_map = json.loads(inea.POINTS_MAP_PATH.read_text(encoding="utf-8"))
+        self.payload = inea.build_water_data(inea_points(), postos_map, "u")
+        self.water_file.write_text(json.dumps(self.payload), encoding="utf-8")
+
+    def get(self, route, today):
+        failing = type("Offline", (), {"fetch": lambda *a, **k: (_ for _ in ()).throw(OSError("offline"))})()
+        with (
+            override_settings(BLUETIDE_DATA_MODE="live", BLUETIDE_WATER_DATA_FILE=str(self.water_file)),
+            patch("django.utils.timezone.now", return_value=today),
+            patch("bluetideapp.services.providers.OpenMeteoProvider", return_value=failing),
+        ):
+            return self.client.get(route)
+
+    def test_age_comes_from_the_real_collection_date(self):
+        provider = FixtureConditionsProvider(self.water_file)
+        for today, expected in ((datetime(2026, 11, 23, 9), 5), (datetime(2026, 11, 28, 22), 10)):
+            now = timezone.make_aware(today)
+            conditions = provider.fetch(BEACH_POINTS[1], now=now)
+            self.assertEqual(
+                (timezone.localtime(now).date() - timezone.localtime(conditions.water_observed_at).date()).days,
+                expected,
+            )
+
+    def test_notice_labels_source_and_nearest_point(self):
+        response = self.get("/praias/ipanema-posto-8/", timezone.make_aware(datetime(2026, 11, 23, 9)))
+
+        self.assertContains(response, "dados reais do INEA")
+        self.assertContains(response, "ponto de monitoramento do INEA mais próximo")
+        self.assertContains(response, "INEA, coleta de 18/11/2026")
+        self.assertContains(response, "Ponto IP006")
+        self.assertNotContains(response, "Modo demonstração")
+        self.assertNotContains(response, 'data-water-notice="old"')
+
+    def test_old_collection_is_flagged(self):
+        response = self.get("/web/", timezone.make_aware(datetime(2026, 11, 30, 9)))
+
+        self.assertContains(response, 'data-water-notice="old"')
+        self.assertContains(response, "Coleta do INEA antiga")
+
+    def test_expired_collection_is_flagged(self):
+        response = self.get("/web/", timezone.make_aware(datetime(2026, 12, 25, 9)))
+
+        self.assertContains(response, 'data-water-notice="expired"')
+        self.assertContains(response, "Coleta do INEA vencida")

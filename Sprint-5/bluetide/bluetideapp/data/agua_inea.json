@@ -1,0 +1,56 @@
+{
+  "generated_at": "2026-11-23T14:04:55+00:00",
+  "source_url": "https://www.inea.rj.gov.br/wp-content/uploads/2026/11/barra_e_zona_sul_historico-3.pdf",
+  "points": {
+    "ipanema-posto-7": {
+      "water": {
+        "status": "propria",
+        "collected_on": "2026-11-18",
+        "inea_point": "AR000",
+        "inea_location": "Canto esquerdo da praia",
+        "distance_m": 114,
+        "source": "INEA, coleta de 18/11/2026"
+      }
+    },
+    "ipanema-posto-8": {
+      "water": {
+        "status": "impropria",
+        "collected_on": "2026-11-18",
+        "inea_point": "IP006",
+        "inea_location": "Em frente à Rua Joana Angélica",
+        "distance_m": 479,
+        "source": "INEA, coleta de 18/11/2026"
+      }
+    },
+    "ipanema-posto-9": {
+      "water": {
+        "status": "impropria",
+        "collected_on": "2026-11-18",
+        "inea_point": "IP006",
+        "inea_location": "Em frente à Rua Joana Angélica",
+        "distance_m": 43,
+        "source": "INEA, coleta de 18/11/2026"
+      }
+    },
+    "ipanema-posto-10": {
+      "water": {
+        "status": "impropria",
+        "collected_on": "2026-11-18",
+        "inea_point": "IP010",
+        "inea_location": "Em frente à Rua Garcia D'Ávila",
+        "distance_m": 227,
+        "source": "INEA, coleta de 18/11/2026"
+      }
+    },
+    "ipanema-posto-11": {
+      "water": {
+        "status": "impropria",
+        "collected_on": "2026-11-18",
+        "inea_point": "LB003",
+        "inea_location": "Em frente à Rua Afrânio de Melo Franco",
+        "distance_m": 318,
+        "source": "INEA, coleta de 18/11/2026"
+      }
+    }
+  }
+}
