@@ -850,6 +850,10 @@ h3 {
     fill: var(--warning);
 }
 
+.map-pin-danger .map-pin-dot {
+    fill: var(--danger);
+}
+
 .map-pin-neutral .map-pin-dot {
     fill: var(--neutral);
 }
@@ -865,6 +869,29 @@ h3 {
 
 .map-pin:focus .map-pin-target {
     fill: rgba(6, 43, 66, 0.16);
+}
+
+.map-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1rem;
+    margin: 0.6rem 0 0;
+    padding: 0;
+    list-style: none;
+    color: var(--ink-700);
+    font-size: 0.8rem;
+}
+
+.map-legend li {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.map-legend-dot {
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
 }
 
 .map-summary {
@@ -1005,6 +1032,10 @@ h3 {
 
 .recommendation-warning {
     border-left: 4px solid var(--warning);
+}
+
+.recommendation-danger {
+    border-left: 4px solid var(--danger);
 }
 
 .recommendation-neutral {

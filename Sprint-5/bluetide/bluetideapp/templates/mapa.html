@@ -47,16 +47,24 @@
         </svg>
         <span class="map-label map-label-land">Ipanema</span>
         <span class="map-label map-label-water">Oceano Atlântico</span>
+        <ul class="map-legend" aria-label="Legenda das cores">
+            <li><span class="map-legend-dot" style="background: var(--success);"></span>Recomendado</li>
+            <li><span class="map-legend-dot" style="background: var(--warning);"></span>Atenção</li>
+            <li><span class="map-legend-dot" style="background: var(--danger);"></span>Evite o banho</li>
+            <li><span class="map-legend-dot" style="background: var(--neutral);"></span>Sem recomendação</li>
+        </ul>
     </section>
 
     <aside class="map-summary" aria-label="Pontos ordenados pela recomendação">
         <div class="card">
             <p class="eyebrow">Leitura do mapa</p>
             <h2>Melhores para você</h2>
-            <p class="small muted" style="margin-bottom: 0;">A ordem considera primeiro a disponibilidade e a segurança dos dados, depois sua preferência.</p>
+            <p class="small muted" style="margin-bottom: 0;">A cor vem da qualidade da água e da chuva. Seu perfil só desempata pontos da mesma cor.</p>
         </div>
-        {% for item in items|slice:":2" %}
+        {% for item in best %}
             {% include "_beach_card.html" %}
+        {% empty %}
+        <div class="card"><p class="small muted" style="margin: 0;">Nenhum ponto recomendável agora. Veja os motivos em cada ponto.</p></div>
         {% endfor %}
         <a class="button-secondary" href="{% url 'pesquisa' %}?perfil={{ profile }}">Ver os 5 pontos</a>
     </aside>

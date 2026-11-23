@@ -33,6 +33,10 @@ class Conditions:
     wind_speed: float | None
     origin: str
     provider_error: str | None = None
+    rain_1h: float | None = None
+    rain_observed_at: datetime | None = None
+    rain_quality: str | None = None
+    high_tide: bool | None = None
 
 
 class FixtureConditionsProvider:
@@ -63,6 +67,10 @@ class FixtureConditionsProvider:
             rain_24h=self._number(marine.get("rain_24h")),
             wind_speed=self._number(marine.get("wind_speed")),
             origin="fixture",
+            rain_1h=self._number(marine.get("rain_1h")),
+            rain_observed_at=self._relative_time(now, self._minutes_to_hours(marine.get("age_minutes"))),
+            rain_quality=marine.get("rain_quality"),
+            high_tide=marine.get("high_tide"),
         )
 
     @staticmethod
@@ -94,6 +102,9 @@ class OpenMeteoProvider:
                 "latitude": beach.latitude,
                 "longitude": beach.longitude,
                 "current": "wave_height,wave_period,sea_surface_temperature,sea_level_height_msl",
+                "hourly": "sea_level_height_msl",
+                "past_days": 1,
+                "forecast_days": 1,
                 "timezone": "America/Sao_Paulo",
             },
         )
@@ -102,7 +113,7 @@ class OpenMeteoProvider:
             {
                 "latitude": beach.latitude,
                 "longitude": beach.longitude,
-                "current": "temperature_2m,wind_speed_10m",
+                "current": "temperature_2m,wind_speed_10m,precipitation",
                 "hourly": "precipitation",
                 "past_days": 1,
                 "forecast_days": 1,
@@ -124,6 +135,10 @@ class OpenMeteoProvider:
             wind_speed=self._number(weather_current.get("wind_speed_10m")),
             origin="live",
             provider_error=None,
+            rain_1h=self._number(weather_current.get("precipitation")),
+            rain_observed_at=self._parse_time(weather_current.get("time")) or now,
+            rain_quality="modelada",
+            high_tide=self._is_high_tide(marine, marine_current),
         )
 
     def _request_json(self, base_url: str, params: dict[str, Any]) -> dict[str, Any]:
@@ -132,6 +147,25 @@ class OpenMeteoProvider:
             if response.status != 200:
                 raise RuntimeError(f"Open-Meteo respondeu HTTP {response.status}")
             return json.load(response)
+
+    @classmethod
+    def _is_high_tide(cls, marine: dict[str, Any], current: dict[str, Any]) -> bool | None:
+        """Alta quando está no quarto mais alto da variação de 12 h antes a 12 h depois."""
+        now_level = cls._number(current.get("sea_level_height_msl"))
+        hourly = marine.get("hourly", {})
+        current_time = cls._parse_time(current.get("time"))
+        times, levels = hourly.get("time", []), hourly.get("sea_level_height_msl", [])
+        if now_level is None or current_time is None or len(times) != len(levels):
+            return None
+        window = [
+            float(level)
+            for raw_time, level in zip(times, levels, strict=True)
+            if level is not None
+            and abs(cls._parse_time(raw_time) - current_time) <= timedelta(hours=12)
+        ]
+        if len(window) < 12 or max(window) == min(window):
+            return None
+        return now_level >= min(window) + 0.75 * (max(window) - min(window))
 
     @classmethod
     def _rain_last_24_hours(cls, payload: dict[str, Any], now: datetime) -> float | None:

@@ -23,7 +23,7 @@
 <div class="comparison-grid">
     {% for item in items %}
     {% with c=item.conditions r=item.recommendation %}
-    <article class="card comparison-card {% if forloop.first and r.available %}is-best{% endif %}">
+    <article class="card comparison-card {% if forloop.first and r.recommendable %}is-best{% endif %}">
         <div><p class="eyebrow">{{ c.beach.neighborhood }}</p><h2>{{ c.beach.posto }}</h2><p class="small muted">{{ c.beach.summary }}</p></div>
         <div class="recommendation recommendation-{{ r.tone }}"><span class="badge badge-{{ r.tone }}">{{ r.label }}</span><p>{{ r.summary }}</p></div>
         <div class="compare-row"><span>Qualidade</span><strong>{{ item.water_label }}</strong></div>
@@ -40,6 +40,6 @@
 <div class="card" style="margin-top: 1rem;">
     <p class="eyebrow">Decisão do Pedro</p>
     <h2>O primeiro ponto disponível é a melhor correspondência</h2>
-    <p class="muted">A ordem nunca coloca um ponto sem boletim, com dado vencido ou com campo essencial ausente acima de uma alternativa comparável.</p>
+    <p class="muted">A ordem nunca coloca um ponto de cor pior (amarelo ou vermelho) acima de uma alternativa de cor melhor; o perfil só desempata.</p>
 </div>
 {% endblock %}
