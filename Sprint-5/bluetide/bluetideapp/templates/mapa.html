@@ -37,7 +37,7 @@
             <path d="M120 2100 C760 2010 1330 2170 1940 2070 S3190 2000 3780 2110 M80 2540 C820 2440 1430 2610 2130 2490 S3260 2410 3820 2530" fill="none" stroke="#ffffff" stroke-opacity=".32" stroke-width="25" />
             {% for item in items %}
             {% with c=item.conditions r=item.recommendation %}
-            <a class="map-pin map-pin-{{ r.tone }}" href="{% url 'detalhes_praia' c.beach.slug %}?perfil={{ profile }}" aria-label="{{ c.beach.display_name }}: {{ r.label }}" focusable="true">
+            <a class="map-pin map-pin-{{ r.tone }}" href="{% url 'detalhes_praia' c.beach.slug %}?perfil={{ profile }}" aria-label="{{ c.beach.display_name }}: {{ r.label }}, {{ r.confidence_label|lower }}" focusable="true">
                 <circle class="map-pin-target" cx="{{ c.beach.map_x }}" cy="{{ c.beach.map_y }}" r="230" />
                 <circle class="map-pin-dot" cx="{{ c.beach.map_x }}" cy="{{ c.beach.map_y }}" r="125" />
                 <text x="{{ c.beach.map_x }}" y="{{ c.beach.map_y }}">{{ c.beach.posto|slice:"6:" }}</text>
@@ -59,7 +59,7 @@
         <div class="card">
             <p class="eyebrow">Leitura do mapa</p>
             <h2>Melhores para você</h2>
-            <p class="small muted" style="margin-bottom: 0;">A cor vem da qualidade da água e da chuva. Seu perfil só desempata pontos da mesma cor.</p>
+            <p class="small muted" style="margin-bottom: 0;">A cor vem da água, da chuva e da maré. Seu perfil só desempata pontos da mesma cor.</p>
         </div>
         {% for item in best %}
             {% include "_beach_card.html" %}

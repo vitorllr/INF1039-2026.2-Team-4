@@ -21,6 +21,7 @@
 
     <div class="recommendation recommendation-{{ r.tone }}">
         <span class="badge badge-{{ r.tone }}">{{ r.label }}</span>
+        <span class="confidence-note">{{ r.confidence_label }}</span>
         <p>{{ r.summary }}</p>
         {% if r.confidence %}<p class="small muted">{{ r.confidence_label }}</p>{% endif %}
     </div>
