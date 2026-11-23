@@ -142,15 +142,13 @@ class RecommendationTests(SimpleTestCase):
 
         self.assertEqual([i["conditions"].beach.posto for i in rank(items)], ["Posto 8", "Posto 11"])
 
-    def test_map_positions_follow_geographic_coordinates(self):
+    def test_catalog_points_run_west_to_east_inside_ipanema(self):
         points_west_to_east = sorted(BEACH_POINTS, key=lambda point: point.longitude)
-        points_north_to_south = sorted(BEACH_POINTS, key=lambda point: point.latitude, reverse=True)
 
         self.assertEqual([point.posto for point in points_west_to_east], ["Posto 11", "Posto 10", "Posto 9", "Posto 8", "Posto 7"])
-        self.assertEqual(sorted(point.map_x for point in points_west_to_east), [point.map_x for point in points_west_to_east])
-        self.assertEqual(sorted(point.map_y for point in points_north_to_south), [point.map_y for point in points_north_to_south])
-        self.assertLess(max(point.map_y for point in BEACH_POINTS) - min(point.map_y for point in BEACH_POINTS), 300)
-        self.assertGreater(max(point.map_x for point in BEACH_POINTS) - min(point.map_x for point in BEACH_POINTS), 2700)
+        for point in BEACH_POINTS:
+            self.assertTrue(-23.0 < point.latitude < -22.97)
+            self.assertTrue(-43.23 < point.longitude < -43.18)
 
 
 class FakeResponse(io.BytesIO):
@@ -287,24 +285,29 @@ class ViewTests(SimpleTestCase):
         self.assertContains(response, "Modo demonstração")
         self.assertContains(response, "Nenhum dado é apresentado como leitura oficial ao vivo")
 
-    def test_map_identifies_approximate_coast_and_places_pins_from_coordinates(self):
-        response = self.client.get("/web/")
+    def test_map_embeds_real_coordinates_and_recommendation_for_every_point(self):
+        response = self.client.get("/web/", {"perfil": "surf"})
 
-        self.assertContains(response, "não é mapa de navegação")
-        for point in BEACH_POINTS:
-            self.assertContains(response, f'cx="{point.map_x}" cy="{point.map_y}"')
+        points = response.context["map_points"]
+        self.assertCountEqual([p["slug"] for p in points], [b.slug for b in BEACH_POINTS])
+        by_slug = {p["slug"]: p for p in points}
+        for beach in BEACH_POINTS:
+            point = by_slug[beach.slug]
+            self.assertEqual((point["lat"], point["lng"]), (beach.latitude, beach.longitude))
+            self.assertEqual(point["posto"], beach.posto.removeprefix("Posto "))
+            self.assertEqual(point["url"], f"/praias/{beach.slug}/?perfil=surf")
+        for item in response.context["items"]:
+            point = by_slug[item["conditions"].beach.slug]
+            self.assertEqual(point["tone"], item["recommendation"].tone)
+            self.assertEqual(point["label"], item["recommendation"].label)
+        self.assertContains(response, 'id="map-points"')
+        self.assertContains(response, "leaflet@1.9.4")
+        self.assertContains(response, "data-map-notice")
 
     def test_map_shows_red_pin_legend_and_only_recommendable_points_as_best(self):
         response = self.client.get("/web/")
 
-        self.assertContains(response, "map-pin-danger")
+        self.assertTrue({"success", "warning", "danger"} <= {p["tone"] for p in response.context["map_points"]})
         self.assertContains(response, "Evite o banho")
         self.assertContains(response, "Legenda das cores")
         self.assertEqual(response.content.decode().count("beach-card-head"), 2)
-
-    def test_map_pin_color_tracks_recommendation_color(self):
-        html = self.client.get("/web/").content.decode()
-
-        self.assertIn("map-pin-success", html)
-        self.assertIn("map-pin-warning", html)
-        self.assertIn("map-pin-danger", html)
