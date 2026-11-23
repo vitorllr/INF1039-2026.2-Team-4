@@ -1,6 +1,6 @@
 import json
 from dataclasses import dataclass, replace
-from datetime import datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
@@ -37,14 +37,19 @@ class Conditions:
     rain_observed_at: datetime | None = None
     rain_quality: str | None = None
     high_tide: bool | None = None
+    water_point: str | None = None
+
+
+def is_demo_mode() -> bool:
+    return settings.BLUETIDE_DATA_MODE in ("demo", "fixture")
 
 
 class FixtureConditionsProvider:
-    """Reads deterministic samples or a production-supplied bulletin file."""
+    """Reads the demo fixture, or a water-quality file such as the INEA one."""
 
     def __init__(self, path: str | Path | None = None):
         default_path = Path(__file__).resolve().parent.parent / "fixtures" / "conditions.json"
-        self.path = Path(path or settings.BLUETIDE_WATER_DATA_FILE or default_path)
+        self.path = Path(path or default_path)
 
     def fetch(self, beach: BeachPoint, now: datetime | None = None) -> Conditions:
         now = now or timezone.now()
@@ -56,7 +61,7 @@ class FixtureConditionsProvider:
         return Conditions(
             beach=beach,
             water_status=water.get("status"),
-            water_observed_at=self._relative_time(now, water.get("age_hours")),
+            water_observed_at=self._water_observed_at(now, water),
             water_source=water.get("source", "Boletim não informado"),
             marine_observed_at=self._relative_time(now, self._minutes_to_hours(marine.get("age_minutes"))),
             wave_height=self._number(marine.get("wave_height")),
@@ -71,7 +76,28 @@ class FixtureConditionsProvider:
             rain_observed_at=self._relative_time(now, self._minutes_to_hours(marine.get("age_minutes"))),
             rain_quality=marine.get("rain_quality"),
             high_tide=marine.get("high_tide"),
+            water_point=self._water_point(water),
         )
+
+    @classmethod
+    def _water_observed_at(cls, now: datetime, water: dict[str, Any]) -> datetime | None:
+        collected_on = water.get("collected_on")
+        if collected_on:
+            midnight = datetime.combine(date.fromisoformat(collected_on), time.min)
+            return timezone.make_aware(midnight, timezone.get_current_timezone())
+        return cls._relative_time(now, water.get("age_hours"))
+
+    @staticmethod
+    def _water_point(water: dict[str, Any]) -> str | None:
+        if not water.get("inea_point"):
+            return None
+        location = water.get("inea_location", "").strip()
+        distance = water.get("distance_m")
+        parts = [f"ponto {water['inea_point']}"]
+        if location:
+            parts.append(location[:1].lower() + location[1:])
+        text = ", ".join(parts)
+        return f"{text} (cerca de {distance} m do posto)" if distance else text
 
     @staticmethod
     def _relative_time(now: datetime, age_hours: float | None) -> datetime | None:
@@ -202,13 +228,34 @@ class OpenMeteoProvider:
 
 class ConditionsService:
     def __init__(self, fixture_provider=None, live_provider=None):
-        self.fixture_provider = fixture_provider or FixtureConditionsProvider()
+        if fixture_provider is None:
+            path = None if is_demo_mode() else settings.BLUETIDE_WATER_DATA_FILE
+            fixture_provider = FixtureConditionsProvider(path)
+        self.fixture_provider = fixture_provider
         self.live_provider = live_provider or OpenMeteoProvider()
 
     def get(self, beach: BeachPoint, now: datetime | None = None) -> Conditions:
         now = now or timezone.now()
-        base = self.fixture_provider.fetch(beach, now=now)
-        if settings.BLUETIDE_DATA_MODE != "live":
+        try:
+            base = self.fixture_provider.fetch(beach, now=now)
+        except (OSError, ValueError, KeyError) as exc:
+            return Conditions(
+                beach=beach,
+                water_status=None,
+                water_observed_at=None,
+                water_source="Dados do INEA indisponíveis",
+                marine_observed_at=None,
+                wave_height=None,
+                wave_period=None,
+                sea_temperature=None,
+                sea_level=None,
+                air_temperature=None,
+                rain_24h=None,
+                wind_speed=None,
+                origin="fallback",
+                provider_error=f"Arquivo de água do INEA indisponível: {exc}",
+            )
+        if is_demo_mode():
             return base
         cached = _LIVE_CACHE.get(beach.slug)
         if cached and now - cached[0] < timedelta(seconds=settings.BLUETIDE_DATA_CACHE_SECONDS):

@@ -6,8 +6,15 @@ from django.shortcuts import render
 from django.utils import timezone
 
 from .services.catalog import BEACH_POINTS, BEACH_POINTS_BY_SLUG
-from .services.providers import ConditionsService
-from .services.recommendations import PROFILE_LABELS, normalize_profile, rank, recommend
+from .services.providers import ConditionsService, is_demo_mode
+from .services.recommendations import (
+    FRESH_WATER_DAYS,
+    MAX_WATER_DAYS,
+    PROFILE_LABELS,
+    normalize_profile,
+    rank,
+    recommend,
+)
 
 
 FAVORITE_SLUGS = {"ipanema-posto-8", "ipanema-posto-9", "ipanema-posto-10"}
@@ -31,6 +38,27 @@ def _status_presentation(status):
         "propria": ("Água própria", "success"),
         "impropria": ("Água imprópria", "danger"),
     }.get(status, ("Sem boletim", "neutral"))
+
+
+def _water_notice(items, now):
+    """Idade da coleta mais antiga do INEA, classificada pela regra da Sprint 9."""
+    observed = [
+        item["conditions"].water_observed_at
+        for item in items
+        if item["conditions"].water_observed_at is not None
+    ]
+    notice = {"fresh_days": FRESH_WATER_DAYS, "max_days": MAX_WATER_DAYS}
+    if not observed:
+        return {**notice, "level": "expired", "age_days": None}
+    oldest = timezone.localtime(min(observed))
+    age_days = (timezone.localtime(now).date() - oldest.date()).days
+    if age_days > MAX_WATER_DAYS:
+        level = "expired"
+    elif age_days > FRESH_WATER_DAYS:
+        level = "old"
+    else:
+        level = "fresh"
+    return {**notice, "level": level, "age_days": age_days, "oldest": oldest}
 
 
 def _dataset(request):
@@ -68,7 +96,8 @@ def _dataset(request):
         "profile_label": PROFILE_LABELS[profile],
         "profiles": PROFILE_LABELS,
         "data_mode": settings.BLUETIDE_DATA_MODE,
-        "is_demo": settings.BLUETIDE_DATA_MODE != "live",
+        "is_demo": is_demo_mode(),
+        "water_notice": None if is_demo_mode() else _water_notice(items, now),
         "data_errors": data_errors,
     }
 

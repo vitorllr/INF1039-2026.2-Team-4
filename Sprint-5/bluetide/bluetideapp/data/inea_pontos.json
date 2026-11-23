@@ -1,0 +1,10 @@
+{
+  "criterio": "Ponto de monitoramento do INEA mais proximo de cada posto, estimado por distancia. O INEA nao monitora por posto.",
+  "postos": {
+    "ipanema-posto-7": {"ponto": "AR000", "distancia_m": 114},
+    "ipanema-posto-8": {"ponto": "IP006", "distancia_m": 479},
+    "ipanema-posto-9": {"ponto": "IP006", "distancia_m": 43},
+    "ipanema-posto-10": {"ponto": "IP010", "distancia_m": 227},
+    "ipanema-posto-11": {"ponto": "LB003", "distancia_m": 318}
+  }
+}

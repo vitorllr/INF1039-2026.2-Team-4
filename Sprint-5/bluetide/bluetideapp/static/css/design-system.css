@@ -764,6 +764,10 @@ h3 {
     margin-bottom: 1rem;
 }
 
+.detail-hero + .mode-banner {
+    margin-top: 1rem;
+}
+
 .map-layout {
     display: grid;
     min-width: 0;
@@ -1195,6 +1199,11 @@ h3 {
     padding-top: 0.65rem;
     border-top: 1px solid var(--line);
     font-size: 0.82rem;
+}
+
+.source-row strong {
+    flex: none;
+    white-space: nowrap;
 }
 
 .source-row span:last-child {

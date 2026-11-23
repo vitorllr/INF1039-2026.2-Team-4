@@ -32,7 +32,7 @@ O arquivo tem resolução de 1280 por 720 pixels, usa H.264 e não contém crede
 ## Regeneração
 
 ```bash
-BLUETIDE_DATA_MODE=fixture python manage.py runserver 127.0.0.1:8765
+BLUETIDE_DATA_MODE=demo python manage.py runserver 127.0.0.1:8765
 pip install -r requirements-demo.txt
 python -m playwright install ffmpeg
 python scripts/record_demo.py
