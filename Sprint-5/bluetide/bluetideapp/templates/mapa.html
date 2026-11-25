@@ -19,7 +19,7 @@
         <p class="eyebrow">Perfil de hoje</p>
         <h2>{{ profile_label }}</h2>
     </div>
-    <div class="profile-selector" aria-label="Escolher perfil de recomendação">
+    <div class="profile-selector" role="group" aria-label="Escolher perfil de recomendação">
         {% for value, label in profiles.items %}
         <a class="profile-link {% if profile == value %}is-active{% endif %}" href="?perfil={{ value }}">{{ label }}</a>
         {% endfor %}
